@@ -1,12 +1,45 @@
-
-
 from .base import BasePlugin
 import subprocess
+import platform
+
 
 class BasicPlugin(BasePlugin):
 
-    def windows(self):
+    def os_platform(self):
+        """
+        获取系统平台
+        :return:
+        """
+        return platform.system()
+
+    def os_hostname(self):
+        """
+        獲取電腦名稱
+        :return:
+        """
+
         pass
+
+    def windows(self):
+        import win32com
+        import wmi
+        wmi_obj = wmi.WMI()
+        # wmi_service_obj = win32com.client.Dispatch("WbemScripting.SWbemLocator")
+        # wmi_service_connector = self.wmi_service_obj.ConnectServer(".", "root\cimv2")
+
+        computer_info = wmi_obj.Win32_ComputerSystem()[0]
+        system_info = wmi_obj.Win32_OperatingSystem()[0]
+        data = {}
+        data['manufactory'] = computer_info.Manufacturer
+        data['model'] = computer_info.Model
+        data['wake_up_type'] = computer_info.WakeUpType
+        data['sn'] = system_info.SerialNumber
+
+        data['os_type'] = platform.system(),
+        data['os_release'] = "%s %s  %s " % (platform.release(), platform.architecture()[0], platform.version()),
+        data['os_distribution'] = 'Microsoft'
+
+        return data
 
     def linux(self):
         filter_keys = ['Manufacturer', 'Serial Number', 'Product Name', 'UUID', 'Wake-up Type']
@@ -35,18 +68,12 @@ class BasicPlugin(BasePlugin):
         data['uuid'] = raw_data['UUID']
         data['wake_up_type'] = raw_data['Wake-up Type']
 
-        distributor = subprocess.getoutput(" lsb_release -a|grep 'Distributor ID'").split(":")
+        distributor = subprocess.getoutput("lsb_release -a|grep 'Distributor ID'").split("\t")[1]
         # release  = subprocess.check_output(" lsb_release -a|grep Description",shell=True).split(":")
-        release = subprocess.getoutput(" lsb_release -a|grep Description").split(":")
-        data['os_distribution'] = distributor[1].strip() if len(distributor) > 1 else None
-        data['os_release'] = release[1].strip() if len(release) > 1 else None,
-        data['os_type'] = "linux"
-
+        release = subprocess.getoutput("lsb_release -a|grep Description").split("\t")[1]
+        data['os_distribution'] = distributor
+        data['os_release'] = release
+        data['os_type'] = platform.system()
+        data['node'] = platform.node()
 
         return data
-
-
-
-
-
-
