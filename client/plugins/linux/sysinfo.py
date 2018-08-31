@@ -26,7 +26,7 @@ def collect():
             print(e)
             raw_data[key] = -2  # means cmd went wrong
 
-    data = {"asset_type": 'server'}
+    data = {"asset_type": 'host'}
     data['manufactory'] = raw_data['Manufacturer']
     data['sn'] = raw_data['Serial Number']
     data['model'] = raw_data['Product Name']

@@ -10,6 +10,28 @@ Windows 使用Wmi
 https://www.activexperts.com/admin/scripts/wmi/python/
 
 
+
+Node
+
+- ssh
+    
+    ```
+    paramiko
+    ```
+    
+- agent
+
+    ```
+    shell command
+    ```
+
+- salt
+
+
+
+
+
+
 Linux
 
 - memory
@@ -52,9 +74,9 @@ client
 ├─bin 執行目錄
 ├─conf 設定檔
 ├─core
-├─file
-├─log
-├─src
+├─lib 公共區(重複代碼)
+├─log 日誌
+├─src 業務邏輯，
 └─test
 ```
 
