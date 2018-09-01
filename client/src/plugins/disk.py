@@ -1,16 +1,32 @@
 
 
 from .base import BasePlugin
-import subprocess
+
 
 
 class DiskPlugin(BasePlugin):
 
     def windows(self):
-        pass
+        data = []
+        for disk in self.wmi_obj.Win32_DiskDrive():
+            item_data = {}
+            iface_choices = ["SAS", "SCSI", "SATA", "SSD"]
+            for iface in iface_choices:
+                if iface in disk.Model:
+                    item_data['iface_type'] = iface
+                    break
+            else:
+                item_data['iface_type'] = 'unknown'
+            item_data['slot'] = disk.Index
+            item_data['sn'] = disk.SerialNumber
+            item_data['model'] = disk.Model
+            item_data['manufactory'] = disk.Manufacturer
+            item_data['capacity'] = int(disk.Size) / (1024 * 1024 * 1024)
+            data.append(item_data)
+        return data
 
     def linux(self):
-        disks = subprocess.getoutput("sudo /sbin/fdisk -l|grep Disk|egrep -v 'identifier|mapper|Disklabel'")
+        disks = self.exec_shell_cmd("sudo /sbin/fdisk -l|grep Disk|egrep -v 'identifier|mapper|Disklabel'")
         # print(disks)
         disks = disks.split("\n")
         disk_list = []
@@ -26,7 +42,7 @@ class DiskPlugin(BasePlugin):
             data['disk_size'] = disk_size.strip().split(" ")[0]
             # print(disk_size.strip().split(" ")[0])
 
-            detail = subprocess.getoutput("sudo hdparm -i %s | grep Model" % driver)
+            detail = self.exec_shell_cmd("sudo hdparm -i %s | grep Model" % driver)
             # print(detail)
 
             for i in detail.split(','):

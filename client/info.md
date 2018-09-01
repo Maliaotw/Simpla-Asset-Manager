@@ -11,6 +11,24 @@ https://www.activexperts.com/admin/scripts/wmi/python/
 
 
 
+Module
+
+- Windows
+
+    ```
+    wmi
+    win32
+    ```
+
+- Linux
+
+    ```
+    paramiko
+    
+    
+    ```
+
+
 Node
 
 - ssh
@@ -27,6 +45,9 @@ Node
 
 - salt
 
+    ```
+    
+    ```
 
 
 

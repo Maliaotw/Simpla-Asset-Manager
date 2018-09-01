@@ -10,7 +10,7 @@ class MemPlugin(BasePlugin):
 
     def linux(self):
         # raw_data = subprocess.check_output(["sudo", "dmidecode" ,"-t", "17"])
-        raw_data = subprocess.getoutput("sudo dmidecode -t 17")
+        raw_data = self.exec_shell_cmd("sudo dmidecode -t 17")
         raw_list = raw_data.split("\n")
         raw_ram_list = []
         item_list = []
@@ -60,7 +60,7 @@ class MemPlugin(BasePlugin):
 
         # get total size(mb) of ram as well
         # raw_total_size = subprocess.check_output(" cat /proc/meminfo|grep MemTotal ",shell=True).split(":")
-        raw_total_size = subprocess.getoutput("cat /proc/meminfo|grep MemTotal ").split(":")
+        raw_total_size = self.exec_shell_cmd("cat /proc/meminfo|grep MemTotal ").split(":")
         ram_data = {'ram': ram_list}
         if len(raw_total_size) == 2:  # correct
 

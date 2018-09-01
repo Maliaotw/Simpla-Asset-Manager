@@ -15,7 +15,7 @@ from src import plugins
 from lib.log import Logger
 from conf import settings
 from concurrent.futures import ThreadPoolExecutor
-
+import subprocess
 
 class AutoBase(object):
     def __init__(self):
@@ -54,8 +54,15 @@ class AutoBase(object):
 
 
 class AutoAgent(AutoBase):
-    def __init__(self):
-        pass
+
+
+
+    def shell_cmd(self,cmd):
+        '''
+        分別以此根據模式進行調用
+        :return:
+        '''
+        return subprocess.getoutput(cmd)
 
 
     def process(self):
@@ -69,9 +76,21 @@ class AutoAgent(AutoBase):
 
 
 class AutoSSH(AutoBase):
-    pass
+
+    def shell_cmd(self):
+        '''
+        分別以此根據模式進行調用
+        :return:
+        '''
+        pass
 
 class AutoSalt(AutoBase):
-    pass
+
+    def shell_cmd(self):
+        '''
+        分別以此根據模式進行調用
+        :return:
+        '''
+        pass
 
 

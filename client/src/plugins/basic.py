@@ -1,5 +1,4 @@
 from .base import BasePlugin
-import subprocess
 import platform
 
 
@@ -48,7 +47,7 @@ class BasicPlugin(BasePlugin):
         for key in filter_keys:
             try:
                 # cmd_res = subprocess.check_output("sudo dmidecode -t system|grep '%s'" %key,shell=True)
-                cmd_res = subprocess.getoutput("sudo dmidecode -t system|grep '%s'" % key)
+                cmd_res = self.exec_shell_cmd("sudo dmidecode -t system|grep '%s'" % key)
                 cmd_res = cmd_res.strip()
 
                 res_to_list = cmd_res.split(':')
@@ -68,9 +67,9 @@ class BasicPlugin(BasePlugin):
         data['uuid'] = raw_data['UUID']
         data['wake_up_type'] = raw_data['Wake-up Type']
 
-        distributor = subprocess.getoutput("lsb_release -a|grep 'Distributor ID'").split("\t")[1]
+        distributor = self.exec_shell_cmd("lsb_release -a|grep 'Distributor ID'").split("\t")[1]
         # release  = subprocess.check_output(" lsb_release -a|grep Description",shell=True).split(":")
-        release = subprocess.getoutput("lsb_release -a|grep Description").split("\t")[1]
+        release = self.exec_shell_cmd("lsb_release -a|grep Description").split("\t")[1]
         data['os_distribution'] = distributor
         data['os_release'] = release
         data['os_type'] = platform.system()
