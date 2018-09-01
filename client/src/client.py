@@ -56,15 +56,6 @@ class AutoBase(object):
 class AutoAgent(AutoBase):
 
 
-
-    def shell_cmd(self,cmd):
-        '''
-        分別以此根據模式進行調用
-        :return:
-        '''
-        return subprocess.getoutput(cmd)
-
-
     def process(self):
         """
         获取当前资产信息
@@ -77,20 +68,11 @@ class AutoAgent(AutoBase):
 
 class AutoSSH(AutoBase):
 
-    def shell_cmd(self):
-        '''
-        分別以此根據模式進行調用
-        :return:
-        '''
         pass
 
 class AutoSalt(AutoBase):
 
-    def shell_cmd(self):
-        '''
-        分別以此根據模式進行調用
-        :return:
-        '''
+
         pass
 
 
