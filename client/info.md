@@ -25,26 +25,32 @@ Module
     ```
     paramiko
     salt
-    
     ```
 
 
 Node
 
+
+- agent
+
+    本地採集資產
+    ```
+    shell command
+    ```
+    
+    
 - ssh
     
+    僅支持遠程採集資產，必須有主機名
     ```
     paramiko
     ```
     
-- agent
 
-    ```
-    shell command
-    ```
 
 - salt
 
+    僅支持遠程採集資產，必須有主機名
     ```
     
     ```
@@ -101,6 +107,8 @@ client
 └─test
 ```
 
+
+test1
 
 
 
