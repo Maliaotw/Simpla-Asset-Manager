@@ -2,6 +2,8 @@
 MODE = 'agent'
 
 
+API_URL = "http://127.0.0.1:8000/api/asset"
+
 KEY = "mdfmsijfiosdjoidfjdf"
 
 AUTH_KEY_NAME = "auth-key"

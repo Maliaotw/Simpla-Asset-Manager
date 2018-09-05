@@ -17,12 +17,21 @@ from conf import settings
 from concurrent.futures import ThreadPoolExecutor
 import subprocess
 
+
 class AutoBase(object):
     def __init__(self):
         pass
 
     def auth_key(self):
-        pass
+        current_time = time.time()
+        app_id = settings.KEY
+        app_id_time = "%s|%s" % (app_id, current_time)
+
+        m = hashlib.md5()
+        m.update(bytes(app_id_time, encoding='utf-8'))
+        authkey = m.hexdigest()
+        authkey_time = "%s|%s" % (authkey, current_time)
+        return authkey_time
 
     def get_asset(self):
         pass
@@ -34,7 +43,15 @@ class AutoBase(object):
         :param callback:
         :return:
         """
-        pass
+
+        authkey = self.auth_key()
+
+        r = requests.post(
+            url=settings.API_URL,
+            json=json.dumps(msg),
+            headers={settings.AUTH_KEY_NAME: authkey}
+        )
+        print(r.text)
 
     def process(self):
         """
@@ -55,7 +72,6 @@ class AutoBase(object):
 
 class AutoAgent(AutoBase):
 
-
     def process(self):
         """
         获取当前资产信息
@@ -63,16 +79,14 @@ class AutoAgent(AutoBase):
         :return:
         """
         server_info = plugins.get_server_info()
-        print(server_info)
+        # print(server_info)
+        self.post_asset(server_info)
+
 
 
 class AutoSSH(AutoBase):
+    pass
 
-        pass
 
 class AutoSalt(AutoBase):
-
-
-        pass
-
-
+    pass

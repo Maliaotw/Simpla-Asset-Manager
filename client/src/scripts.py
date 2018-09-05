@@ -14,4 +14,5 @@ def client():
         cli = AutoSalt()
     else:
         raise Exception('请配置资产采集模式，如：ssh、agent、salt')
+
     cli.process()
