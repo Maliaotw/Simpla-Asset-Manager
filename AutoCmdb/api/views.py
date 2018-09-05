@@ -11,14 +11,12 @@ auth_list = []
 @csrf_exempt
 def asset(request):
 
-
-    # print(request.POST)
-    # print(request.body)
     if request.method == 'POST':
 
-        auth_key_time = request.META["HTTP_AUTHKEY"]
+        print(request.META)
+        auth_key_time = request.META["HTTP_AUTH_KEY"]
 
-        auth_key,client_ctime = auth_key_time.split("|")
+        auth_key_client,client_ctime = auth_key_time.split("|")
         server_current_time = time.time()
         if server_current_time-30 > float(client_ctime):
             # 太久遠
@@ -27,32 +25,19 @@ def asset(request):
             # 已經訪問過
             return HttpResponse("你來晚了")
 
+        # 開始驗證
+
+        key_time = "%s|%s" % (ck,client_ctime)
+        m = hashlib.md5()
+        m.update(bytes(key_time, encoding='utf-8'))
+        authkey = m.hexdigest()
 
 
+        if authkey != auth_key_client:
+            return HttpResponse("授權失敗")
+        auth_list.append(auth_key_time)
 
-        # key_time = "%s|%s" % (ck,client_ctime)
+        print("auth_list",auth_list)
 
-
-        #
-        # m = hashlib.md5()
-        # m.update(bytes(key_time, encoding='utf-8'))
-        # authkey = m.hexdigest()
-        #
-        # host_info = json.loads(str(request.body,encoding='utf8'))
-        # if request.META['HTTP_AUTHKEY'] == ck:
-        #     ret = '...'
-        # else:
-        #     ret = "驗證失敗"
-        #
-        #
-        # print(host_info)
-
-        return HttpResponse("")
-
-
-
-
-
-
-
+        return HttpResponse("成功")
 

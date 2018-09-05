@@ -42,7 +42,6 @@ data = {
              {'manufactory': '(标准磁盘驱动器)', 'capacity': 465.7593083381653, 'slot': 0, 'sn': '           544TC4OZT',
               'model': 'SanDisk SD8SB8U256G1122', 'iface_type': 'unknown'}]}
 
-# headers={'a': 123}
 
 import json
 
@@ -61,7 +60,7 @@ authkey_time = "%s|%s" % (authkey,current_time)
 r = requests.post(
     url="http://127.0.0.1:8000/api/asset",
     json=json.dumps(data),
-    headers={'auth-key': authkey_time}
+    headers={'authkey': "65cf888a0857c12d2d01c42ba9897560|1536138465.9408777"}
 )
 
 print(authkey_time)

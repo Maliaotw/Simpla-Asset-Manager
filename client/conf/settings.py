@@ -1,6 +1,11 @@
 
 MODE = 'agent'
 
+
+KEY = "mdfmsijfiosdjoidfjdf"
+
+AUTH_KEY_NAME = "auth-key"
+
 PLUGINS = {
     'disk': 'src.plugins.disk.DiskPlugin',
     'mem': 'src.plugins.mem.MemPlugin',
