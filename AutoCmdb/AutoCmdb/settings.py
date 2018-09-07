@@ -38,7 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'api',
-    'assetapp',
+    'asset',
+    'host',
+    'nethardware',
 ]
 
 MIDDLEWARE = [

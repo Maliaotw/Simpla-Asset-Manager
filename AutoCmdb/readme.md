@@ -2,10 +2,19 @@
 # Basic
 
 Superuser
-```
-maliao
-m12345678
-```
+
+- Create cmd
+    
+    ```
+    python manage.py createsuperuser
+    ```
+
+- use this
+
+    ```
+    maliao
+    m12345678
+    ```
 
 Create Project
 ```
@@ -25,5 +34,11 @@ python manage.py migrate
 ```
 
 
+創建測試帳號
 
+
+```
+2001
+m12345678
+```
 
