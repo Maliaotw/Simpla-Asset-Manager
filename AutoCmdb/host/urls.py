@@ -16,11 +16,10 @@ Including another URLconf
 from django.conf.urls import url,include
 from django.contrib import admin
 
-from api import views
+from host import views
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^api/asset', views.asset),
-    url(r'^host/', include('host.urls')),
-    url(r'^asset/', include('asset.urls')),
+    # url(r'^admin/', admin.site.urls),
+    url(r'^index/', views.index),
+
 ]
