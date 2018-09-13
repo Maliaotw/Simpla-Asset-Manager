@@ -1,18 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Asset</title>
-</head>
-<body>
-
-{% for asset in asset_obj %}
-
-    {{ asset.name }}
-
-{% endfor %}
-
-</body>
-</html>
+{% extends 'asset/base.html' %}
 
 
+
+
+
+
+{% block content %}
+
+
+    <h2 class="sub-header">資產管理</h2>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>資產編號</th>
+                <th>價格</th>
+                <th>類型</th>
+                <th>部門</th>
+                <th>負責人</th>
+
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for asset in asset_obj %}
+
+                <tr>
+                    <td>{{ asset.category.code }}-{{ asset.sn }}</td>
+                    <td>{{ asset.price }}</td>
+                    <td>{{ asset.category }}</td>
+                    <td>{{ asset.department }}</td>
+                    <td>{{ asset.manager }}</td>
+
+                </tr>
+            {% endfor %}
+
+
+            </tbody>
+        </table>
+    </div>
+
+
+{% endblock %}

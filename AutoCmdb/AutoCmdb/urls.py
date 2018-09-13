@@ -23,4 +23,10 @@ urlpatterns = [
     url(r'^api/asset', views.asset),
     url(r'^host/', include('host.urls')),
     url(r'^asset/', include('asset.urls')),
+
+
+
+
+
+
 ]

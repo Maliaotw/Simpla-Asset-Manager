@@ -1,34 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Host</title>
-    <link href="/static/css/bootstrap.css" rel="stylesheet">
-    <script src="/static/js/bootstrap.js"></script>
-</head>
-<body>
-<h2 class="sub-header">Section title</h2>
-<div class="table-responsive">
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>name</th>
-            <th>sn</th>
+{% extends 'host/base.html' %}
 
-        </tr>
-        </thead>
-        <tbody>
-        {% for host in host_obj %}
 
+
+
+
+
+{% block content %}
+
+
+    <h2 class="sub-header">主機列表</h2>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
             <tr>
-                <td>{{ host.name }}</td>
-                <td>{{ host.sn }}</td>
+                <th>主機編號</th>
+                <th>類型</th>
+                <th>型號</th>
+                <th>管理IP</th>
+                <th>作業系統</th>
+                <th>所在位置</th>
+                <th>運維負責人</th>
+                <th>所屬部門</th>
+                <th>關聯資產</th>
+
+
             </tr>
-        {% endfor %}
+            </thead>
+            <tbody>
+            {% for host in host_obj %}
+
+                <tr>
+                    <td>{{ host.number }}</td>
+                    <td>{{ host.get_host_type_id_display }}</td>
+                    <td>{{ host.manufacturer }} {{ host.model }}</td>
+                    <td>{{ host.manage_ip }}</td>
+                    <td>{{ host.os_platform }}</td>
+                    <td>{{ host.location }}</td>
+                    <td>{{ host.ops_owner }}</td>
+                    <td>{{ host.asset.department.name | default:"None"}}</td>
+                    <td>{{ host.asset }}</td>
 
 
-        </tbody>
-    </table>
-</div>
-</body>
-</html>
+                </tr>
+            {% endfor %}
+
+
+            </tbody>
+        </table>
+    </div>
+
+
+{% endblock %}

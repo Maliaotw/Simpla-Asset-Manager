@@ -1,0 +1,38 @@
+{% extends 'asset/base.html' %}
+
+
+
+
+
+
+{% block content %}
+
+
+    <h2 class="sub-header">類型管理</h2>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>名稱</th>
+                <th>代號</th>
+
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for category in category_obj %}
+
+                <tr>
+                    <td>{{ category.name}}</td>
+                    <td>{{ category.code }}</td>
+
+                </tr>
+            {% endfor %}
+
+
+            </tbody>
+        </table>
+    </div>
+
+
+{% endblock %}

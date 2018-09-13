@@ -7,10 +7,14 @@ from asset import froms
 
 def index(request):
     asset_obj = models.Asset.objects.all()
+    return render(request, "asset/index.html",locals())
+
+def department(request):
+    department_obj = models.Department.objects.all()
+    return render(request, "asset/department.html",locals())
 
 
-    data = {
-        'asset_obj': asset_obj,
-    }
+def category(request):
+    category_obj = models.Catagory.objects.all()
+    return render(request, "asset/category.html",locals())
 
-    return render(request, "asset/index.html", data)
