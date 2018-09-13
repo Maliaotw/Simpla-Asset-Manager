@@ -3,13 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <title>Host</title>
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <script src="/static/js/bootstrap.js"></script>
 </head>
 <body>
-{% for i in data %}
-    {{ i.name }}
-{% endfor %}
+<h2 class="sub-header">Section title</h2>
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>name</th>
+            <th>sn</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        {% for host in host_obj %}
+
+            <tr>
+                <td>{{ host.name }}</td>
+                <td>{{ host.sn }}</td>
+            </tr>
+        {% endfor %}
 
 
-
+        </tbody>
+    </table>
+</div>
 </body>
 </html>

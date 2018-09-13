@@ -14,14 +14,4 @@ class AssetForm(ModelForm):
         fields = '__all__'
 
 
-class AssetHostForm(ModelForm):
-    '''
-    資產主機表單
-    '''
-
-    class Meta:
-        model = models.AssetHost
-        fields = '__all__'
-
-
 

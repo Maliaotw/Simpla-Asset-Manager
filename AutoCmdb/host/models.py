@@ -3,6 +3,12 @@ from django.db import models
 # Create your models here.
 
 
+
+
+
+
+
+
 class Host(models.Model):
     '''
     主機資產表
@@ -17,11 +23,14 @@ class Host(models.Model):
         (6, '測試機'),
     )
 
+    asset = models.OneToOneField('asset.Asset',null=True,blank=True)
+    ops_owner = models.ForeignKey('asset.UserProfile',verbose_name="運維負責人",null=True, blank=True)
+    location = models.ForeignKey('asset.Location', verbose_name='位置', null=True, blank=True)
 
     host_type_id = models.IntegerField(choices=host_type_choice, default=2)
 
-    name = models.CharField(max_length=128, unique=True)
-    sn = models.CharField('SN', max_length=64, db_index=True)
+    number = models.IntegerField(verbose_name="編號")
+    sn = models.CharField('SN序號', max_length=64, db_index=True)
     manufacturer = models.CharField(verbose_name='製造商', max_length=64, null=True, blank=True)
     model = models.CharField('型號', max_length=64, null=True, blank=True)
 
@@ -37,8 +46,9 @@ class Host(models.Model):
     class Meta:
         verbose_name_plural = "主機資產表"
 
+
     def __str__(self):
-        return "%s" % (self.name)
+        return "PC-%03d %s" % (self.number,self.manage_ip)
 
 
 class NIC(models.Model):
@@ -56,7 +66,7 @@ class NIC(models.Model):
         verbose_name_plural = "網卡表"
 
     def __str__(self):
-        return "%s %s" % (self.host_obj, self.name)
+        return "%s %s" % (self.host_obj, self.ipaddress)
 
 
 class Disk(models.Model):
@@ -64,9 +74,11 @@ class Disk(models.Model):
     硬盤信息表
     """
     slot = models.CharField('插槽位置', max_length=8)
-    model = models.CharField('硬盤型號', max_length=64)
+    model = models.CharField('硬盤型號', max_length=64,null=True, blank=True)
     capacity = models.FloatField('硬盤容量')
     host_obj = models.ForeignKey("Host", related_name='disk')
+    sn = models.CharField("硬碟序號",max_length=128,null=True, blank=True)
+    manufacturer = models.CharField('製造商', max_length=32, null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "硬盤表"

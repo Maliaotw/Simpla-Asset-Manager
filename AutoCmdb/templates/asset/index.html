@@ -6,8 +6,13 @@
 </head>
 <body>
 
-{{ asset_form }}
-{{ assethost_form }}
+{% for asset in asset_obj %}
+
+    {{ asset.name }}
+
+{% endfor %}
 
 </body>
 </html>
+
+

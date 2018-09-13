@@ -6,6 +6,6 @@ from host import models
 def index(requesrt):
     host_obj = models.Host.objects.all()
 
-    data = {'data': host_obj}
+    data = {'host_obj': host_obj}
 
     return render(requesrt, "host/index.html", data)
