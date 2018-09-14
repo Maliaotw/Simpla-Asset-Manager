@@ -2,7 +2,6 @@
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
     <meta name="description" content="">
@@ -14,6 +13,15 @@
     <!-- Bootstrap core CSS -->
     <link href="/static/css/bootstrap.css" rel="stylesheet">
     <link href="/static/css/dashboard.css" rel="stylesheet">
+    <link href="/static/css/all.css" rel="stylesheet">
+
+
+    <!-- Bootstrap core JavaScript
+================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/static/js/jquery-3.3.1.js"></script>
+    <script src="/static/js/bootstrap.js"></script>
+    <script src="/static/js/all.js"></script>
 
 
 </head>
@@ -34,9 +42,10 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="#">Settings</a></li>
-                <li><a href="#">Profile</a></li>
-                <li><a href="#">Help</a></li>
+                <li><a href="#"><i class="far fa-bell"></i></a>
+                <li><a href="#"><i class="far fa-envelope"></i></a>
+                <li><a href="#"><i class="far fa-user"></i></a>
+
             </ul>
 
         </div>
@@ -50,7 +59,7 @@
 
                 <ul class="nav nav-sidebar">
 
-                    <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
+                    <li><i class="fas fa-bell"></i></li>
                     <li><a href="#">Reports</a></li>
                     <li><a href="#">Analytics</a></li>
                     <li><a href="#">Export</a></li>
@@ -63,7 +72,7 @@
 
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 
-            {% block content  %}
+            {% block content %}
                 <h1 class="page-header">Dashboard</h1>
 
                 <h2 class="sub-header">Section title</h2>
@@ -102,11 +111,14 @@
     </div>
 </div>
 
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="/static/js/jquery-3.3.1.js"></script>
-<script src="/static/js/bootstrap.js"></script>
+
+
+{% block extra-js %}
+
+
+
+{% endblock %}
+
 
 </body>
 </html>
