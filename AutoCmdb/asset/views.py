@@ -28,3 +28,16 @@ def category(request):
     category_obj = models.Catagory.objects.all()
     return render(request, "asset/category.html",locals())
 
+
+
+
+def user(request):
+    user_obj = models.UserProfile.objects.all()
+
+    return render(request,'asset/user.html',locals())
+
+
+
+
+
+

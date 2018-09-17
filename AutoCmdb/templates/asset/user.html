@@ -1,0 +1,37 @@
+{% extends 'asset/base.html' %}
+
+
+
+{% block content %}
+
+
+    <h2 class="sub-header">用戶管理</h2>
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>名稱</th>
+                <th>編號</th>
+                <th>部門</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for user in user_obj %}
+
+                <tr>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.code }}</td>
+                    <td>{{ user.dent }}</td>
+
+                </tr>
+            {% endfor %}
+
+
+            </tbody>
+        </table>
+    </div>
+
+
+{% endblock %}

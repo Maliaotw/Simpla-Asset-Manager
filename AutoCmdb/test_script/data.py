@@ -14,7 +14,6 @@ from asset.models import *
 Catagory.objects.all().delete()
 UserProfile.objects.all().delete()
 User.objects.all().delete()
-Department.objects.all().delete()
 Host.objects.all().delete()
 Location.objects.all().delete()
 
@@ -23,31 +22,6 @@ cate_pc = Catagory.objects.create(name="電腦", code='PC')
 cate_m = Catagory.objects.create(name="滑鼠", code='M')
 cate_p = Catagory.objects.create(name="變壓器", code='P')
 cate_a = Catagory.objects.create(name='延長線', code='A')
-
-# 創建用戶
-users = ["Aaron", "Abbas", "Christine", "Gardner"]
-passwd = "12345678"
-
-for i, name in enumerate(users):
-    user = User()
-    user.username = name
-    user.set_password(passwd)
-    user.is_staff = True
-    user.save()
-    UserProfile.objects.create(user=user, name=name, code=i)
-
-# 部門
-department = [
-    {'code': 'HR', 'name': '人資'},
-    {'code': 'IT', 'name': '資訊'},
-    {'code': 'RD', 'name': '研發'},
-    {'code': 'PR', 'name': '公關'},
-    {'code': 'CS', 'name': '客服'},
-
-]
-
-for d in department:
-    Department.objects.create(**d)
 
 # 位置
 

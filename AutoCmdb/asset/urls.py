@@ -24,4 +24,6 @@ urlpatterns = [
     url(r'^department/', views.department),
     url(r'^category/', views.category),
 
+    url(r'^user/', views.user),
+
 ]

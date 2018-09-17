@@ -11,8 +11,15 @@ class UserProfile(models.Model):
 
     user = models.OneToOneField(User)
     name = models.CharField(max_length=64, verbose_name="暱稱")
-    code = models.IntegerField(verbose_name='員工編號')
-    dent = models.ForeignKey('Department',verbose_name='部門')
+    code = models.IntegerField(verbose_name='員工編號',blank=True,null=True)
+
+    sex_choice = (
+        (1, '男'),
+        (2, '女'),
+    )
+
+    sex = models.IntegerField(choices=sex_choice)
+    dent = models.ForeignKey('Department',verbose_name='部門',blank=True,null=True)
 
     class Meta:
         verbose_name_plural = "用戶"
