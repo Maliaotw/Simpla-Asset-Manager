@@ -1,8 +1,10 @@
 from django.shortcuts import render,HttpResponse
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt,csrf_protect
 import json
 import hashlib
 import time
+from asset.models import Catagory ,Asset
 # Create your views here.
 
 ck = "mdfmsijfiosdjoidfjdf"
@@ -40,4 +42,15 @@ def asset(request):
         print("auth_list",auth_list)
 
         return HttpResponse("成功")
+
+
+def category(request):
+    cate_id = request.GET.get('cate')
+    c = Catagory.objects.get(id=cate_id)
+    a = Asset.objects.filter(category=c)
+    data = {
+        'count':a.count(),
+        'number':"%03d" % a.count()
+    }
+    return JsonResponse(data)
 

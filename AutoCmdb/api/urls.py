@@ -19,14 +19,8 @@ from django.contrib import admin
 from api import views
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^host/', include('host.urls')),
-    url(r'^api/', include('api.urls')),
-    url(r'^asset/', include('asset.urls')),
-
-
-
-
-
+    # url(r'^admin/', admin.site.urls),
+    url(r'^category/', views.category),
+    url(r'^asset/', views.asset),
 
 ]

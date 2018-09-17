@@ -12,6 +12,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User)
     name = models.CharField(max_length=64, verbose_name="暱稱")
     code = models.IntegerField(verbose_name='員工編號')
+    dent = models.ForeignKey('Department',verbose_name='部門')
 
     class Meta:
         verbose_name_plural = "用戶"
@@ -38,7 +39,11 @@ class Department(models.Model):
     部門
     '''
     name = models.CharField(max_length=255,verbose_name="部門名稱")
-    code = models.CharField(max_length=128,verbose_name='部門代號')
+    code = models.CharField(max_length=128,verbose_name='部門簡稱')
+    block_number = models.CharField(max_length=128,verbose_name='部門工/代號')
+    block_number_len = models.PositiveIntegerField(verbose_name='部門工/代號碼長度')
+    user = models.ForeignKey('UserProfile',verbose_name='部門負責人',blank=True,null=True)
+
 
     class Meta:
         verbose_name_plural = "部門"
@@ -67,11 +72,8 @@ class Asset(models.Model):
     '''
 
     sn = models.CharField(max_length=255)
-
     price = models.IntegerField(verbose_name='價格', null=True, blank=True)
-
     category = models.ForeignKey("Catagory",verbose_name='類型')
-
     department = models.ForeignKey('Department', verbose_name='部門', null=True, blank=True)
     manager = models.ForeignKey("UserProfile", verbose_name='負責人', null=True, blank=True)
     latest_date = models.DateTimeField(verbose_name='更新日期', auto_now=True)
