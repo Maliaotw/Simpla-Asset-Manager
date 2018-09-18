@@ -29,6 +29,7 @@ department = [
     {'code': 'RD', 'name': '研發','block_number':'3','block_number_len':3},
     {'code': 'PR', 'name': '公關','block_number':'4','block_number_len':3},
     {'code': 'CS', 'name': '客服','block_number':'5','block_number_len':3},
+    {'code': 'OM', 'name': '運營','block_number':'0','block_number_len':3},
 
 ]
 

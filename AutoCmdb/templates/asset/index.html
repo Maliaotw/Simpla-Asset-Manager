@@ -67,7 +67,6 @@
             <thead>
             <tr>
                 <th>資產編號</th>
-
                 <th>類型</th>
                 <th>部門</th>
                 <th>負責人</th>
@@ -83,19 +82,15 @@
 
                 <tr>
                     <td>{{ asset.category.code }}-{{ asset.sn }}</td>
-
                     <td>{{ asset.category }}</td>
                     <td>{{ asset.department }}</td>
                     <td>{{ asset.manager }}</td>
-                    <td>{{ asset.create_date|date:"Y-m-d"}}</td>
-
+                    <td>{{ asset.create_date|date:"Y-m-d" }}</td>
                     <td>{{ asset.price }}</td>
                     <td>
                         <i class="fas fa-pen"></i>
-
                         <i class="fas fa-trash-alt"></i>
                     </td>
-
                 </tr>
             {% endfor %}
 
@@ -119,7 +114,7 @@
                         {% csrf_token %}
                         <div class="form-group">
                             <label for="">類型</label>
-                            <select name="category" onchange="foo(this)" class="form-control">
+                            <select name="category" onchange="get_category(this)" class="form-control">
                                 <option value="">-------</option>
                                 {% for category in category_obj %}
                                     <option
@@ -136,7 +131,7 @@
 
                         <div class="form-group">
                             <label class="col-form-label">部門</label>
-                            <select class="form-control">
+                            <select name="dent_user" onchange="get_dent_user(this)" class="form-control">
                                 <option>-------</option>
                                 {% for department in department_obj %}
                                     <option name="department"
@@ -148,11 +143,11 @@
 
                         <div class="form-group">
                             <label class="col-form-label">資產負責人</label>
-                            <select name="user" class="form-control">
+                            <select id='user_select' name="user" class="form-control">
                                 <option value="">-------</option>
-                                {% for user in user_obj %}
-                                    <option value="{{ user.id }}">{{ user.name }}({{ user.code }})</option>
-                                {% endfor %}
+                                {#                                {% for user in user_obj %}#}
+                                {#                                    <option value="{{ user.id }}">{{ user.name }}({{ user.dent.block_number }}{{ user.code }})</option>#}
+                                {#                                {% endfor %}#}
                             </select>
                         </div>
 
@@ -192,14 +187,13 @@
         });
 
 
-
         $('#assetform_add_Modal').on('show.bs.modal', function (e) {
             $("#assetform_add").trigger('reset');
         });
 
 
         // 選擇類型後請求該分類數量
-        function foo(e) {
+        function get_category(e) {
             //console.log(e);
             //console.log($(this));
             //console.log(e.value);
@@ -212,6 +206,53 @@
                 success: function (callback) {
                     //console.log(callback);
                     $('#assetform_add_Modal').find("[name='sn']").val(callback.number)
+                },
+                error: function () {
+                }
+            });
+        };
+
+        // 選擇類型後請求該分類數量
+        function get_dent_user(e) {
+            //console.log(e);
+            //console.log($(this));
+            //console.log(e.value);
+
+            $.ajax({
+                url: "/api/dent_user",
+                type: "GET",
+                data: {'dent': e.value},
+
+                success: function (callback) {
+                    console.log(callback);
+
+
+                    document.getElementById("user_select").options.length = 1;
+                    users = callback.users;
+                    owner = callback.owner;
+                    $.each(users, function (i, item) {
+                            //console.log(item);
+
+                            if (item.code == owner.code) {
+                                console.log(item.code);
+                                console.log(owner.code);
+
+                                $('#user_select').append($('<option>', {
+                                    value: item.code,
+                                    text: item.user + "(" + item.code + ")",
+                                    selected:true,
+                                }));
+                            } else {
+
+                                $('#user_select').append($('<option>', {
+                                    value: item.code,
+                                    text: item.user + "(" + item.code + ")"
+                                }));
+                            }
+                        }
+                    );
+
+
                 },
                 error: function () {
 
@@ -233,7 +274,6 @@
                 data: postData,
                 success: function (callback) {
                     console.log(callback);
-
                     $('#assetform_add_Modal').modal('hide')
                 },
                 error: function () {

@@ -14,7 +14,10 @@
             <thead>
             <tr>
                 <th>名稱</th>
-                <th>代號</th>
+                <th>簡稱</th>
+                <th>工/代號</th>
+                <th>工/代號長度</th>
+                <th>負責人</th>
 
 
             </tr>
@@ -25,6 +28,9 @@
                 <tr>
                     <td>{{ department.name}}</td>
                     <td>{{ department.code }}</td>
+                    <td>{{ department.block_number }}</td>
+                    <td>{{ department.block_number_len }}</td>
+                    <td>{{ department.user }}</td>
 
                 </tr>
             {% endfor %}

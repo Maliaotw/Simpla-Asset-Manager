@@ -21,6 +21,7 @@ from api import views
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
     url(r'^category/', views.category),
+    url(r'^dent_user/', views.dent_user),
     url(r'^asset/', views.asset),
 
 ]

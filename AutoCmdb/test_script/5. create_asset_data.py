@@ -15,13 +15,13 @@ Asset.objects.all().delete()
 
 for i in range(200):
 
-    cate =  Catagory.objects.all()
-    depame = Department.objects.all()
+    cate = Catagory.objects.all()
+    dent = Department.objects.all()
 
     as_count = Asset.objects.filter(category=cate).count() + 1
     num = "%03d" % as_count
 
-    Asset.objects.create(sn=num,price=400,category=choice(cate),department=choice(depame))
+    Asset.objects.create(sn=num,price=400,category=choice(cate),department=choice(dent))
 
 
 
