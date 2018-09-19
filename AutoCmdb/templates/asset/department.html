@@ -13,6 +13,7 @@
         <table class="table">
             <thead>
             <tr>
+                <th>ID</th>
                 <th>名稱</th>
                 <th>簡稱</th>
                 <th>工/代號</th>
@@ -26,7 +27,8 @@
             {% for department in department_obj %}
 
                 <tr>
-                    <td>{{ department.name}}</td>
+                    <td>{{ department.id}}</td>
+                    <td>{{ department.name}}部</td>
                     <td>{{ department.code }}</td>
                     <td>{{ department.block_number }}</td>
                     <td>{{ department.block_number_len }}</td>

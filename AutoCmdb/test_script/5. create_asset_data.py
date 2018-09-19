@@ -18,10 +18,11 @@ for i in range(200):
     cate = Catagory.objects.all()
     dent = Department.objects.all()
 
-    as_count = Asset.objects.filter(category=cate).count() + 1
+    c = choice(cate)
+    as_count = Asset.objects.filter(category=c).count() + 1
     num = "%03d" % as_count
 
-    Asset.objects.create(sn=num,price=400,category=choice(cate),department=choice(dent))
+    Asset.objects.create(sn=num,price=400,category=c ,department=choice(dent))
 
 
 

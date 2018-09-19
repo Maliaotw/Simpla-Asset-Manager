@@ -63,7 +63,7 @@
         </div>
 
 
-        <table class="table">
+        <table class="table" id="mytable">
             <thead>
             <tr>
                 <th>資產編號</th>
@@ -81,12 +81,71 @@
             {% for asset in asset_obj %}
 
                 <tr>
-                    <td>{{ asset.category.code }}-{{ asset.sn }}</td>
-                    <td>{{ asset.category }}</td>
-                    <td>{{ asset.department }}</td>
-                    <td>{{ asset.manager }}</td>
-                    <td>{{ asset.create_date|date:"Y-m-d" }}</td>
-                    <td>{{ asset.price }}</td>
+                    <td name="sn"><span class="form-control-static">{{ asset.category.code }}-{{ asset.sn }}</span></td>
+                    <td name="category">
+
+                        <span class="form-control-static">
+                            {{ asset.category }}
+                        </span>
+                        <select class="form-control" style="display: none">
+
+                            {% for category in category_obj %}
+                                {% if  asset.category  ==  category %}
+                                    <option selected
+                                            value="{{ category.id }}">{{ category.name }}({{ category.code }})
+                                    </option>
+                                {% else %}
+                                    <option value="{{ category.id }}">{{ category.name }}({{ category.code }})</option>
+                                {% endif %}
+
+                            {% endfor %}
+                        </select>
+
+
+                    </td>
+
+                    <td name="department">
+                        <span class="form-control-static">
+                            {{ asset.department }}
+                        </span>
+
+                        <select class="form-control" >
+
+                            {% for department in department_obj %}
+                                {% if  asset.department  ==  department %}
+                                    <option selected
+                                            value="{{ department.id }}">{{ department.name }}部({{ department.code }})
+                                    </option>
+                                {% else %}
+                                    <option value="{{ department.id }}">{{ department.name }}部({{ department.code }})</option>
+                                {% endif %}
+
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td name="manager">
+                        <span class="form-control-static">
+                            {{ asset.manager }}
+                        </span>
+
+                        <select class="form-control" >
+                            <option value="">------</option>
+                            {% for user in user_obj %}
+                                {% if  asset.manager  ==  user %}
+                                    <option selected
+                                            value="{{ user.id }}">{{ user.name }}({{ user.code }})
+                                    </option>
+                                {% else %}
+                                    <option value="{{ user.id }}">{{ user.name }}({{ user.code }})</option>
+                                {% endif %}
+
+                            {% endfor %}
+                        </select>
+
+
+                    </td>
+                    <td><span class="form-control-static">{{ asset.create_date|date:"Y-m-d" }}</span></td>
+                    <td name="price"><span class="form-control-static">{{ asset.price }}</span></td>
                     <td>
                         <i class="fas fa-pen"></i>
                         <i class="fas fa-trash-alt"></i>
@@ -131,8 +190,8 @@
 
                         <div class="form-group">
                             <label class="col-form-label">部門</label>
-                            <select name="dent_user" onchange="get_dent_user(this)" class="form-control">
-                                <option>-------</option>
+                            <select name="department" onchange="get_dent_user(this)" class="form-control">
+                                <option value="">-------</option>
                                 {% for department in department_obj %}
                                     <option name="department"
                                             value="{{ department.id }}">{{ department.name }}部({{ department.code }})
@@ -143,7 +202,7 @@
 
                         <div class="form-group">
                             <label class="col-form-label">資產負責人</label>
-                            <select id='user_select' name="user" class="form-control">
+                            <select id='user_select' name="manager" class="form-control">
                                 <option value="">-------</option>
                                 {#                                {% for user in user_obj %}#}
                                 {#                                    <option value="{{ user.id }}">{{ user.name }}({{ user.dent.block_number }}{{ user.code }})</option>#}
@@ -176,7 +235,6 @@
 {% block extra-js %}
 
     <script>
-
 
         $(document).ready(function () {
             $('.dropdown-toggle').dropdown()
@@ -225,8 +283,6 @@
 
                 success: function (callback) {
                     console.log(callback);
-
-
                     document.getElementById("user_select").options.length = 1;
                     users = callback.users;
                     owner = callback.owner;
@@ -234,18 +290,18 @@
                             //console.log(item);
 
                             if (item.code == owner.code) {
-                                console.log(item.code);
-                                console.log(owner.code);
+                                //console.log(item.code);
+                                //console.log(owner.code);
 
                                 $('#user_select').append($('<option>', {
-                                    value: item.code,
+                                    value: item.id,
                                     text: item.user + "(" + item.code + ")",
-                                    selected:true,
+                                    selected: true,
                                 }));
                             } else {
 
                                 $('#user_select').append($('<option>', {
-                                    value: item.code,
+                                    value: item.id,
                                     text: item.user + "(" + item.code + ")"
                                 }));
                             }
@@ -274,7 +330,14 @@
                 data: postData,
                 success: function (callback) {
                     console.log(callback);
-                    $('#assetform_add_Modal').modal('hide')
+
+                    if (callback.status == 'ok') {
+                        $('#assetform_add_Modal').modal('hide');
+                    } else {
+
+                    }
+
+
                 },
                 error: function () {
 
@@ -286,6 +349,40 @@
         $("#assetform_submit").on('click', function () {
 
             $("#assetform_add").submit();
+
+        });
+
+        //EditData : Change icon
+        $("#mytable").on('click', "svg.svg-inline--fa.fa-pen.fa-w-16", function (ele) {
+            console.log('edit');
+            $(this).attr('data-icon', 'file');
+            tds = $(this).parent().prevAll();
+            tr = $(this).closest("tr");
+            var obj_id = tr.find("[name='id']").text();
+            //console.log(obj_id);
+            $.each(tds, function (i, ele) {
+                var txt = $(this).text();
+                if ($(this).attr("name") == 'category') {
+                    //console.log("EditData : Change icon");
+
+                } else if ($(this).attr("name") == 'department') {
+
+                } else if ($(this).attr("name") == 'manager') {
+
+                }
+
+                else {
+                    $(this).html("").append("<input type='text' class='form-control match-content' value=\"" + txt + "\">");
+                }
+            })
+        });
+
+
+        //DeleteData : Delete icon
+        $("#mytable").on('click', "svg.svg-inline--fa.fa-trash-alt.fa-w-14", function (ele) {
+            console.log('Delete');
+
+
         });
 
 

@@ -48,10 +48,10 @@ def category(request):
     cate_id = request.GET.get('cate')
 
     c = Catagory.objects.get(id=cate_id)
-    a = Asset.objects.filter(category=c)
+    a = Asset.objects.filter(category=c).count()+1
     data = {
-        'count': a.count(),
-        'number': "%03d" % a.count()
+        'count': a,
+        'number': "%03d" % a
     }
     return JsonResponse(data)
 
@@ -67,17 +67,19 @@ def dent_user(request):
         'users': '',
         'owner': {
             'user': dent.user.user.username,
-            'code': '%s%s' % (dent.block_number,dent.user.code)
+            'code': '%s%s' % (dent.block_number,dent.user.code),
+            'id': dent.user.user.id,
         }
     }
 
     user_list = []
     for u in users:
-        data = {
+        user_data = {
             'user': u.user.username,
-            'code': "%s%s" % (dent.block_number,u.code)
+            'code': "%s%s" % (dent.block_number,u.code),
+            'id': u.user.id
         }
-        user_list.append(data)
+        user_list.append(user_data)
 
     ret['users'] = user_list
 
