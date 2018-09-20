@@ -1,5 +1,5 @@
 {% extends 'asset/base.html' %}
-
+{% load asset_tags %}
 
 
 
@@ -16,16 +16,14 @@
         <div class="row">
 
             <div class="col-md-4">
-
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#assetform_add_Modal">
                     新增資產
                 </button>
-
-
             </div>
 
 
             <div class="col-md-8" style="text-align: right">
+                <!-- 篩選 -->
                 <form class="form-inline" method="get">
 
                     <div class="form-group">
@@ -63,6 +61,7 @@
         </div>
 
 
+        <!--- 資產列表-->
         <table class="table" id="mytable">
             <thead>
             <tr>
@@ -104,12 +103,14 @@
 
                     </td>
 
+
+
                     <td name="department">
                         <span class="form-control-static">
                             {{ asset.department }}
                         </span>
 
-                        <select class="form-control" >
+                        <select class="form-control" onchange="get_dent_user(this)" style="display: none">
 
                             {% for department in department_obj %}
                                 {% if  asset.department  ==  department %}
@@ -123,23 +124,16 @@
                             {% endfor %}
                         </select>
                     </td>
+
+
                     <td name="manager">
                         <span class="form-control-static">
                             {{ asset.manager }}
                         </span>
 
-                        <select class="form-control" >
+                        <select id='user_put' class="form-control" style="display: none">
                             <option value="">------</option>
-                            {% for user in user_obj %}
-                                {% if  asset.manager  ==  user %}
-                                    <option selected
-                                            value="{{ user.id }}">{{ user.name }}({{ user.code }})
-                                    </option>
-                                {% else %}
-                                    <option value="{{ user.id }}">{{ user.name }}({{ user.code }})</option>
-                                {% endif %}
-
-                            {% endfor %}
+                            {% get_dent_user_column asset_obj request %}
                         </select>
 
 
@@ -159,6 +153,7 @@
 
     </div>
 
+    <!--- 新增資產表單-->
     <div class="modal fade" id="assetform_add_Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -190,7 +185,7 @@
 
                         <div class="form-group">
                             <label class="col-form-label">部門</label>
-                            <select name="department" onchange="get_dent_user(this)" class="form-control">
+                            <select name="department" onchange="add_assetform_user(this)" class="form-control">
                                 <option value="">-------</option>
                                 {% for department in department_obj %}
                                     <option name="department"
@@ -202,11 +197,8 @@
 
                         <div class="form-group">
                             <label class="col-form-label">資產負責人</label>
-                            <select id='user_select' name="manager" class="form-control">
+                            <select id='user_add' name="manager" class="form-control">
                                 <option value="">-------</option>
-                                {#                                {% for user in user_obj %}#}
-                                {#                                    <option value="{{ user.id }}">{{ user.name }}({{ user.dent.block_number }}{{ user.code }})</option>#}
-                                {#                                {% endfor %}#}
                             </select>
                         </div>
 
@@ -235,6 +227,7 @@
 {% block extra-js %}
 
     <script>
+
 
         $(document).ready(function () {
             $('.dropdown-toggle').dropdown()
@@ -270,7 +263,7 @@
             });
         };
 
-        // 選擇類型後請求該分類數量
+        // 選擇部門後請求關聯使用資料
         function get_dent_user(e) {
             //console.log(e);
             //console.log($(this));
@@ -280,40 +273,92 @@
                 url: "/api/dent_user",
                 type: "GET",
                 data: {'dent': e.value},
+                async: false,
 
                 success: function (callback) {
-                    console.log(callback);
-                    document.getElementById("user_select").options.length = 1;
-                    users = callback.users;
-                    owner = callback.owner;
-                    $.each(users, function (i, item) {
-                            //console.log(item);
-
-                            if (item.code == owner.code) {
-                                //console.log(item.code);
-                                //console.log(owner.code);
-
-                                $('#user_select').append($('<option>', {
-                                    value: item.id,
-                                    text: item.user + "(" + item.code + ")",
-                                    selected: true,
-                                }));
-                            } else {
-
-                                $('#user_select').append($('<option>', {
-                                    value: item.id,
-                                    text: item.user + "(" + item.code + ")"
-                                }));
-                            }
-                        }
-                    );
-
-
+                    window.dent_user = {
+                        'status': 'ok',
+                        'data': callback
+                    };
+                    console.log(window.dent_user);
                 },
                 error: function () {
 
                 }
             });
+        };
+
+
+        function add_assetform_user(e) {
+            get_dent_user(e);
+            dent_user = window.dent_user;
+            console.log(dent_user);
+            if (dent_user.status == 'ok') {
+                console.log('lll');
+                document.getElementById("user_add").options.length = 1;
+                users = dent_user.data.users;
+                owner = dent_user.data.owner;
+                $.each(users, function (i, item) {
+                        console.log(item);
+                        console.log(item.code);
+                        console.log(owner.code);
+
+                        if (item.code == owner.code) {
+                            //console.log(item.code);
+                            //console.log(owner.code);
+
+                            $('#user_add').append($('<option>', {
+                                value: item.id,
+                                text: item.user + "(" + item.code + ")",
+                                selected: true,
+                            }));
+                        } else {
+
+                            $('#user_add').append($('<option>', {
+                                value: item.id,
+                                text: item.user + "(" + item.code + ")"
+                            }));
+                        }
+                    }
+                );
+            }
+
+        }
+
+        // 選擇類型後請求該分類數量
+        function put_dent_user(e) {
+            get_dent_user(e);
+            dent_user = window.dent_user;
+
+            if (dent_user.status == 'ok') {
+                console.log('lll');
+                document.getElementById("user_put").options.length = 1;
+                users = dent_user.data.users;
+                owner = dent_user.data.owner;
+                $.each(users, function (i, item) {
+                        console.log(item);
+                        console.log(item.code);
+                        console.log(owner.code);
+
+                        if (item.code == owner.code) {
+                            //console.log(item.code);
+                            //console.log(owner.code);
+
+                            $('#user_put').append($('<option>', {
+                                value: item.id,
+                                text: item.user + "(" + item.code + ")",
+                                selected: true,
+                            }));
+                        } else {
+
+                            $('#user_put').append($('<option>', {
+                                value: item.id,
+                                text: item.user + "(" + item.code + ")"
+                            }));
+                        }
+                    }
+                );
+            }
         };
 
 
@@ -352,7 +397,7 @@
 
         });
 
-        //EditData : Change icon
+        //編輯 EditData : Change icon
         $("#mytable").on('click', "svg.svg-inline--fa.fa-pen.fa-w-16", function (ele) {
             console.log('edit');
             $(this).attr('data-icon', 'file');
@@ -366,8 +411,18 @@
                     //console.log("EditData : Change icon");
 
                 } else if ($(this).attr("name") == 'department') {
+                    $(this).find("span").hide();
+                    d = $(this).find('select');
+                    var d_id = d.val();
+                    d.show();
+                    console.log(d_id);
 
                 } else if ($(this).attr("name") == 'manager') {
+
+                    put_dent_user(d_id);
+                    $(this).find("span").hide();
+                    u = $(this).find('select');
+                    u.show();
 
                 }
 
