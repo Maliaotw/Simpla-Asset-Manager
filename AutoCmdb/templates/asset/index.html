@@ -80,7 +80,17 @@
             {% for asset in asset_obj %}
 
                 <tr>
-                    <td name="sn"><span class="form-control-static">{{ asset.category.code }}-{{ asset.sn }}</span></td>
+                    <td name="id" style="display: none">
+                        {{ asset_obj.id }}
+                    </td>
+
+                    <td name="sn">
+                        <span class="form-control-static">
+                            {{ asset.category.code }}-{{ asset.sn }}
+                        </span>
+                    </td>
+
+
                     <td name="category">
 
                         <span class="form-control-static">
@@ -104,13 +114,12 @@
                     </td>
 
 
-
                     <td name="department">
                         <span class="form-control-static">
                             {{ asset.department }}
                         </span>
 
-                        <select class="form-control" onchange="get_dent_user(this)" style="display: none">
+                        <select class="form-control" onchange="put_dent_user(this)" style="display: none">
 
                             {% for department in department_obj %}
                                 {% if  asset.department  ==  department %}
@@ -133,12 +142,18 @@
 
                         <select id='user_put' class="form-control" style="display: none">
                             <option value="">------</option>
-                            {% get_dent_user_column asset_obj request %}
+                            {% get_dent_user_column asset request %}
                         </select>
 
 
                     </td>
-                    <td><span class="form-control-static">{{ asset.create_date|date:"Y-m-d" }}</span></td>
+                    <td name="date" id="datebox">
+                        <input type="text" class="form-control">
+
+                        <span class="form-control-static">
+                            {{ asset.create_date|date:"Y-m-d" }}
+                        </span>
+                    </td>
                     <td name="price"><span class="form-control-static">{{ asset.price }}</span></td>
                     <td>
                         <i class="fas fa-pen"></i>
@@ -230,11 +245,14 @@
 
 
         $(document).ready(function () {
-            $('.dropdown-toggle').dropdown()
+            $('.dropdown-toggle').dropdown();
+            $('#datebox input').datepicker({});
+
         });
 
         $('#myModal').on('hidden.bs.modal', function (e) {
             // do something...
+
         });
 
 
@@ -294,7 +312,7 @@
             dent_user = window.dent_user;
             console.log(dent_user);
             if (dent_user.status == 'ok') {
-                console.log('lll');
+                console.log('add_assetform_user');
                 document.getElementById("user_add").options.length = 1;
                 users = dent_user.data.users;
                 owner = dent_user.data.owner;
@@ -331,14 +349,13 @@
             dent_user = window.dent_user;
 
             if (dent_user.status == 'ok') {
-                console.log('lll');
                 document.getElementById("user_put").options.length = 1;
                 users = dent_user.data.users;
                 owner = dent_user.data.owner;
                 $.each(users, function (i, item) {
-                        console.log(item);
-                        console.log(item.code);
-                        console.log(owner.code);
+                        //console.log(item);
+                        //console.log(item.code);
+                        //console.log(owner.code);
 
                         if (item.code == owner.code) {
                             //console.log(item.code);
@@ -358,6 +375,8 @@
                         }
                     }
                 );
+
+
             }
         };
 
@@ -377,11 +396,12 @@
                     console.log(callback);
 
                     if (callback.status == 'ok') {
+
                         $('#assetform_add_Modal').modal('hide');
+
                     } else {
 
                     }
-
 
                 },
                 error: function () {
@@ -405,28 +425,26 @@
             tr = $(this).closest("tr");
             var obj_id = tr.find("[name='id']").text();
             //console.log(obj_id);
+
             $.each(tds, function (i, ele) {
                 var txt = $(this).text();
-                if ($(this).attr("name") == 'category') {
-                    //console.log("EditData : Change icon");
+                select_list = ['department', 'manager'];
+                input_list = ['price', 'date'];
 
-                } else if ($(this).attr("name") == 'department') {
+
+                n = $(this).attr("name");
+
+                if (select_list.includes(n)) {
+
+                    console.log(n);
                     $(this).find("span").hide();
                     d = $(this).find('select');
                     var d_id = d.val();
                     d.show();
-                    console.log(d_id);
-
-                } else if ($(this).attr("name") == 'manager') {
-
-                    put_dent_user(d_id);
-                    $(this).find("span").hide();
-                    u = $(this).find('select');
-                    u.show();
-
                 }
 
-                else {
+
+                if (input_list.includes(n)) {
                     $(this).html("").append("<input type='text' class='form-control match-content' value=\"" + txt + "\">");
                 }
             })
@@ -436,7 +454,6 @@
         //DeleteData : Delete icon
         $("#mytable").on('click', "svg.svg-inline--fa.fa-trash-alt.fa-w-14", function (ele) {
             console.log('Delete');
-
 
         });
 

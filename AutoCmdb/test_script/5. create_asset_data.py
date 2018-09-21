@@ -22,7 +22,7 @@ for i in range(200):
     as_count = Asset.objects.filter(category=c).count() + 1
     num = "%03d" % as_count
 
-    Asset.objects.create(sn=num,price=400,category=c ,department=choice(dent))
+    Asset.objects.create(sn=num,price=400,category=c,department=choice(dent))
 
 
 

@@ -7,7 +7,7 @@ from asset import forms
 # Create your views here.
 
 def index(request):
-    asset_obj = models.Asset.objects.all()
+    asset_obj = models.Asset.objects.all()[:10]
     category_obj = models.Catagory.objects.all()
     department_obj = models.Department.objects.all()
     user_obj = models.UserProfile.objects.all()
