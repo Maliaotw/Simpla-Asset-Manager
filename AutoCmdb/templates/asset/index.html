@@ -2,6 +2,17 @@
 {% load asset_tags %}
 
 
+{% block head %}
+    <!-- CSS -->
+    <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
+
+    <!--  JavaScript -->
+    <script src="/static/js/bootstrap-datepicker.js"></script>
+    <script src="/static/js/bootstrap-datepicker.zh-TW.min.js"></script>
+
+
+{% endblock %}
+
 
 {% block content %}
 
@@ -81,10 +92,14 @@
 
                 <tr>
                     <td name="id" style="display: none">
-                        {{ asset_obj.id }}
+                        <input type="text" class="form-control" value="{{ asset.id }}"/>
                     </td>
 
-                    <td name="sn">
+                    <td name="sn" style="display: none">
+                        <input type="text" class="form-control" value="{{ asset.sn }}"/>
+                    </td>
+
+                    <td>
                         <span class="form-control-static">
                             {{ asset.category.code }}-{{ asset.sn }}
                         </span>
@@ -109,8 +124,6 @@
 
                             {% endfor %}
                         </select>
-
-
                     </td>
 
 
@@ -147,14 +160,22 @@
 
 
                     </td>
-                    <td name="date" id="datebox">
-                        <input type="text" class="form-control">
+                    <td name="purchase_date" id="datebox">
 
-                        <span class="form-control-static">
-                            {{ asset.create_date|date:"Y-m-d" }}
-                        </span>
+
+                        <span class="form-control-static">{{ asset.purchase_date|date:"Y-m-d" }}</span>
+
+                        <input type="text" class="form-control match-content" style="display:none;">
+
+
                     </td>
-                    <td name="price"><span class="form-control-static">{{ asset.price }}</span></td>
+                    <td name="price">
+                        <span class="form-control-static">
+                            {{ asset.price }}
+                        </span>
+
+                        <input type='number' class='form-control match-content' value="" style="display: none">
+                    </td>
                     <td>
                         <i class="fas fa-pen"></i>
                         <i class="fas fa-trash-alt"></i>
@@ -236,6 +257,7 @@
 
 
 
+
 {% endblock %}
 
 
@@ -244,11 +266,35 @@
     <script>
 
 
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+
         $(document).ready(function () {
             $('.dropdown-toggle').dropdown();
-            $('#datebox input').datepicker({});
+            $('#datebox input').datepicker(
+                {
+                    language: 'zh-TW',
+                    format: "yyyy-mm-dd",
+                    todayHighlight: true,
 
-        });
+                })
+
+
+        })
+        ;
 
         $('#myModal').on('hidden.bs.modal', function (e) {
             // do something...
@@ -306,7 +352,7 @@
             });
         };
 
-
+        // 新增資產 關聯用戶
         function add_assetform_user(e) {
             get_dent_user(e);
             dent_user = window.dent_user;
@@ -343,13 +389,21 @@
 
         }
 
+
         // 選擇類型後請求該分類數量
-        function put_dent_user(e) {
-            get_dent_user(e);
+        function put_dent_user(ele) {
+            get_dent_user(ele);
             dent_user = window.dent_user;
 
+            // 跳到上上層tr
+            tr = $(ele).closest("tr");
+
+            // 先找td name='manager' 再找 select id='user_put'
+            user_put = tr.find('[name="manager"]').find("select");
+
+            // 對 user_put append
             if (dent_user.status == 'ok') {
-                document.getElementById("user_put").options.length = 1;
+                user_put.prop('options').length = 1;
                 users = dent_user.data.users;
                 owner = dent_user.data.owner;
                 $.each(users, function (i, item) {
@@ -361,14 +415,14 @@
                             //console.log(item.code);
                             //console.log(owner.code);
 
-                            $('#user_put').append($('<option>', {
+                            user_put.append($('<option>', {
                                 value: item.id,
                                 text: item.user + "(" + item.code + ")",
                                 selected: true,
                             }));
                         } else {
 
-                            $('#user_put').append($('<option>', {
+                            user_put.append($('<option>', {
                                 value: item.id,
                                 text: item.user + "(" + item.code + ")"
                             }));
@@ -418,7 +472,7 @@
         });
 
         //編輯 EditData : Change icon
-        $("#mytable").on('click', "svg.svg-inline--fa.fa-pen.fa-w-16", function (ele) {
+        $("#mytable").on('click', ".fa-pen", function (ele) {
             console.log('edit');
             $(this).attr('data-icon', 'file');
             tds = $(this).parent().prevAll();
@@ -427,9 +481,11 @@
             //console.log(obj_id);
 
             $.each(tds, function (i, ele) {
-                var txt = $(this).text();
+                var span_tag = $(this).find("span");
+                var input_tag = $(this).find("input");
+
                 select_list = ['department', 'manager'];
-                input_list = ['price', 'date'];
+                input_list = ['price', 'purchase_date'];
 
 
                 n = $(this).attr("name");
@@ -437,22 +493,119 @@
                 if (select_list.includes(n)) {
 
                     console.log(n);
-                    $(this).find("span").hide();
-                    d = $(this).find('select');
-                    var d_id = d.val();
-                    d.show();
+                    span_tag.hide();
+                    $(this).find('select').show();
+
                 }
 
 
                 if (input_list.includes(n)) {
-                    $(this).html("").append("<input type='text' class='form-control match-content' value=\"" + txt + "\">");
+                    span_tag.hide();
+                    //console.log(span_tag);
+                    input_tag.val($.trim(span_tag.text()));
+                    input_tag.show()
                 }
             })
         });
 
 
+        //SaveData : PUT
+        $("#mytable").on('click', ".fa-file", function (ele) {
+            console.log('save');
+
+            tr = $(this).closest('tr');
+            //console.log(tr);
+            tds = $(this).parent().prevAll();
+            //console.log(tr);
+
+
+            id = tr.find('[name="id"]').find("input").val();
+            sn = tr.find('[name="sn"]').find("input").val();
+            category = tr.find('[name="category"]').find("select").val();
+            department = tr.find('[name="department"]').find("select").val();
+            manager = tr.find('[name="manager"]').find("select").val();
+            price = tr.find('[name="price"]').find("input").val();
+            purchase_date = tr.find('[name="purchase_date"]').find("input").val();
+
+            data = {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                id: id,
+                sn: sn,
+                category: category,
+                department: department,
+                manager: manager,
+                price: price,
+                purchase_date: purchase_date
+            };
+
+            console.log(data);
+
+            $.ajax({
+                headers: {
+                    'X-HTTP-Method-Override': 'PATCH'
+                },
+                url: "",
+                data: data,
+                type: 'PUT',
+                async: false,
+                success: function (callback) {
+                    //console.log(callback);
+
+                    if (callback.status == 'ok') {
+                        put_status = true
+
+                    } else {
+                        put_status = false
+                    }
+
+                },
+                error: function () {
+                    put_status = false
+
+                }
+
+            });
+
+            if (put_status) {
+                $(this).attr('data-icon', 'pen');
+                $.each(tds, function (i, ele) {
+
+                    var span_tag = $(this).find("span");
+                    var input_tag = $(this).find("input");
+                    var select_tag = $(this).find('select');
+
+                    select_list = ['department', 'manager'];
+                    input_list = ['price', 'purchase_date'];
+
+                    n = $(this).attr("name");
+
+                    if (select_list.includes(n)) {
+
+                        //console.log(select_tag);
+                        selected_text = $.trim(select_tag.find(":selected").text());
+                        console.log(selected_text);
+                        span_tag.text(selected_text);
+                        select_tag.hide();
+                        span_tag.show();
+
+                    }
+
+                    if (input_list.includes(n)) {
+                        span_tag.show();
+                        span_tag.text($.trim(input_tag.val()));
+                        input_tag.hide()
+                    }
+
+                })
+
+            }
+
+
+        });
+
+
         //DeleteData : Delete icon
-        $("#mytable").on('click', "svg.svg-inline--fa.fa-trash-alt.fa-w-14", function (ele) {
+        $("#mytable").on('click', ".fa-trash-alt", function (ele) {
             console.log('Delete');
 
         });

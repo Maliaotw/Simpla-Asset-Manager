@@ -83,6 +83,8 @@ class Asset(models.Model):
     category = models.ForeignKey("Catagory", verbose_name='類型')
     department = models.ForeignKey('Department', verbose_name='部門', null=True, blank=True)
     manager = models.ForeignKey("UserProfile", verbose_name='負責人', null=True, blank=True)
+    purchase_date = models.DateTimeField(verbose_name='購買日期', null=True, blank=True)
+
     latest_date = models.DateTimeField(verbose_name='更新日期', auto_now=True)
     create_date = models.DateTimeField(verbose_name='創建日期', auto_now_add=True)
 

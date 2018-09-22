@@ -1,5 +1,6 @@
 from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
+from django.http import QueryDict
 from asset import models
 from asset import forms
 
@@ -12,10 +13,9 @@ def index(request):
     department_obj = models.Department.objects.all()
     user_obj = models.UserProfile.objects.all()
 
-
     if request.method == 'POST':
 
-        data = {
+        ret = {
             'msg': '',
             'status': ''
         }
@@ -41,14 +41,48 @@ def index(request):
             models.Asset.objects.create(manager=manager, sn=sn, category=category, department=dent,
                                         price=price)
 
-            data['status'] = 'ok'
-            data['msg'] = '新增成功'
+            ret['status'] = 'ok'
+            ret['msg'] = '新增成功'
 
         else:
-            data['status'] = 'error'
-            data['msg'] = '輸入錯誤'
+            ret['status'] = 'error'
+            ret['msg'] = '輸入錯誤'
 
-        return JsonResponse(data)
+        return JsonResponse(ret)
+
+    if request.method == 'PUT':
+        print("This is PUT")
+        ret = {"status": "", "re_html": "", "msg": ""}
+
+        put = QueryDict(request.body)
+        print(put)
+        id = put.get('id')
+        asset_obj = models.Asset.objects.get(id=id)
+
+        form_obj = forms.AssetForm(data=put, instance=asset_obj)
+        if form_obj.is_valid():
+
+            category = form_obj.cleaned_data['category']
+            department = form_obj.cleaned_data['department']
+            manager = form_obj.cleaned_data['manager']
+            price = form_obj.cleaned_data['price']
+            purchase_date = form_obj.cleaned_data['purchase_date']
+
+
+            asset_obj.category = category
+            asset_obj.department = department
+            asset_obj.manager = manager
+            asset_obj.price = price
+            asset_obj.purchase_date = purchase_date
+            asset_obj.save()
+
+            ret['status'] = "ok"
+
+
+        else:
+            ret['status'] = 'error'
+
+        return JsonResponse(ret)
 
     return render(request, "asset/index.html", locals())
 
