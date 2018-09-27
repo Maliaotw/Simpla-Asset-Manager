@@ -3,15 +3,60 @@ from django.http import JsonResponse
 from django.http import QueryDict
 from asset import models
 from asset import forms
-
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Create your views here.
 
 def index(request):
-    asset_obj = models.Asset.objects.all()[:10]
+
+    search_field = {}
+
     category_obj = models.Catagory.objects.all()
     department_obj = models.Department.objects.all()
     user_obj = models.UserProfile.objects.all()
+
+    if request.GET:
+
+        # GET 字段
+        name = request.GET.get("name", '')
+        cate_id = request.GET.get("cate_id", '')
+        dent_id = request.GET.get("dent_id", '')
+
+        search_field['name'] = name
+        search_field['cate_id'] = cate_id
+        search_field['dent_id'] = dent_id
+
+        print(search_field)
+
+        # GET 字段 篩選
+
+        if cate_id and dent_id:
+            asset_obj = models.Asset.objects.filter(sn__contains=name,category_id=cate_id,department_id=dent_id)
+        elif cate_id:
+            asset_obj = models.Asset.objects.filter(sn__contains=name,category_id=cate_id)
+        elif dent_id:
+            asset_obj = models.Asset.objects.filter(sn__contains=name,department_id=dent_id)
+        else:
+            asset_obj = models.Asset.objects.filter(sn__contains=name)
+
+
+    else:
+        asset_obj = models.Asset.objects.all()
+
+
+    # 分頁功能
+
+    paginator = Paginator(asset_obj, 10)  # Show 10 contacts per page
+
+    page = request.GET.get('page')
+    try:
+        asset_obj = paginator.page(page)
+    except PageNotAnInteger:
+        asset_obj = paginator.page(1)
+    except EmptyPage:
+        asset_obj = paginator.page(paginator.num_pages)
+
+
 
     if request.method == 'POST':
 
@@ -38,8 +83,7 @@ def index(request):
             dent = form_obj.cleaned_data['department']
             price = form_obj.cleaned_data['price']
 
-            models.Asset.objects.create(manager=manager, sn=sn, category=category, department=dent,
-                                        price=price)
+            models.Asset.objects.create(manager=manager, sn=sn, category=category, department=dent,price=price)
 
             ret['status'] = 'ok'
             ret['msg'] = '新增成功'

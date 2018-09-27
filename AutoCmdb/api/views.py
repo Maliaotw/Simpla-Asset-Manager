@@ -66,7 +66,7 @@ def dent_user(request):
         'msg': '',
         'users': '',
         'owner': {
-            'user': dent.user.user.username,
+            'user': dent.user.name,
             'code': '%s%s' % (dent.block_number,dent.user.code),
             'id': dent.user.user.id,
         }
@@ -75,7 +75,7 @@ def dent_user(request):
     user_list = []
     for u in users:
         user_data = {
-            'user': u.user.username,
+            'user': u.name,
             'code': "%s%s" % (dent.block_number,u.code),
             'id': u.user.id
         }
