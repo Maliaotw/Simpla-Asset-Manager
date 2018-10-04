@@ -15,3 +15,24 @@ class AssetForm(ModelForm):
 
 
 
+
+class DentForm(ModelForm):
+    '''
+    部門表單
+    '''
+
+    class Meta:
+        model = models.Department
+        fields = '__all__'
+
+
+class CaryForm(ModelForm):
+    '''
+    類型表單
+    '''
+
+    class Meta:
+        model = models.Catagory
+        fields = '__all__'
+
+

@@ -101,6 +101,21 @@ def get_pageer(data, search_field):
     if data.has_next():
         # <li><a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
         # txt += '<a class="icon item" href="?page=%s%s"><i class="right chevron icon"></i></a>' % (data.paginator.num_pages, search_str)
-        txt += '<li><a href="?page=%s%s" aria-label="Next"><span aria-hidden="true"></span></a></li>' % (data.paginator.num_pages, search_str)
+        txt += '<li><a href="?page=%s%s" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>' % (data.paginator.num_pages, search_str)
 
     return mark_safe(txt)
+
+
+@register.simple_tag
+def get_category_column(category_obj):
+
+    return models.Asset.objects.filter(category=category_obj).count()
+
+
+
+
+
+
+
+
+

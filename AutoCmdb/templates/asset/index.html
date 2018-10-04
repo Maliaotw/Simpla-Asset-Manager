@@ -124,7 +124,7 @@
                         <select class="form-control" style="display: none">
 
                             {% for category in category_obj %}
-                                {% if  asset.category  ==  category %}
+                                {% if asset.category  ==  category %}
                                     <option selected
                                             value="{{ category.id }}">{{ category.name }}({{ category.code }})
                                     </option>
@@ -143,6 +143,7 @@
                         </span>
 
                         <select class="form-control" onchange="put_dent_user(this)" style="display: none">
+
 
                             {% for department in department_obj %}
                                 {% if  asset.department  ==  department %}
@@ -172,9 +173,7 @@
                     </td>
                     <td name="purchase_date" id="datebox">
 
-
                         <span class="form-control-static">{{ asset.purchase_date|date:"Y-m-d" }}</span>
-
                         <input type="text" class="form-control match-content" style="display:none;">
 
 
@@ -188,11 +187,10 @@
                     </td>
                     <td>
                         <i class="fas fa-pen"></i>
-                        <i class="fas fa-trash-alt"></i>
+
                     </td>
                 </tr>
             {% endfor %}
-
 
             </tbody>
 
@@ -274,8 +272,8 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button id="assetform_submit" type="button" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="assetform_submit" type="button" class="btn btn-primary">新增</button>
                 </div>
             </div>
         </div>
@@ -308,7 +306,6 @@
             }
         });
 
-
         $(document).ready(function () {
             $('.dropdown-toggle').dropdown();
             $('#datebox input').datepicker(
@@ -321,20 +318,6 @@
 
             $(".selectpicker[name='cate_id']").selectpicker('val', {{ cate_id }});
             $(".selectpicker[name='dent_id']").selectpicker('val', {{ dent_id }});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         })
         ;
@@ -399,7 +382,7 @@
         function add_assetform_user(e) {
             get_dent_user(e);
             dent_user = window.dent_user;
-            console.log(dent_user);
+            //console.log(dent_user);
             if (dent_user.status == 'ok') {
                 console.log('add_assetform_user');
                 document.getElementById("user_add").options.length = 1;
@@ -535,7 +518,7 @@
 
                 if (select_list.includes(n)) {
 
-                    console.log(n);
+                    //console.log(n);
                     span_tag.hide();
                     $(this).find('select').show();
 
@@ -581,7 +564,7 @@
                 purchase_date: purchase_date
             };
 
-            console.log(data);
+            //console.log(data);
 
             $.ajax({
                 headers: {
@@ -637,7 +620,9 @@
                         span_tag.show();
                         span_tag.text($.trim(input_tag.val()));
                         input_tag.hide()
+
                     }
+
 
                 })
 
@@ -649,7 +634,8 @@
 
         //DeleteData : Delete icon
         $("#mytable").on('click', ".fa-trash-alt", function (ele) {
-            console.log('Delete');
+            //console.log('Delete');
+
 
         });
 

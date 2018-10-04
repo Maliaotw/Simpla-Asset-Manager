@@ -1,5 +1,5 @@
 {% extends 'asset/base.html' %}
-
+{% load asset_tags %}
 
 
 
@@ -8,39 +8,432 @@
 {% block content %}
 
 
-    <h2 class="sub-header">部門</h2>
-    <div class="table-responsive">
-        <table class="table">
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>名稱</th>
-                <th>簡稱</th>
-                <th>工/代號</th>
-                <th>工/代號長度</th>
-                <th>負責人</th>
+    <ol class="breadcrumb">
+        <li><a href="#">部門管理</a></li>
 
+    </ol>
 
-            </tr>
-            </thead>
-            <tbody>
-            {% for department in department_obj %}
+    <div class="panel panel-default" style="padding: 20px">
 
+        <div class="row">
+
+            <div class="col-md-4">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#dentform_add_Modal">
+                    新增部門
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table" id="mytable" style="margin-top: 20px">
+                <thead>
                 <tr>
-                    <td>{{ department.id}}</td>
-                    <td>{{ department.name}}部</td>
-                    <td>{{ department.code }}</td>
-                    <td>{{ department.block_number }}</td>
-                    <td>{{ department.block_number_len }}</td>
-                    <td>{{ department.user }}</td>
-
+                    <th>ID</th>
+                    <th>名稱</th>
+                    <th>簡稱</th>
+                    <th>工/代號</th>
+                    <th>工/代號長度</th>
+                    <th>負責人</th>
+                    <th>操作</th>
                 </tr>
-            {% endfor %}
+                </thead>
+                <tbody>
+                {% for department in department_obj %}
+
+                    <tr>
+                        <td name="id">
+                            {{ department.id }}
+                        </td>
+
+                        <td name="name">{{ department.name }}部</td>
+                        <td name="code">{{ department.code }}</td>
+                        <td name="block_number">{{ department.block_number }}</td>
+                        <td name="block_number_len">{{ department.block_number_len }}</td>
+                        <td name="user">
+
+                            <span class="form-control-static">
+                                {{ department.user }}
+                            </span>
+                            <select class="form-control" style="display: none">
+
+                                <option value="">-----</option>
 
 
-            </tbody>
-        </table>
+                                {% for user in user_obj %}
+                                    {% if department.user   ==  user %}
+                                        <option selected
+                                                value="{{ user.id }}">{{ user }}
+                                        </option>
+                                    {% else %}
+                                        <option value="{{ user.id }}">{{ user }}</option>
+                                    {% endif %}
+
+                                {% endfor %}
+                            </select>
+
+                        </td>
+                        <td>
+                            <i class="fas fa-pen"></i>
+                            <i class="fas fa-trash-alt"></i>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+
+
+
+            <tfoot>
+            <th colspan="7">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pull-right">
+                        {% get_pageer dent_obj search_field %}
+                    </ul>
+                </nav>
+
+            </th>
+
+            </tfoot>
+
+
+            </table>
+        </div>
     </div>
 
 
+
+
+    <!--- 新增部門表單-->
+    <div class="modal fade" id="dentform_add_Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+
+                    <h4 class="modal-title" id="myModalLabel">新增部門</h4>
+                </div>
+                <div class="modal-body">
+                    <form method="post" id="dentform_add">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label class="col-form-label">部門名稱</label>
+                            <input type="text" name="name" class="form-control" placeholder="">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-form-label">簡稱</label>
+                            <input type="text" name="code" class="form-control" placeholder="">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-form-label">工/代號</label>
+                            <input type="number" name="block_number" class="form-control" placeholder="">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-form-label">工/代號長度</label>
+                            <input type="number" name="block_number_len" class="form-control" placeholder="">
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="col-form-label">資產負責人</label>
+                            <select id='user_add' name="manager" class="form-control">
+                                <option value="">-------</option>
+
+                                {% for user in user_obj %}
+
+                                    <option value="{{ user.id }}">{{ user.name }}({{ user.dent.block_number }}{{ user.code }})</option>
+
+                                {% endfor %}
+                            </select>
+                        </div>
+
+
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="dentform_add_submit" type="button" class="btn btn-primary">新增</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <!--- 刪除部門表單 -->
+
+    <div class="modal fade" id="dentform_del_Modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">刪除部門</h4>
+                </div>
+                <div class="modal-body">
+                    <p>您確定要刪除<span style="color: red"></span><input type="number" style="display:none;">嗎</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="dentform_del_submit" type="button" class="btn btn-primary">確認</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+
+
+
 {% endblock %}
+
+
+
+
+
+{% block extra-js %}
+
+    <script>
+
+
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+
+        // 提交 新增資產表單
+        $("#dentform_add").on("submit", function (e) {
+            //console.log(e);
+            //console.log($(this));
+            var postData = $(this).serializeArray();
+            console.log(postData);
+
+            $.ajax({
+                url: "",
+                type: "POST",
+                data: postData,
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback.status == 'ok') {
+
+                        $('#dentform_add_Modal').modal('hide');
+                        location.reload();
+
+                    }else{
+                        //請輸入資料
+
+                    }
+
+                },
+                error: function () {
+
+                }
+            });
+            e.preventDefault();
+        });
+
+
+        $("#dentform_add_submit").on('click', function () {
+
+            $("#dentform_add").submit();
+
+        });
+
+
+        //編輯 EditData : Change icon
+        $("#mytable").on('click', ".fa-pen", function (ele) {
+            console.log('edit');
+
+            $(this).attr('data-icon', 'file');
+
+            tds = $(this).parent().prevAll();
+            tr = $(this).closest("tr");
+            var obj_id = tr.find("[name='id']").text();
+
+            //console.log(obj_id);
+
+            $.each(tds, function (i, ele) {
+                var span_tag = $(this).find("span");
+                var input_tag = $(this).find("input");
+
+                //user
+                select_list = ['user'];
+
+                n = $(this).attr("name");
+
+
+                if (select_list.includes(n)) {
+                    console.log(n);
+                    span_tag.hide();
+                    $(this).find('select').show();
+                }
+
+            });
+
+
+        });
+
+
+        //SaveData : PUT
+        $("#mytable").on('click', ".fa-file", function (ele) {
+
+            console.log('save');
+            $(this).attr('data-icon', 'pen');
+
+            tr = $(this).closest('tr');
+            //console.log(tr);
+            tds = $(this).parent().prevAll();
+            //console.log(tr);
+
+
+            id = $.trim(tr.find('[name="id"]').text());
+            user = tr.find('[name="user"]').find("select").val();
+
+            data = {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                id: id,
+                user: user,
+
+            };
+
+            //console.log(data);
+
+
+            $.ajax({
+                headers: {
+                    'X-HTTP-Method-Override': 'PATCH'
+                },
+                url: "",
+                data: data,
+                type: 'PUT',
+                async: false,
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback.status == 'ok') {
+                        put_status = true
+
+                    } else {
+                        put_status = false
+                    }
+
+                },
+                error: function () {
+                    put_status = false
+
+                }
+
+            });
+
+
+            if (put_status) {
+                $(this).attr('data-icon', 'pen');
+                $.each(tds, function (i, ele) {
+
+                    var span_tag = $(this).find("span");
+                    var input_tag = $(this).find("input");
+                    var select_tag = $(this).find('select');
+
+                    select_list = ['user'];
+                    input_list = [];
+
+                    n = $(this).attr("name");
+
+                    if (select_list.includes(n)) {
+
+                        //console.log(select_tag);
+                        selected_text = $.trim(select_tag.find(":selected").text());
+                        console.log(selected_text);
+                        span_tag.text(selected_text);
+                        select_tag.hide();
+                        span_tag.show();
+
+                    }
+
+                    if (input_list.includes(n)) {
+                        span_tag.show();
+                        span_tag.text($.trim(input_tag.val()));
+                        input_tag.hide()
+                    }
+
+                })
+
+            }
+
+
+        });
+
+
+        // 刪除 DelData : Del icon
+        $("#mytable").on('click', ".fa-trash-alt", function (ele) {
+
+            console.log('del');
+
+            tr = $(this).closest("tr");
+
+            var id = $.trim(tr.find("[name='id']").text());
+            var name = $.trim(tr.find("[name='name']").text());
+            //console.log($.trim(id),$.trim(name));
+
+            $('#dentform_del_Modal .modal-body').find('span').text(name);
+            $('#dentform_del_Modal .modal-body').find('input').val(id);
+            $('#dentform_del_Modal').modal('show');
+
+        });
+
+
+        // 提交刪除
+
+        $("#dentform_del_submit").on('click', function (event) {
+
+
+            var name = $('#dentform_del_Modal .modal-body').find('span').text();
+            var id = $('#dentform_del_Modal .modal-body').find('input').val();
+
+            console.log(name, id);
+
+            data = {id: id};
+
+            $.ajax({
+                url: "",
+                data: data,
+                type: 'DELETE',
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback.status == 'ok') {
+
+                        tr.remove();
+                        $('#dentform_del_Modal').modal('hide');
+
+
+                    }
+                }
+            });
+
+
+        });
+
+
+    </script>
+
+{% endblock %}
+

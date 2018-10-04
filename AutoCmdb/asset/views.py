@@ -39,7 +39,6 @@ def index(request):
         else:
             asset_obj = models.Asset.objects.filter(sn__contains=name)
 
-
     else:
         asset_obj = models.Asset.objects.all()
 
@@ -132,12 +131,181 @@ def index(request):
 
 
 def department(request):
+
+
+    ret = {"status": "", "re_html": "", "msg": ""}
+
+
+    search_field = {}
+
     department_obj = models.Department.objects.all()
+    user_obj = models.UserProfile.objects.all()
+
+    # 分頁功能
+
+    paginator = Paginator(department_obj, 10)  # Show 10 contacts per page
+
+    page = request.GET.get('page')
+    try:
+        dent_obj = paginator.page(page)
+    except PageNotAnInteger:
+        dent_obj = paginator.page(1)
+    except EmptyPage:
+        dent_obj = paginator.page(paginator.num_pages)
+
+    if request.method == 'POST':
+
+
+        form_obj = forms.DentForm(data=request.POST)
+
+        if form_obj.is_valid():
+
+            form_obj.save()
+
+            ret['status'] = 'ok'
+            ret['msg'] = '新增成功'
+
+        else:
+            ret['status'] = 'error'
+            ret['msg'] = '輸入錯誤'
+
+        return JsonResponse(ret)
+
+
+
+    if request.method == 'PUT':
+        print("This is PUT")
+
+
+        put = QueryDict(request.body)
+        print(put)
+        dent_id = put.get('id')
+        dent_obj = models.Department.objects.get(id=dent_id)
+        user_id = put.get('user')
+
+
+        if user_id:
+            user_obj = models.UserProfile.objects.get(id=user_id)
+            dent_obj.user = user_obj
+        else:
+
+            dent_obj.user = None
+
+        dent_obj.save()
+
+        ret['msg'] = '成功'
+        ret['status'] = 'ok'
+
+        return JsonResponse(ret)
+
+    if request.method == 'DELETE':
+        print("This is Delete")
+        put = QueryDict(request.body)
+        id = put.get('id')
+        dent_obj = models.Department.objects.get(id=id)
+        dent_obj.delete()
+
+        ret['msg'] = '成功'
+        ret['status'] = 'ok'
+
+        return JsonResponse(ret)
+
+
+
+    
     return render(request, "asset/department.html", locals())
 
 
 def category(request):
+
+
+    ret = {"status": "", "re_html": "", "msg": ""}
+
+    search_field = {}
+
     category_obj = models.Catagory.objects.all()
+
+    # 分頁功能
+
+    paginator = Paginator(category_obj, 10)  # Show 10 contacts per page
+
+    page = request.GET.get('page')
+    try:
+        cary_obj = paginator.page(page)
+    except PageNotAnInteger:
+        cary_obj = paginator.page(1)
+    except EmptyPage:
+        cary_obj = paginator.page(paginator.num_pages)
+
+
+    # 增
+    if request.method == 'POST':
+
+        print("This is POST")
+
+        form_obj = forms.CaryForm(data=request.POST)
+
+        if form_obj.is_valid():
+
+            form_obj.save()
+
+            ret['status'] = 'ok'
+            ret['msg'] = '新增成功'
+
+        else:
+            ret['status'] = 'error'
+            ret['msg'] = '輸入錯誤!'
+
+
+        return JsonResponse(ret)
+
+    # 改
+    if request.method == 'PUT':
+
+        print("This is PUT")
+
+        put = QueryDict(request.body)
+        print(put)
+        cary_id = put.get('id')
+        name = put.get('name')
+        code = put.get('code')
+
+        cary_obj = models.Catagory.objects.get(id=cary_id)
+
+        form_obj = forms.CaryForm(data=put,instance=cary_obj)
+
+        if form_obj.is_valid():
+            form_obj.save()
+
+            ret['status'] = 'ok'
+            ret['msg'] = '新增成功'
+
+        else:
+            ret['status'] = 'error'
+            ret['msg'] = '輸入錯誤!'
+
+
+
+
+
+
+        return JsonResponse(ret)
+
+
+    # 刪
+    if request.method == 'DELETE':
+
+        print("This is DELETE")
+
+        return JsonResponse(ret)
+
+
+
+
+
+
+
+
     return render(request, "asset/category.html", locals())
 
 
