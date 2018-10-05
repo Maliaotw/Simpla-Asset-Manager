@@ -20,10 +20,10 @@ from asset import views
 
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
-    url(r'^index', views.index),
-    url(r'^department/', views.department),
-    url(r'^category/', views.category),
+    url(r'^index', views.index, name="asset"),
+    url(r'^department/', views.department,name="department"),
+    url(r'^category/', views.category,name="category"),
 
-    url(r'^user/', views.user),
+    url(r'^user/', views.user,name="user"),
 
 ]

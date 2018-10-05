@@ -48,7 +48,7 @@ def category(request):
     cate_id = request.GET.get('cate')
 
     c = Catagory.objects.get(id=cate_id)
-    a = Asset.objects.filter(category=c).count()+1
+    a = Asset.objects.filter(category=c).count() + 1
     data = {
         'count': a,
         'number': "%03d" % a
@@ -57,26 +57,33 @@ def category(request):
 
 
 def dent_user(request):
+    ret = {
+        'msg': '',
+        'users': '',
+        'owner': ''
+    }
+
     dent_id = request.GET.get('dent')
 
     dent = Department.objects.get(id=dent_id)
     users = UserProfile.objects.filter(dent=dent)
     # print(users)
-    ret = {
-        'msg': '',
-        'users': '',
-        'owner': {
+
+    # 負責人
+
+    if dent.user:
+        ret['owner'] = {
             'user': dent.user.name,
-            'code': '%s%s' % (dent.block_number,dent.user.code),
+            'code': '%s%s' % (dent.block_number, dent.user.code),
             'id': dent.user.user.id,
         }
-    }
 
+    # 遍歷用戶
     user_list = []
     for u in users:
         user_data = {
             'user': u.name,
-            'code': "%s%s" % (dent.block_number,u.code),
+            'code': "%s%s" % (dent.block_number, u.code),
             'id': u.user.id
         }
         user_list.append(user_data)
@@ -84,3 +91,34 @@ def dent_user(request):
     ret['users'] = user_list
 
     return JsonResponse(ret)
+
+
+def add_user_number(request):
+
+    ret = {
+        'data': '',
+        'status': ''
+    }
+
+    dent_id = request.GET.get('id')
+    dent_obj = Department.objects.get(id=dent_id)
+
+    # 部門人數
+    user_count = UserProfile.objects.filter(dent=dent_obj).count()+1
+
+    # 部門編號
+    block_number = dent_obj.block_number
+
+    # 部門長度
+
+    block_number_len = dent_obj.block_number_len
+
+    num_format = "%0{}d".format(block_number_len - len(block_number))  # block_numer_len
+
+    num = num_format % (user_count)  # block_numer
+
+    print(block_number + num)
+    ret['data'] = block_number + num
+
+    return JsonResponse(ret)
+

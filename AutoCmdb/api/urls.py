@@ -22,6 +22,7 @@ urlpatterns = [
     # url(r'^admin/', admin.site.urls),
     url(r'^category/', views.category),
     url(r'^dent_user/', views.dent_user),
+    url(r'^add_user_number/', views.add_user_number),
     url(r'^asset/', views.asset),
 
 ]

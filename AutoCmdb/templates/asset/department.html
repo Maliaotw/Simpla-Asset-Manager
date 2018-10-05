@@ -114,6 +114,14 @@
                     <h4 class="modal-title" id="myModalLabel">新增部門</h4>
                 </div>
                 <div class="modal-body">
+
+
+                <!-- 錯誤提示-->
+                    <div class="alert alert-danger">
+                        <strong></strong>
+                    </div>
+
+
                     <form method="post" id="dentform_add">
                         {% csrf_token %}
                         <div class="form-group">
@@ -218,6 +226,16 @@
         });
 
 
+        // 初始 新增類型表單
+        $('#dentform_add_Modal').on('show.bs.modal', function (event) {
+
+            $("#dentform_add_Modal .alert-danger").hide();
+
+        });
+
+
+
+
         // 提交 新增資產表單
         $("#dentform_add").on("submit", function (e) {
             //console.log(e);
@@ -238,7 +256,9 @@
                         location.reload();
 
                     }else{
-                        //請輸入資料
+                        //新增錯誤
+                        $("#dentform_add_Modal .alert-danger").show();
+                        $("#dentform_add_Modal .alert-danger strong").text(callback.msg);
 
                     }
 

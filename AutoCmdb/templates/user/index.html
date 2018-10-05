@@ -1,38 +1,281 @@
 {% extends 'user/base.html' %}
+{% load asset_tags %}
+
+
+
+{% block head %}
+    <!-- CSS -->
+    <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/css/bootstrap-select.css">
+
+
+
+    <!--  JavaScript -->
+    <script src="/static/js/bootstrap-datepicker.js"></script>
+    <script src="/static/js/bootstrap-datepicker.zh-TW.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="/static/js/bootstrap-select.js"></script>
+
+
+
+{% endblock %}
 
 
 
 {% block content %}
 
-    <h2 class="sub-header">用戶管理</h2>
 
-    <div class="table-responsive">
-        <table class="table">
-            <thead>
-            <tr>
-                <th>名稱</th>
-                <th>英文名</th>
-                <th>性別</th>
-                <th>編號</th>
-                <th>部門</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for user in user_obj %}
+    <ol class="breadcrumb">
+        <li><a href="#">用戶管理</a></li>
 
+    </ol>
+
+
+    <div class="panel panel-default" style="padding: 20px">
+
+
+        <div class="row">
+
+            <div class="col-md-4">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#userform_add_Modal">
+                    新增用戶
+                </button>
+            </div>
+
+
+            <!-- 篩選 -->
+            <div class="col-md-8" style="text-align: right">
+
+
+                <form class="form-inline" method="get">
+
+                    <div class="form-group">
+                        <label for="inputsearch" class="col-form-label">搜尋</label>
+                        <input type="" class="form-control" name='name' id="search" placeholder="" value="{{ name }}">
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-form-label">性別</label>
+                        <select class="selectpicker" name='sex_id' data-width="fit">
+                            <option value="">-------</option>
+                            {% for sex in sex_obj %}
+                                <option value="{{ sex.0 }}">{{ sex.1 }}</option>
+                            {% endfor %}
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-form-label">部門</label>
+                        <select class="selectpicker" name="dent_id" data-width="fit">
+                            <option value="">-------</option>
+                            {% for department in dent_obj %}
+                                <option value="{{ department.id }}">{{ department.name }}部({{ department.code }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success" style="margin-left: 20px">Submit</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table" id="mytable" style="margin-top: 20px">
+                <thead>
                 <tr>
-                    <td>{{ user.name }}</td>
-                    <td>{{ user.user.username }}</td>
-                    <td>{{ user.get_sex_display }}</td>
-                    <td>{{ user.dent.block_number }}{{ user.code }}</td>
-                    <td>{{ user.dent }}</td>
+
+                    <th>編號</th>
+                    <th>名稱</th>
+                    <th>英文名</th>
+                    <th>性別</th>
+                    <th>部門</th>
                 </tr>
+                </thead>
+                <tbody>
+                {% for user in user_obj %}
 
-            {% endfor %}
+                    <tr>
+                        <td>{{ user.dent.block_number }}{{ user.code }}</td>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.user.username }}</td>
+                        <td>{{ user.get_sex_display }}</td>
+                        <td>{{ user.dent }}</td>
+                    </tr>
 
-            </tbody>
-        </table>
+                {% endfor %}
+
+                </tbody>
+
+
+                <tfoot>
+                <th colspan="7">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination pull-right">
+                            {% get_pageer user_obj search_field %}
+                        </ul>
+                    </nav>
+
+                </th>
+
+                </tfoot>
+
+            </table>
+        </div>
     </div>
 
 
+    <!--- 新增用戶表單-->
+    <div class="modal fade" id="userform_add_Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+
+                    <h4 class="modal-title" id="myModalLabel">新增用戶</h4>
+
+                </div>
+                <div class="modal-body">
+
+
+                    <!-- 錯誤提示-->
+                    <div class="alert alert-danger">
+                        <strong></strong>
+                    </div>
+
+
+                    <form method="post" id="userform_add">
+                        {% csrf_token %}
+
+                        <div class="form-group">
+                            <label class="col-form-label">中文名</label>
+                            <input type="text" name="name" class="form-control" placeholder="">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-form-label">英文名</label>
+                            <input type="text" name="username" class="form-control" placeholder="">
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="col-form-label">性別</label>
+                            <select id='sex_add' name="sex" class="form-control">
+                                <option value="">-------</option>
+                                {% for sex in sex_obj %}
+                                    <option value="{{ sex.0 }}">{{ sex.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-form-label">部門</label>
+                            <select name="dent" class="form-control" onchange="get_user_number(this)">
+                                <option value="">-------</option>
+                                {% for department in dent_obj %}
+                                    <option value="{{ department.id }}">{{ department.name }}部({{ department.code }})</option>
+                                {% endfor %}
+
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-form-label">編號</label>
+                            <input type="number" name="code" class="form-control" placeholder="">
+                        </div>
+
+
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="userform_submit" type="button" class="btn btn-primary">新增</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
 {% endblock %}
+
+
+
+
+
+
+
+{% block extra-js %}
+
+    <script>
+
+
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        $(document).ready(function () {
+
+            $(".selectpicker[name='sex_id']").selectpicker('val', {{ sex_id }});
+            $(".selectpicker[name='dent_id']").selectpicker('val', {{ dent_id }});
+
+
+        })
+
+
+        // 初始 新增用戶表單
+        $('#userform_add_Modal').on('show.bs.modal', function (e) {
+
+            $("#userform_add").trigger('reset');
+            $("#userform_add_Modal .alert-danger").hide();
+            $("#userform_add_Modal [name='code']").attr("disabled", "disabled");
+
+        });
+
+
+        // 選擇類型後請求該分類數量
+        function get_user_number(e) {
+
+
+            $.ajax({
+                url: "/api/add_user_number",
+                type: "GET",
+                data: {'id':18},
+
+                success: function (callback) {
+                    console.log(callback);
+
+                },
+                error: function () {
+                }
+            });
+        };
+
+    </script>
+
+{% endblock %}
+
+

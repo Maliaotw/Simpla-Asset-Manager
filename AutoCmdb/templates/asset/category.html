@@ -26,6 +26,10 @@
             </div>
         </div>
 
+        <div class="alert alert-danger" style="margin-top: 20px;display: none">
+            <strong></strong>
+        </div>
+
 
         <div class="table-responsive">
             <table class="table" id="mytable" style="margin-top: 20px">
@@ -45,8 +49,7 @@
                         <td name="id" style="display: none">
 
 
-                            <input type="text" class='form-control match-content' value="{{ category.id }}"
-                                   >
+                            <input type="text" class='form-control match-content' value="{{ category.id }}">
 
                         </td>
 
@@ -77,11 +80,8 @@
                             <i class="fas fa-pen"></i>
                             <i class="fas fa-trash-alt"></i>
                         </td>
-
-
                     </tr>
                 {% endfor %}
-
 
                 </tbody>
 
@@ -117,6 +117,7 @@
                     <h4 class="modal-title" id="myModalLabel">新增類型</h4>
                 </div>
                 <div class="modal-body">
+                    <!-- 錯誤提示-->
                     <div class="alert alert-danger">
                         <strong></strong>
                     </div>
@@ -296,7 +297,6 @@
             tds = $(this).parent().prevAll();
             //console.log(tr);
 
-
             var id = tr.find('[name="id"]').find("input").val();
             var name = tr.find('[name="name"]').find("input").val();
             var code = tr.find('[name="code"]').find("input").val();
@@ -320,15 +320,18 @@
                     //console.log(callback);
 
                     if (callback.status == 'ok') {
-                        put_status = true
+                        put_status = true;
+                        put_msg = callback.msg;
 
                     } else {
-                        put_status = false
+                        put_status = false;
+                        put_msg = callback.msg;
                     }
 
                 },
                 error: function () {
-                    put_status = false
+                    put_status = false;
+                    put_msg = callback.msg;
 
                 }
 
@@ -337,6 +340,8 @@
             if (put_status) {
                 // 修改完成
                 $(this).attr('data-icon', 'pen');
+                $(".panel-default .alert-danger strong").text("");
+                $(".panel-default .alert-danger").hide();
                 $.each(tds, function (i, ele) {
 
                     var span_tag = $(this).find("span");
@@ -369,9 +374,10 @@
 
                 })
 
-            }else {
+            } else {
 
-
+                $(".panel-default .alert-danger strong").text(put_msg);
+                $(".panel-default .alert-danger").show()
 
 
             }
@@ -382,7 +388,49 @@
         // 刪除 DelData : Del icon
         $("#mytable").on('click', ".fa-trash-alt", function (ele) {
             console.log('del');
+            tr = $(this).closest("tr");
+            var id = $.trim(tr.find("[name='id'] input").val());
+            var name = $.trim(tr.find("[name='name']").text());
+            console.log($.trim(id),$.trim(name));
+
+            $('#caryform_del_Modal .modal-body').find('span').text(name);
+            $('#caryform_del_Modal .modal-body').find('input').val(id);
+            $('#caryform_del_Modal').modal('show');
+
         });
+
+
+        // 提交刪除
+
+        $("#caryform_del_submit").on('click', function (event) {
+
+
+            var name = $('#caryform_del_Modal .modal-body').find('span').text();
+            var id = $('#caryform_del_Modal .modal-body').find('input').val();
+
+            console.log(name, id);
+
+            data = {id: id};
+
+            $.ajax({
+                url: "{% url 'category' %}",
+                data: data,
+                type: 'DELETE',
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback.status == 'ok') {
+
+                        tr.remove();
+                        $('#caryform_del_Modal').modal('hide');
+
+                    }
+                }
+            });
+
+
+        });
+
 
     </script>
 

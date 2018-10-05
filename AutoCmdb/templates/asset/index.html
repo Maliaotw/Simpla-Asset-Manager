@@ -8,8 +8,6 @@
 
     <link rel="stylesheet" href="/static/css/bootstrap-select.css">
 
-
-
     <!--  JavaScript -->
     <script src="/static/js/bootstrap-datepicker.js"></script>
     <script src="/static/js/bootstrap-datepicker.zh-TW.min.js"></script>
@@ -40,9 +38,9 @@
                 </button>
             </div>
 
-
+            <!-- 篩選 -->
             <div class="col-md-8" style="text-align: right">
-                <!-- 篩選 -->
+
                 <form class="form-inline" method="get">
 
                     <div class="form-group">
@@ -92,6 +90,7 @@
                 <th>負責人</th>
                 <th>購買日期</th>
                 <th>價格</th>
+                <th>狀態</th>
                 <th>操作</th>
 
 
@@ -185,6 +184,11 @@
 
                         <input type='number' class='form-control match-content' value="" style="display: none">
                     </td>
+
+
+                    <!-- TODO  狀態 --->
+                    <td></td>
+
                     <td>
                         <i class="fas fa-pen"></i>
 
@@ -225,6 +229,14 @@
                     <h4 class="modal-title" id="myModalLabel">新增資產</h4>
                 </div>
                 <div class="modal-body">
+
+
+                    <!-- 錯誤提示-->
+                    <div class="alert alert-danger">
+                        <strong></strong>
+                    </div>
+
+
                     <form method="post" id="assetform_add">
                         {% csrf_token %}
                         <div class="form-group">
@@ -327,9 +339,14 @@
 
         });
 
-
+        // 初始 新增資產表單
         $('#assetform_add_Modal').on('show.bs.modal', function (e) {
+
             $("#assetform_add").trigger('reset');
+            $("#assetform_add_Modal .alert-danger").hide();
+            $("#assetform_add_Modal #user_add").attr("disabled","disabled");
+
+
         });
 
 
@@ -384,14 +401,17 @@
             dent_user = window.dent_user;
             //console.log(dent_user);
             if (dent_user.status == 'ok') {
+                // 解開#user_add select選項 disabled
+                $("#assetform_add_Modal #user_add").removeAttr("disabled");
+
                 console.log('add_assetform_user');
                 document.getElementById("user_add").options.length = 1;
                 users = dent_user.data.users;
                 owner = dent_user.data.owner;
                 $.each(users, function (i, item) {
-                        console.log(item);
-                        console.log(item.code);
-                        console.log(owner.code);
+                        //console.log(item);
+                        //console.log(item.code);
+                        //console.log(owner.code);
 
                         if (item.code == owner.code) {
                             //console.log(item.code);
@@ -461,6 +481,9 @@
         };
 
 
+
+
+
         // 提交 新增資產表單
         $("#assetform_add").on("submit", function (e) {
             //console.log(e);
@@ -477,9 +500,13 @@
 
                     if (callback.status == 'ok') {
 
+                        $("#assetform_add_Modal .alert-danger strong").text("");
                         $('#assetform_add_Modal').modal('hide');
 
                     } else {
+
+                        $("#assetform_add_Modal .alert-danger").show();
+                        $("#assetform_add_Modal .alert-danger strong").text(callback.msg);
 
                     }
 
@@ -544,7 +571,6 @@
             tds = $(this).parent().prevAll();
             //console.log(tr);
 
-
             id = tr.find('[name="id"]').find("input").val();
             sn = tr.find('[name="sn"]').find("input").val();
             category = tr.find('[name="category"]').find("select").val();
@@ -599,6 +625,7 @@
                     var span_tag = $(this).find("span");
                     var input_tag = $(this).find("input");
                     var select_tag = $(this).find('select');
+
 
                     select_list = ['department', 'manager'];
                     input_list = ['price', 'purchase_date'];

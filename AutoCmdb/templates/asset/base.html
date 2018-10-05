@@ -8,17 +8,28 @@
 {% block sideber_menu %}
 
 
+
+    {% url 'asset' as asset %}
+    {% url 'department' as department %}
+    {% url 'category' as category %}
+
+    {% url 'host' as host %}
+    {% url 'user' as user %}
+
+
     <ul class="nav nav-sidebar">
 
-        <li class="active"><a href="/asset/index">資產管理</a></li>
-        <li><a href="/asset/department">部門</a></li>
-        <li><a href="/asset/category">類型</a></li>
+        <li {% if request.path == asset %}class="active"{% endif %}><a href={{ asset }}>資產管理</a></li>
+        <li {% if request.path == department %}class="active"{% endif %}><a href={{ department }}>部門</a></li>
+        <li {% if request.path == category %}class="active"{% endif %}><a href={{ category }}>類型</a></li>
 
     </ul>
 
     <ul class="nav nav-sidebar">
-        <li><a href="/host/index">運維管理</a></li>
-        <li><a href="/asset/user">用戶管理</a></li>
+
+        <li {% if request.path == host %}class="active"{% endif %}><a href={{ host }}>運維管理</a></li>
+        <li {% if request.path == user %}class="active"{% endif %}><a href={{ user }}>用戶管理</a></li>
+
     </ul>
 
 

@@ -8,18 +8,23 @@
 {% block sideber_menu %}
 
 
+    {% url 'host' as host %}
+    {% url 'location' as location %}
+
+    {% url 'asset' as asset %}
+
+
     <ul class="nav nav-sidebar">
 
-        <li class="active"><a href="/host/index">主機管理</a></li>
-        <li><a href="/host/location">位置</a></li>
-
+        <li {% if request.path == host %}class="active"{% endif %}><a href={{ host }}>主機管理</a></li>
+        <li {% if request.path == location %}class="active"{% endif %}><a href={{ location }}>位置</a></li>
 
     </ul>
 
 
     <ul class="nav nav-sidebar">
+        <li {% if request.path == asset %}class="active"{% endif %}><a href={{ asset }}>資產管理</a></li>
 
-        <li><a href="/asset/index">資產管理</a></li>
     </ul>
 
 

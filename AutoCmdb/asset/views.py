@@ -89,7 +89,7 @@ def index(request):
 
         else:
             ret['status'] = 'error'
-            ret['msg'] = '輸入錯誤'
+            ret['msg'] = '新增信息輸入不正確!'
 
         return JsonResponse(ret)
 
@@ -167,7 +167,7 @@ def department(request):
 
         else:
             ret['status'] = 'error'
-            ret['msg'] = '輸入錯誤'
+            ret['msg'] = '新增信息輸入不正確!'
 
         return JsonResponse(ret)
 
@@ -225,6 +225,10 @@ def category(request):
 
     category_obj = models.Catagory.objects.all()
 
+
+
+
+
     # 分頁功能
 
     paginator = Paginator(category_obj, 10)  # Show 10 contacts per page
@@ -236,6 +240,8 @@ def category(request):
         cary_obj = paginator.page(1)
     except EmptyPage:
         cary_obj = paginator.page(paginator.num_pages)
+
+
 
 
     # 增
@@ -278,15 +284,11 @@ def category(request):
             form_obj.save()
 
             ret['status'] = 'ok'
-            ret['msg'] = '新增成功'
+            ret['msg'] = '修改成功'
 
         else:
             ret['status'] = 'error'
-            ret['msg'] = '輸入錯誤!'
-
-
-
-
+            ret['msg'] = '修改信息輸入不正確!'
 
 
         return JsonResponse(ret)
@@ -295,9 +297,20 @@ def category(request):
     # 刪
     if request.method == 'DELETE':
 
-        print("This is DELETE")
+        print("This is Delete")
+        put = QueryDict(request.body)
+        id = put.get('id')
+
+        print(put)
+
+        cary_obj = models.Catagory.objects.get(id=id)
+        cary_obj.delete()
+
+        ret['msg'] = '成功'
+        ret['status'] = 'ok'
 
         return JsonResponse(ret)
+
 
 
 
@@ -310,5 +323,73 @@ def category(request):
 
 
 def user(request):
+
+
+    ret = {"status": "", "re_html": "", "msg": ""}
+    search_field = {}
+
     user_obj = models.UserProfile.objects.all()
+    sex_obj = models.UserProfile.sex_choice
+
+    # print(sex_obj)
+
+    dent_obj = models.Department.objects.all()
+
+
+
+
+
+    if request.GET:
+        # GET 字段
+        name = request.GET.get("name", '')
+        sex_id = request.GET.get("sex_id", '')
+        dent_id = request.GET.get("dent_id", '')
+
+        search_field['name'] = name
+        search_field['sex_id'] = sex_id
+        search_field['dent_id'] = dent_id
+
+        print(search_field)
+
+        # GET 字段 篩選
+
+        if sex_id and dent_id:
+            user_obj = models.UserProfile.objects.filter(name__contains=name, sex=sex_id, dent_id=dent_id)
+        elif sex_id:
+            user_obj = models.UserProfile.objects.filter(name__contains=name, sex=sex_id)
+        elif dent_id:
+            user_obj = models.UserProfile.objects.filter(name__contains=name, dent_id=dent_id)
+        else:
+            user_obj = models.UserProfile.objects.filter(name__contains=name)
+
+
+
+    # 分頁功能
+
+    paginator = Paginator(user_obj, 10)  # Show 10 contacts per page
+
+    page = request.GET.get('page')
+    try:
+        user_obj = paginator.page(page)
+    except PageNotAnInteger:
+        user_obj = paginator.page(1)
+    except EmptyPage:
+        user_obj = paginator.page(paginator.num_pages)
+
+    # 增
+    if request.method == 'POST':
+        pass
+
+    # 改
+    if request.method == 'PUT':
+        pass
+
+    # 刪
+    if request.method == 'DELETE':
+        pass
+
+
+
+
+
     return render(request, 'user/index.html', locals())
