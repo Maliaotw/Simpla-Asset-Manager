@@ -94,31 +94,37 @@ def dent_user(request):
 
 
 def add_user_number(request):
-
     ret = {
         'data': '',
         'status': ''
     }
 
     dent_id = request.GET.get('id')
-    dent_obj = Department.objects.get(id=dent_id)
 
-    # 部門人數
-    user_count = UserProfile.objects.filter(dent=dent_obj).count()+1
+    if dent_id:
 
-    # 部門編號
-    block_number = dent_obj.block_number
+        dent_obj = Department.objects.get(id=dent_id)
 
-    # 部門長度
+        # 部門人數
+        user_count = UserProfile.objects.filter(dent=dent_obj).count() + 1
 
-    block_number_len = dent_obj.block_number_len
+        # 部門編號
+        block_number = dent_obj.block_number
 
-    num_format = "%0{}d".format(block_number_len - len(block_number))  # block_numer_len
+        # 部門長度
 
-    num = num_format % (user_count)  # block_numer
+        block_number_len = dent_obj.block_number_len
 
-    print(block_number + num)
-    ret['data'] = block_number + num
+        num_format = "%0{}d".format(block_number_len - len(block_number))  # block_numer_len
+
+        num = num_format % (user_count)  # block_numer
+
+        print(block_number + num)
+        ret['data'] = block_number + num
+        ret['status'] = 'ok'
+
+    else:
+        ret['data'] = ""
+        ret['status'] = 'error'
 
     return JsonResponse(ret)
-

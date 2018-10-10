@@ -97,6 +97,8 @@
                     <th>英文名</th>
                     <th>性別</th>
                     <th>部門</th>
+                    <th>操作</th>
+
                 </tr>
                 </thead>
                 <tbody>
@@ -108,6 +110,10 @@
                         <td>{{ user.user.username }}</td>
                         <td>{{ user.get_sex_display }}</td>
                         <td>{{ user.dent }}</td>
+                        <td>
+
+                            <a href="{% url 'userinfo' user.id %}"><i  class="fas fa-pen"></i></a>
+                        </td>
                     </tr>
 
                 {% endfor %}
@@ -206,9 +212,6 @@
 
 
 
-
-
-
 {% endblock %}
 
 
@@ -243,7 +246,7 @@
             $(".selectpicker[name='dent_id']").selectpicker('val', {{ dent_id }});
 
 
-        })
+        });
 
 
         // 初始 新增用戶表單
@@ -256,23 +259,90 @@
         });
 
 
-        // 選擇類型後請求該分類數量
+        // 選擇部門後請求該用戶編號
         function get_user_number(e) {
 
+            console.log(e.value);
 
             $.ajax({
                 url: "/api/add_user_number",
                 type: "GET",
-                data: {'id':18},
+                data: {'id': e.value},
 
                 success: function (callback) {
-                    console.log(callback);
+                    //console.log(callback);
+
+                    if (callback.status == 'ok') {
+                        $("#userform_add_Modal [name='code']").val(callback.data);
+                        $("#userform_add_Modal [name='code']").removeAttr("disabled");
+                    }
+                    else {
+                        console.log("請求錯誤");
+                        $("#userform_add_Modal [name='code']").val("");
+                        $("#userform_add_Modal [name='code']").attr("disabled", "disabled");
+                    }
+
 
                 },
                 error: function () {
+                    console.log("請求錯誤");
+                    $("#userform_add_Modal [name='code']").val("");
+                    $("#userform_add_Modal [name='code']").attr("disabled", "disabled");
                 }
             });
         };
+
+
+        // 提交 新增資產表單
+        $("#userform_add").on("submit", function (e) {
+
+
+            var postData = $(this).serializeArray();
+            console.log(postData);
+
+            $.ajax({
+                url: "",
+                type: "POST",
+                data: postData,
+                success: function (callback) {
+                    console.log(callback);
+
+
+                    if (callback.status == 'ok') {
+                        $("#userform_add_Modal .alert-danger strong").text("");
+                        $('#userform_add_Modal').modal('hide');
+                        location.reload();
+
+
+                    } else {
+                        $("#userform_add_Modal .alert-danger").show();
+                        $("#userform_add_Modal .alert-danger strong").text(callback.msg);
+
+
+                    }
+
+
+                },
+                error: function () {
+
+                }
+            });
+            e.preventDefault();
+        });
+
+
+        $("#userform_submit").on('click', function () {
+
+            $("#userform_add").submit();
+
+        });
+
+
+        //編輯 EditData : Change icon
+        $("#mytable").on('click', ".fa-pen", function (ele) {
+            console.log('edit');
+        });
+
 
     </script>
 

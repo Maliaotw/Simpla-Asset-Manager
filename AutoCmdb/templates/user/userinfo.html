@@ -1,0 +1,174 @@
+{% extends 'user/base.html' %}
+{% load asset_tags %}
+
+
+
+{% block head %}
+    <!-- CSS -->
+    <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/css/bootstrap-select.css">
+
+
+
+    <!--  JavaScript -->
+    <script src="/static/js/bootstrap-datepicker.js"></script>
+    <script src="/static/js/bootstrap-datepicker.zh-TW.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="/static/js/bootstrap-select.js"></script>
+
+    <style>
+        .col-md-2.col-form-label, .col-md-6.form-group, .col-md-10.form-control-static {
+            padding-left: 15px;
+        }
+
+        .form-control-static {
+
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+
+    </style>
+
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+
+    <ol class="breadcrumb">
+        <li><a href="{% url 'user' %}">用戶管理</a></li>
+        <li class="active">
+            {{ userinfo_obj.dent.block_number }}{{ userinfo_obj.code }} {{ userinfo_obj.user.username }}</li>
+
+    </ol>
+
+
+    <div class="panel panel-default" style="padding: 20px">
+        <form method="post" id="userform_add">
+
+
+            <div class="form-group">
+                <label> 基本信息</label>
+            </div>
+
+            <div class="form-group col-md-6">
+                <label class="col-form-label">編號</label>
+                <input disabled type="number" name="code" class="form-control" placeholder=""
+                       value="{{ userinfo_obj.dent.block_number }}{{ userinfo_obj.code }}">
+            </div>
+
+
+            <div class="col-md-6 form-group">
+                <label class="col-form-label">性別</label>
+                <select id='sex_add' name="sex" class="form-control">
+
+                    <option value="">-------</option>
+                    {% for sex in userinfo_obj.sex_choice %}
+                        {% if sex.0 == userinfo_obj.sex %}
+                            <option selected value="{{ sex.0 }}">{{ sex.1 }}</option>
+                        {% else %}
+                            <option value="{{ sex.0 }}">{{ sex.1 }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+
+
+            <div class="col-md-6 form-group">
+                <label class="col-form-label">用戶名</label>
+                <input type="text" name="username" class="form-control" placeholder=""
+                       value="{{ userinfo_obj.user.username }}">
+            </div>
+
+
+            <div class="col-md-6  form-group">
+                <label class="col-form-label">暱稱</label>
+                <input type="text" name="name" class="form-control" placeholder="" value="{{ userinfo_obj.name }}">
+            </div>
+
+
+            <div class="col-md-6  form-group">
+                <label class="col-form-label">部門</label>
+                <select name="dent" class="form-control">
+                    <option value="">-------</option>
+                    {% for department in dent_obj %}
+
+                        {% if userinfo_obj.dent == department %}
+                            <option selected value="{{ department.id }}">{{ department.name }}部({{ department.code }})
+                            </option>
+                        {% else %}
+                            <option value="{{ department.id }}">{{ department.name }}部({{ department.code }})</option>
+                        {% endif %}
+                    {% endfor %}
+
+                </select>
+            </div>
+
+            <div class="col-md-6  form-group">
+                <label class="col-form-label">生日</label>
+                <input type="text" name="name" class="form-control" placeholder="" value="1988/10/26">
+            </div>
+
+            <div class="form-group" style="padding-left:15px;    padding-right: 15px; ">
+                <label> 在職狀態</label>
+                <select name="dent" class="form-control">
+                    <option value="">在職</option>
+                    <option value="">離職</option>
+                </select>
+            </div>
+
+
+            <div class="form-group">
+                <label> 登入功能</label>
+            </div>
+
+            <div class="form-inline" style="padding-right: 15px; ">
+                <label class="col-md-2  col-form-label">狀態</label>
+
+                <select name="dent" class="col-md-10  form-control-static" style="margin-bottom: 10px">
+                    <option value="">是</option>
+                    <option value="">否</option>
+                </select>
+            </div>
+
+            <div class="form-inline" style="padding-right: 15px; ">
+                <label class="col-md-2  col-form-label">密碼</label>
+
+                <input type="text" name="" class="col-md-10  form-control-static" placeholder=""
+                       value="******" style="margin-bottom: 10px">
+            </div>
+
+
+            <div class="form-inline" style="padding-right: 15px; ">
+                <label class="col-md-2  col-form-label">確認密碼</label>
+
+                <input type="text" name="" class="col-md-10  form-control-static" placeholder=""
+                       value="******" style="margin-bottom: 10px">
+            </div>
+
+
+            <div class="form-group">
+
+                <button id="userform_submit" type="button" class="btn btn-primary center-block">更改</button>
+            </div>
+
+
+        </form>
+
+
+    </div>
+
+
+{% endblock %}
+
+
+
+
+
+

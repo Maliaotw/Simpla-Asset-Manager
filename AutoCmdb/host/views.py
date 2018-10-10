@@ -19,6 +19,5 @@ def location(requesrt):
 
 
 
-
 def demo1(request):
     return render(request, "base.html")

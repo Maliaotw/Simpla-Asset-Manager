@@ -36,3 +36,11 @@ class CaryForm(ModelForm):
         fields = '__all__'
 
 
+class UserProfileForm(ModelForm):
+    '''
+    類型表單
+    '''
+
+    class Meta:
+        model = models.UserProfile
+        fields = '__all__'

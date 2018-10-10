@@ -25,5 +25,6 @@ urlpatterns = [
     url(r'^category/', views.category,name="category"),
 
     url(r'^user/', views.user,name="user"),
+    url(r'^userinfo/(?P<pk>\d+)', views.userinfo,name="userinfo"),
 
 ]

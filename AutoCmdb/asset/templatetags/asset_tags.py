@@ -76,7 +76,7 @@ def get_pageer(data, search_field):
             part2 += data.number + 5
         else:
             # print("data.paginator.num_pages - part1", 10 - (data.paginator.num_pages - part1))
-            part2 = data.paginator.num_pages
+            part2 = data.paginator.num_pages+1
             part1 = part1 - (10 - (data.paginator.num_pages - part1))
 
         # print(part1, part2)

@@ -5,10 +5,10 @@ from asset import models
 from asset import forms
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+
 # Create your views here.
 
 def index(request):
-
     search_field = {}
 
     category_obj = models.Catagory.objects.all()
@@ -31,17 +31,16 @@ def index(request):
         # GET 字段 篩選
 
         if cate_id and dent_id:
-            asset_obj = models.Asset.objects.filter(sn__contains=name,category_id=cate_id,department_id=dent_id)
+            asset_obj = models.Asset.objects.filter(sn__contains=name, category_id=cate_id, department_id=dent_id)
         elif cate_id:
-            asset_obj = models.Asset.objects.filter(sn__contains=name,category_id=cate_id)
+            asset_obj = models.Asset.objects.filter(sn__contains=name, category_id=cate_id)
         elif dent_id:
-            asset_obj = models.Asset.objects.filter(sn__contains=name,department_id=dent_id)
+            asset_obj = models.Asset.objects.filter(sn__contains=name, department_id=dent_id)
         else:
             asset_obj = models.Asset.objects.filter(sn__contains=name)
 
     else:
         asset_obj = models.Asset.objects.all()
-
 
     # 分頁功能
 
@@ -54,8 +53,6 @@ def index(request):
         asset_obj = paginator.page(1)
     except EmptyPage:
         asset_obj = paginator.page(paginator.num_pages)
-
-
 
     if request.method == 'POST':
 
@@ -82,7 +79,7 @@ def index(request):
             dent = form_obj.cleaned_data['department']
             price = form_obj.cleaned_data['price']
 
-            models.Asset.objects.create(manager=manager, sn=sn, category=category, department=dent,price=price)
+            models.Asset.objects.create(manager=manager, sn=sn, category=category, department=dent, price=price)
 
             ret['status'] = 'ok'
             ret['msg'] = '新增成功'
@@ -111,7 +108,6 @@ def index(request):
             price = form_obj.cleaned_data['price']
             purchase_date = form_obj.cleaned_data['purchase_date']
 
-
             asset_obj.category = category
             asset_obj.department = department
             asset_obj.manager = manager
@@ -131,10 +127,7 @@ def index(request):
 
 
 def department(request):
-
-
     ret = {"status": "", "re_html": "", "msg": ""}
-
 
     search_field = {}
 
@@ -155,7 +148,6 @@ def department(request):
 
     if request.method == 'POST':
 
-
         form_obj = forms.DentForm(data=request.POST)
 
         if form_obj.is_valid():
@@ -171,18 +163,14 @@ def department(request):
 
         return JsonResponse(ret)
 
-
-
     if request.method == 'PUT':
         print("This is PUT")
-
 
         put = QueryDict(request.body)
         print(put)
         dent_id = put.get('id')
         dent_obj = models.Department.objects.get(id=dent_id)
         user_id = put.get('user')
-
 
         if user_id:
             user_obj = models.UserProfile.objects.get(id=user_id)
@@ -210,24 +198,15 @@ def department(request):
 
         return JsonResponse(ret)
 
-
-
-    
     return render(request, "asset/department.html", locals())
 
 
 def category(request):
-
-
     ret = {"status": "", "re_html": "", "msg": ""}
 
     search_field = {}
 
     category_obj = models.Catagory.objects.all()
-
-
-
-
 
     # 分頁功能
 
@@ -240,9 +219,6 @@ def category(request):
         cary_obj = paginator.page(1)
     except EmptyPage:
         cary_obj = paginator.page(paginator.num_pages)
-
-
-
 
     # 增
     if request.method == 'POST':
@@ -262,7 +238,6 @@ def category(request):
             ret['status'] = 'error'
             ret['msg'] = '輸入錯誤!'
 
-
         return JsonResponse(ret)
 
     # 改
@@ -278,7 +253,7 @@ def category(request):
 
         cary_obj = models.Catagory.objects.get(id=cary_id)
 
-        form_obj = forms.CaryForm(data=put,instance=cary_obj)
+        form_obj = forms.CaryForm(data=put, instance=cary_obj)
 
         if form_obj.is_valid():
             form_obj.save()
@@ -290,13 +265,10 @@ def category(request):
             ret['status'] = 'error'
             ret['msg'] = '修改信息輸入不正確!'
 
-
         return JsonResponse(ret)
-
 
     # 刪
     if request.method == 'DELETE':
-
         print("This is Delete")
         put = QueryDict(request.body)
         id = put.get('id')
@@ -311,20 +283,10 @@ def category(request):
 
         return JsonResponse(ret)
 
-
-
-
-
-
-
-
-
     return render(request, "asset/category.html", locals())
 
 
 def user(request):
-
-
     ret = {"status": "", "re_html": "", "msg": ""}
     search_field = {}
 
@@ -334,10 +296,6 @@ def user(request):
     # print(sex_obj)
 
     dent_obj = models.Department.objects.all()
-
-
-
-
 
     if request.GET:
         # GET 字段
@@ -362,8 +320,6 @@ def user(request):
         else:
             user_obj = models.UserProfile.objects.filter(name__contains=name)
 
-
-
     # 分頁功能
 
     paginator = Paginator(user_obj, 10)  # Show 10 contacts per page
@@ -378,18 +334,67 @@ def user(request):
 
     # 增
     if request.method == 'POST':
-        pass
+
+        print("This is POST")
+
+        form_obj = forms.UserProfileForm(data=request.POST)
+
+        data = request.POST
+
+        try:
+
+            # 獲取
+            username = data.get("username")
+            dent_id = data.get("dent")
+            code = data.get("code")
+            sex = data.get("sex")
+            name = data.get("name")
+
+            # 創建User
+
+            user = models.User()
+            user.username = username
+            user.set_password('12345678')
+            user.is_staff = False
+            user.save()
+
+            # 創建Userinfo
+            dent = models.Department.objects.get(id=dent_id)
+
+            # 只取編號不取部門號碼
+            code = code[len(dent.block_number):]
+
+
+            models.UserProfile.objects.create(user=user, name=name, sex=sex, code=code, dent=dent)
+
+            ret['status'] = 'ok'
+            ret['msg'] = '新增成功'
+
+
+        except:
+
+            ret['status'] = 'error'
+            ret['msg'] = '用戶信息輸入不正確!'
+
+        return JsonResponse(ret)
 
     # 改
     if request.method == 'PUT':
-        pass
+        return JsonResponse(ret)
 
     # 刪
     if request.method == 'DELETE':
-        pass
-
-
-
-
+        return JsonResponse(ret)
 
     return render(request, 'user/index.html', locals())
+
+
+def userinfo(request,pk):
+
+    # pk = 804
+    userinfo_obj = models.UserProfile.objects.get(id=pk)
+    dent_obj = models.Department.objects.all()
+
+    return render(request, "user/userinfo.html", locals())
+
+
