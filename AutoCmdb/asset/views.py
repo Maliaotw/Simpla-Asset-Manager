@@ -4,7 +4,7 @@ from django.http import QueryDict
 from asset import models
 from asset import forms
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+from django.contrib.auth.models import User
 
 # Create your views here.
 
@@ -337,44 +337,42 @@ def user(request):
 
         print("This is POST")
 
-        form_obj = forms.UserProfileForm(data=request.POST)
-
         data = request.POST
 
-        try:
+        # 獲取
+        username = data.get("username")
+        dent_id = data.get("dent")
+        code = data.get("code")
+        sex = data.get("sex")
+        name = data.get("name")
 
-            # 獲取
-            username = data.get("username")
-            dent_id = data.get("dent")
-            code = data.get("code")
-            sex = data.get("sex")
-            name = data.get("name")
 
+
+
+        # 驗證用戶名
+        user_form_obj = forms.UserForm(request.POST)
+
+        print(dict(request.POST))
+        print(type(request.POST))
+        userprofile = dict(request.POST)
+
+        if user_form_obj.is_valid():
+
+            user_obj = user_form_obj.save(commit=False)
+            user_obj.set_password('12345678')
+            user_obj.is_staff = False
+            userprofile['user'] = [user_obj]
+
+        userprofile_form_obj = forms.UserProfileForm(userprofile)
+        if user_form_obj.is_valid() and userprofile_form_obj.is_valid():
+            print ("userform_obj and user_form_obj ok")
             # 創建User
+            # user_obj = user_form_obj.save(commit=False)
+            # user_obj.set_password('12345678')
+            # user_obj.is_staff = False
+            #user_obj.save()
 
-            user = models.User()
-            user.username = username
-            user.set_password('12345678')
-            user.is_staff = False
-            user.save()
-
-            # 創建Userinfo
-            dent = models.Department.objects.get(id=dent_id)
-
-            # 只取編號不取部門號碼
-            code = code[len(dent.block_number):]
-
-
-            models.UserProfile.objects.create(user=user, name=name, sex=sex, code=code, dent=dent)
-
-            ret['status'] = 'ok'
-            ret['msg'] = '新增成功'
-
-
-        except:
-
-            ret['status'] = 'error'
-            ret['msg'] = '用戶信息輸入不正確!'
+        print(userprofile_form_obj.errors)
 
         return JsonResponse(ret)
 

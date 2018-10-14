@@ -38,9 +38,20 @@ class CaryForm(ModelForm):
 
 class UserProfileForm(ModelForm):
     '''
-    類型表單
+    Userinfo表單
     '''
 
     class Meta:
         model = models.UserProfile
         fields = '__all__'
+
+
+
+class UserForm(ModelForm):
+    '''
+    User表單
+    '''
+
+    class Meta:
+        model = User
+        fields = ['username']
