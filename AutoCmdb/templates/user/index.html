@@ -112,7 +112,7 @@
                         <td>{{ user.dent }}</td>
                         <td>
 
-                            <a href="{% url 'userinfo' user.id %}"><i  class="fas fa-pen"></i></a>
+                            <a href="{% url 'userinfo' user.id %}"><i class="fas fa-pen"></i></a>
                         </td>
                     </tr>
 
@@ -160,43 +160,16 @@
 
                     <form method="post" id="userform_add">
                         {% csrf_token %}
+{#                        {{ form_obj }}#}
+                        {% for form in form_obj %}
+                            <div class="form-group
 
-                        <div class="form-group">
-                            <label class="col-form-label">中文名</label>
-                            <input type="text" name="name" class="form-control" placeholder="">
-                        </div>
+">
+                            {{ form.label }}
+                            {{ form }}
+                            </div>
+                        {% endfor %}
 
-                        <div class="form-group">
-                            <label class="col-form-label">英文名</label>
-                            <input type="text" name="username" class="form-control" placeholder="">
-                        </div>
-
-
-                        <div class="form-group">
-                            <label class="col-form-label">性別</label>
-                            <select id='sex_add' name="sex" class="form-control">
-                                <option value="">-------</option>
-                                {% for sex in sex_obj %}
-                                    <option value="{{ sex.0 }}">{{ sex.1 }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-form-label">部門</label>
-                            <select name="dent" class="form-control" onchange="get_user_number(this)">
-                                <option value="">-------</option>
-                                {% for department in dent_obj %}
-                                    <option value="{{ department.id }}">{{ department.name }}部({{ department.code }})</option>
-                                {% endfor %}
-
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-form-label">編號</label>
-                            <input type="number" name="code" class="form-control" placeholder="">
-                        </div>
 
 
                     </form>
@@ -261,7 +234,6 @@
 
         // 選擇部門後請求該用戶編號
         function get_user_number(e) {
-
             console.log(e.value);
 
             $.ajax({
@@ -317,10 +289,7 @@
                     } else {
                         $("#userform_add_Modal .alert-danger").show();
                         $("#userform_add_Modal .alert-danger strong").text(callback.msg);
-
-
                     }
-
 
                 },
                 error: function () {

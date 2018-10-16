@@ -14,8 +14,6 @@ class AssetForm(ModelForm):
         fields = '__all__'
 
 
-
-
 class DentForm(ModelForm):
     '''
     部門表單
@@ -46,12 +44,57 @@ class UserProfileForm(ModelForm):
         fields = '__all__'
 
 
-
-class UserForm(ModelForm):
+class UserForm(forms.Form):
     '''
     User表單
     '''
 
-    class Meta:
-        model = User
-        fields = ['username']
+    username = forms.CharField(
+        label="用戶名",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        required=True,
+
+    )
+
+
+    name = forms.CharField(
+        label="暱稱",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        required=True,
+
+    )
+
+    sex_choice = (
+        (1, '男'),
+        (2, '女'),
+    )
+
+    sex = forms.ChoiceField(
+        label="性別",
+        choices=sex_choice,
+        widget=forms.Select(attrs={"class": "form-control"}),
+        required=True,
+
+    )
+
+
+    dent = forms.ModelChoiceField(
+        label="部門",
+        queryset=models.Department.objects.all(),
+        widget=forms.Select(attrs={"class": "form-control","onchange":"get_user_number(this)"}),
+        required=True,
+
+    )
+
+    code = forms.CharField(
+        label="編號",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        disabled=True
+    )
+
+
+
+class test1Form(forms.Form):
+    id = forms.IntegerField(required=False, widget=forms.HiddenInput())
+    dent = forms.ModelChoiceField(queryset=models.Department.objects.all())
+    cary = forms.ModelChoiceField(queryset=models.Catagory.objects.all())

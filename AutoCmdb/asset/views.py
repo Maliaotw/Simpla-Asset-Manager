@@ -6,6 +6,7 @@ from asset import forms
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.models import User
 
+
 # Create your views here.
 
 def index(request):
@@ -297,6 +298,9 @@ def user(request):
 
     dent_obj = models.Department.objects.all()
 
+    # user forms表單
+    form_obj = forms.UserForm()
+
     if request.GET:
         # GET 字段
         name = request.GET.get("name", '')
@@ -337,42 +341,25 @@ def user(request):
 
         print("This is POST")
 
-        data = request.POST
+        form_obj = forms.UserForm(data=request.POST)
 
-        # 獲取
-        username = data.get("username")
-        dent_id = data.get("dent")
-        code = data.get("code")
-        sex = data.get("sex")
-        name = data.get("name")
+        # data = request.POST
+        #
+        # print(data)
 
 
+        if form_obj.is_valid():
 
 
-        # 驗證用戶名
-        user_form_obj = forms.UserForm(request.POST)
 
-        print(dict(request.POST))
-        print(type(request.POST))
-        userprofile = dict(request.POST)
+            ret['status'] = 'ok'
+            ret['msg'] = '新增成功'
 
-        if user_form_obj.is_valid():
 
-            user_obj = user_form_obj.save(commit=False)
-            user_obj.set_password('12345678')
-            user_obj.is_staff = False
-            userprofile['user'] = [user_obj]
-
-        userprofile_form_obj = forms.UserProfileForm(userprofile)
-        if user_form_obj.is_valid() and userprofile_form_obj.is_valid():
-            print ("userform_obj and user_form_obj ok")
-            # 創建User
-            # user_obj = user_form_obj.save(commit=False)
-            # user_obj.set_password('12345678')
-            # user_obj.is_staff = False
-            #user_obj.save()
-
-        print(userprofile_form_obj.errors)
+        else:
+            print(form_obj.errors)
+            ret['status'] = 'error'
+            ret['msg'] = '用戶信息輸入不正確!'
 
         return JsonResponse(ret)
 
@@ -387,8 +374,7 @@ def user(request):
     return render(request, 'user/index.html', locals())
 
 
-def userinfo(request,pk):
-
+def userinfo(request, pk):
     # pk = 804
     userinfo_obj = models.UserProfile.objects.get(id=pk)
     dent_obj = models.Department.objects.all()
@@ -396,3 +382,31 @@ def userinfo(request,pk):
     return render(request, "user/userinfo.html", locals())
 
 
+def test1(request):
+    print("this is test1")
+
+    forms_obj = forms.test1Form()
+    print(models.Catagory.objects.filter(id=2))
+    print([models.Catagory.objects.get(id=2)])
+    data = {'id': '', 'cary': models.Catagory.objects.filter(id=2), 'dent': models.Department.objects.filter(id=8)}
+    print(data)
+    forms_obj1 = forms.test1Form(data)
+
+    # forms_obj1.fields["cary"].queryset=models.Catagory.objects.filter(id=2)
+    # forms_obj1.fields["dent"].queryset=models.Department.objects.filter(id=8)
+
+    print("forms_obj1.errors", forms_obj1.errors)
+
+    if request.method == "POST":
+        print(request.POST)
+
+        print("forms_obj.errors",forms_obj.errors)
+
+    return render(request, "test/test1.html", locals())
+
+
+def test2(request):
+
+    forms_obj = forms.UserForm()
+
+    return render(request, "test/test2.html", locals())
