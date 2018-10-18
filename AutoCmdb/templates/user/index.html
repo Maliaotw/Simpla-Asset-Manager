@@ -160,17 +160,14 @@
 
                     <form method="post" id="userform_add">
                         {% csrf_token %}
-{#                        {{ form_obj }}#}
-                        {% for form in form_obj %}
-                            <div class="form-group
 
-">
-                            {{ form.label }}
-                            {{ form }}
+                        {% for form in form_obj %}
+                            <div class="form-group has-feedback">
+                                <label for="">{{ form.label }}</label>
+                                {{ form }}
+                                <span class="glyphicon form-control-feedback"></span>
                             </div>
                         {% endfor %}
-
-
 
                     </form>
 
@@ -184,11 +181,7 @@
     </div>
 
 
-
 {% endblock %}
-
-
-
 
 
 
@@ -228,6 +221,11 @@
             $("#userform_add").trigger('reset');
             $("#userform_add_Modal .alert-danger").hide();
             $("#userform_add_Modal [name='code']").attr("disabled", "disabled");
+
+
+            $("#userform_add").find(".form-group").removeClass("has-error");
+            $("#userform_add .form-group span").removeClass("glyphicon-remove");
+
 
         });
 
@@ -279,16 +277,41 @@
                 success: function (callback) {
                     console.log(callback);
 
-
                     if (callback.status == 'ok') {
                         $("#userform_add_Modal .alert-danger strong").text("");
                         $('#userform_add_Modal').modal('hide');
                         location.reload();
 
-
                     } else {
                         $("#userform_add_Modal .alert-danger").show();
                         $("#userform_add_Modal .alert-danger strong").text(callback.msg);
+
+                        console.log(callback.errors_fields);
+                        console.log(callback.success_fields);
+
+                        $.each(callback.errors_fields, function (i, val) {
+
+                            input_tag = $("#userform_add [name='" + val + "']");
+
+                            div_tag = input_tag.closest("div");
+                            div_tag.removeClass("has-success").addClass("has-error");
+                            div_tag.find("span").removeClass("glyphicon-ok").addClass("glyphicon-remove");
+
+
+                        });
+
+                        $.each(callback.success_fields, function (i, val) {
+
+                            input_tag = $("#userform_add [name='" + val + "']");
+                            div_tag = input_tag.closest("div");
+                            div_tag.removeClass("has-error").addClass("has-success");
+                            div_tag.find("span").removeClass("glyphicon-remove").addClass("glyphicon-ok");
+
+                        });
+
+
+
+
                     }
 
                 },

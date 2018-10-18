@@ -311,7 +311,6 @@ def user(request):
         search_field['sex_id'] = sex_id
         search_field['dent_id'] = dent_id
 
-        print(search_field)
 
         # GET 字段 篩選
 
@@ -343,23 +342,50 @@ def user(request):
 
         form_obj = forms.UserForm(data=request.POST)
 
-        # data = request.POST
-        #
-        # print(data)
+        fields = set(list(dict(form_obj.fields).keys()))
+        errors = set(list(form_obj.errors.keys()))
 
+        errors_fields = list(fields & errors)
+        success_fields = list(fields - errors)
+        print(errors_fields)
+        print(success_fields)
+
+        print(form_obj.errors)
 
         if form_obj.is_valid():
 
+            # 取值
+            name = form_obj.cleaned_data.get('name')
+            sex = form_obj.cleaned_data.get('sex')
+            code = form_obj.cleaned_data.get('code')
+            dent = form_obj.cleaned_data.get('dent')
+            username = form_obj.cleaned_data.get('username')
 
+            # 創建user
+            user = User()
+            user.username = username
+            user.set_password('12345678')
+            user.is_staff = False
+            user.save()
 
+            # 創建Userinfo
+
+            # 只取編號不包含部門編號
+            code = code[len(dent.block_number):]
+            models.UserProfile.objects.create(user=user, name=name, sex=sex, code=code, dent=dent)
+
+            # result
             ret['status'] = 'ok'
             ret['msg'] = '新增成功'
-
+            ret['errors_fields'] = errors_fields
+            ret['success_fields'] = success_fields
 
         else:
-            print(form_obj.errors)
+
             ret['status'] = 'error'
             ret['msg'] = '用戶信息輸入不正確!'
+            ret['errors_fields'] = errors_fields
+            ret['success_fields'] = success_fields
 
         return JsonResponse(ret)
 
@@ -378,6 +404,13 @@ def userinfo(request, pk):
     # pk = 804
     userinfo_obj = models.UserProfile.objects.get(id=pk)
     dent_obj = models.Department.objects.all()
+
+    forms_obj = forms.UserProfileForm(instance=userinfo_obj)
+
+
+
+
+
 
     return render(request, "user/userinfo.html", locals())
 
@@ -407,6 +440,15 @@ def test1(request):
 
 def test2(request):
 
-    forms_obj = forms.UserForm()
+    userinfo_obj = models.UserProfile.objects.get(id=796)
+    dent_obj = models.Department.objects.all()
+
+    print(userinfo_obj.user)
+
+    forms_user_obj = forms.UsersForm(instance=userinfo_obj.user)
+    forms_userproinfo_obj = forms.UserProfileForm(instance=userinfo_obj)
+
+
+
 
     return render(request, "test/test2.html", locals())

@@ -44,6 +44,18 @@ class UserProfileForm(ModelForm):
         fields = '__all__'
 
 
+class UsersForm(ModelForm):
+    '''
+    UsersForm
+    '''
+
+    class Meta:
+        model = models.User
+        fields = '__all__'
+
+
+
+
 class UserForm(forms.Form):
     '''
     User表單
@@ -53,9 +65,7 @@ class UserForm(forms.Form):
         label="用戶名",
         widget=forms.TextInput(attrs={"class": "form-control"}),
         required=True,
-
     )
-
 
     name = forms.CharField(
         label="暱稱",
@@ -65,6 +75,7 @@ class UserForm(forms.Form):
     )
 
     sex_choice = (
+        (None, '-----'),
         (1, '男'),
         (2, '女'),
     )
@@ -88,10 +99,100 @@ class UserForm(forms.Form):
 
     code = forms.CharField(
         label="編號",
-        widget=forms.TextInput(attrs={"class": "form-control"}),
-        disabled=True
+        widget=forms.TextInput(attrs={"class": "form-control","disabled":"disabled"}),
+        # disabled=True
     )
 
+    def clean(self):
+        cleaned_data = super().clean()
+        user_obj = User.objects.filter(username=cleaned_data.get('username'))
+        if user_obj:
+            self.add_error('username', "username error")
+
+class UserinfoForm_admin(forms.Form):
+    '''
+
+    '''
+
+    username = forms.CharField(
+        label="用戶名",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        required=True,
+    )
+
+    name = forms.CharField(
+        label="暱稱",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        required=True,
+
+    )
+
+    sex_choice = (
+        (None, '-----'),
+        (1, '男'),
+        (2, '女'),
+    )
+
+    sex = forms.ChoiceField(
+        label="性別",
+        choices=sex_choice,
+        widget=forms.Select(attrs={"class": "form-control"}),
+        required=True,
+
+    )
+
+    dent = forms.ModelChoiceField(
+        label="部門",
+        queryset=models.Department.objects.all(),
+        widget=forms.Select(attrs={"class": "form-control", "onchange": "get_user_number(this)"}),
+        required=True,
+
+    )
+
+    code = forms.CharField(
+        label="編號",
+        widget=forms.TextInput(attrs={"class": "form-control", "disabled": "disabled"}),
+
+    )
+
+    birthday = forms.DateTimeField(
+        label="生日",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        required=True,
+    )
+
+    inservice_choice = (
+        (1, '在職'),
+        (2, '已離職'),
+    )
+
+    inservice = forms.ChoiceField(
+        label="在職狀態",
+        choices=sex_choice,
+        widget=forms.Select(attrs={"class": "form-control"}),
+        required=True,
+
+    )
+
+
+    login = forms.BooleanField(
+        label="狀態",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        required=True
+
+    )
+
+    password1 = forms.CharField(
+        label="密碼",
+        widget=forms.PasswordInput(attrs={"class": "form-control"}),
+
+    )
+
+    password2 = forms.CharField(
+        label="確認密碼",
+        widget=forms.PasswordInput(attrs={"class": "form-control"}),
+
+    ),
 
 
 class test1Form(forms.Form):
