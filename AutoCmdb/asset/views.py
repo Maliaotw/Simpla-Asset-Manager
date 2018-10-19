@@ -299,7 +299,7 @@ def user(request):
     dent_obj = models.Department.objects.all()
 
     # user forms表單
-    form_obj = forms.UserForm()
+    form_obj = forms.User_Add_Form()
 
     if request.GET:
         # GET 字段
@@ -340,7 +340,7 @@ def user(request):
 
         print("This is POST")
 
-        form_obj = forms.UserForm(data=request.POST)
+        form_obj = forms.User_Add_Form(data=request.POST)
 
         fields = set(list(dict(form_obj.fields).keys()))
         errors = set(list(form_obj.errors.keys()))
@@ -402,8 +402,11 @@ def user(request):
 
 def userinfo(request, pk):
     # pk = 804
+
+
+
     userinfo_obj = models.UserProfile.objects.get(id=pk)
-    dent_obj = models.Department.objects.all()
+
 
     forms_obj = forms.UserProfileForm(instance=userinfo_obj)
 
@@ -441,13 +444,28 @@ def test1(request):
 def test2(request):
 
     userinfo_obj = models.UserProfile.objects.get(id=796)
-    dent_obj = models.Department.objects.all()
+    # dent_obj = models.Department.objects.all()
 
-    print(userinfo_obj.user)
+    if request.method == 'GET':
+        forms_user_obj = forms.UserForm(instance=userinfo_obj.user)
+        forms_userproinfo_obj = forms.UserProfileForm(instance=userinfo_obj)
 
-    forms_user_obj = forms.UsersForm(instance=userinfo_obj.user)
-    forms_userproinfo_obj = forms.UserProfileForm(instance=userinfo_obj)
+    elif request.method == 'POST':
 
+        print(request.POST)
+
+
+        forms_user_obj = forms.UserForm(request.POST,instance=userinfo_obj.user)
+        forms_userproinfo_obj = forms.UserProfileForm(request.POST,instance=userinfo_obj)
+
+
+        if forms_user_obj.is_valid() and forms_userproinfo_obj.is_valid():
+            print("ok")
+        else:
+            print("error")
+
+        print(forms_user_obj.errors)
+        print(forms_userproinfo_obj.errors)
 
 
 

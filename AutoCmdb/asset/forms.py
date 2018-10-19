@@ -36,29 +36,87 @@ class CaryForm(ModelForm):
 
 class UserProfileForm(ModelForm):
     '''
-    Userinfo表單
+    UserProfile表單
     '''
+
+    user = forms.CharField(
+        label="用戶名",
+        widget=forms.TextInput(
+            attrs={
+                # "disabled": "ture",
+                "readonly": 'ture'
+            }),
+        # required=True,
+
+    )
+
+    name = forms.CharField(
+        label="暱稱",
+        widget=forms.TextInput(
+            attrs={
+                # "disabled": "ture",
+                "readonly": 'ture'
+            }),
+    )
+
+    admin_readonly_fields = ("")
+    user_readonly_fields = ("name",)
+
+    def __init__(self, *args, **kwargs):
+        super(UserProfileForm, self).__init__(*args, **kwargs)
+
+        # 對所有字段添加Css屬性
+        for k, v in self.fields.items():
+            self.fields[k].widget.attrs['class'] = 'form-control'
 
     class Meta:
         model = models.UserProfile
-        fields = '__all__'
+        fields = "__all__"
 
 
-class UsersForm(ModelForm):
+class UserForm(ModelForm):
     '''
     UsersForm
     '''
 
+    is_staff_choice = (
+        (True, '是'),
+        (False, '否'),
+    )
+
+    is_staff = forms.ChoiceField(
+        label='登入',
+        widget=forms.Select(attrs={"class": "form-control"}),
+        choices=is_staff_choice,
+        required=True,
+    )
+
+    password1 = forms.CharField(
+        label="密碼",
+        widget=forms.PasswordInput(attrs={"class": "form-control"}),
+
+    )
+
+    password2 = forms.CharField(
+        label="確認密碼",
+        widget=forms.PasswordInput(attrs={"class": "form-control"}),
+
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(UserForm, self).__init__(*args, **kwargs)
+
+        for k, v in self.fields.items():
+            self.fields[k].widget.attrs['class'] = 'form-control'
+
     class Meta:
         model = models.User
-        fields = '__all__'
+        fields = ('is_staff',)
 
 
-
-
-class UserForm(forms.Form):
+class User_Add_Form(forms.Form):
     '''
-    User表單
+    User Add 表單
     '''
 
     username = forms.CharField(
@@ -88,18 +146,17 @@ class UserForm(forms.Form):
 
     )
 
-
     dent = forms.ModelChoiceField(
         label="部門",
         queryset=models.Department.objects.all(),
-        widget=forms.Select(attrs={"class": "form-control","onchange":"get_user_number(this)"}),
+        widget=forms.Select(attrs={"class": "form-control", "onchange": "get_user_number(this)"}),
         required=True,
 
     )
 
     code = forms.CharField(
         label="編號",
-        widget=forms.TextInput(attrs={"class": "form-control","disabled":"disabled"}),
+        widget=forms.TextInput(attrs={"class": "form-control", "disabled": "disabled"}),
         # disabled=True
     )
 
@@ -108,6 +165,7 @@ class UserForm(forms.Form):
         user_obj = User.objects.filter(username=cleaned_data.get('username'))
         if user_obj:
             self.add_error('username', "username error")
+
 
 class UserinfoForm_admin(forms.Form):
     '''
@@ -173,7 +231,6 @@ class UserinfoForm_admin(forms.Form):
         required=True,
 
     )
-
 
     login = forms.BooleanField(
         label="狀態",
