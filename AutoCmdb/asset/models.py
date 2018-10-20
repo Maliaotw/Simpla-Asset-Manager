@@ -10,7 +10,7 @@ class UserProfile(models.Model):
     '''
 
     user = models.OneToOneField(User)
-    name = models.CharField(max_length=64, verbose_name="暱稱")
+    name = models.CharField(max_length=64, verbose_name="姓名")
     code = models.CharField(max_length=64, verbose_name='員工編號', blank=True, null=True)
 
     sex_choice = (
@@ -18,8 +18,21 @@ class UserProfile(models.Model):
         (2, '女'),
     )
 
-    sex = models.IntegerField(choices=sex_choice)
+    sex = models.IntegerField(choices=sex_choice ,verbose_name='性別')
     dent = models.ForeignKey('Department', verbose_name='部門', blank=True, null=True)
+
+    in_service_choice = (
+        (1, '在職'),
+        (2, '離職'),
+        (3, '停職'),
+        (4, '退休'),
+    )
+
+
+
+    in_service = models.IntegerField(choices=in_service_choice ,verbose_name='在職狀態')
+    birthday = models.DateTimeField(null=True, blank=True, verbose_name='生日日期')
+
 
     class Meta:
         verbose_name_plural = "用戶"

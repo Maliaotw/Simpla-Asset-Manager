@@ -403,13 +403,27 @@ def user(request):
 def userinfo(request, pk):
     # pk = 804
 
-
-
     userinfo_obj = models.UserProfile.objects.get(id=pk)
 
+    if request.method == 'GET':
+        forms_user_obj = forms.UserForm(instance=userinfo_obj.user,request=request)
+        forms_userproinfo_obj = forms.UserProfileForm(instance=userinfo_obj,request=request)
 
-    forms_obj = forms.UserProfileForm(instance=userinfo_obj)
+    elif request.method == 'POST':
 
+        print(request.POST)
+
+
+        forms_user_obj = forms.UserForm(request.POST,instance=userinfo_obj.user,request=request)
+        forms_userproinfo_obj = forms.UserProfileForm(request.POST,instance=userinfo_obj,request=request)
+
+
+        if forms_user_obj.is_valid() and forms_userproinfo_obj.is_valid():
+            print("ok")
+        else:
+            print("error")
+            print(forms_user_obj.errors)
+            print(forms_userproinfo_obj.errors)
 
 
 
@@ -447,16 +461,16 @@ def test2(request):
     # dent_obj = models.Department.objects.all()
 
     if request.method == 'GET':
-        forms_user_obj = forms.UserForm(instance=userinfo_obj.user)
-        forms_userproinfo_obj = forms.UserProfileForm(instance=userinfo_obj)
+        forms_user_obj = forms.UserForm(instance=userinfo_obj.user,request=request)
+        forms_userproinfo_obj = forms.UserProfileForm(instance=userinfo_obj,request=request)
 
     elif request.method == 'POST':
 
         print(request.POST)
 
 
-        forms_user_obj = forms.UserForm(request.POST,instance=userinfo_obj.user)
-        forms_userproinfo_obj = forms.UserProfileForm(request.POST,instance=userinfo_obj)
+        forms_user_obj = forms.UserForm(request.POST,instance=userinfo_obj.user,request=request)
+        forms_userproinfo_obj = forms.UserProfileForm(request.POST,instance=userinfo_obj,request=request)
 
 
         if forms_user_obj.is_valid() and forms_userproinfo_obj.is_valid():

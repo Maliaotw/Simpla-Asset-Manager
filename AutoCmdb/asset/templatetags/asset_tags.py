@@ -108,11 +108,7 @@ def get_pageer(data, search_field):
 
 @register.simple_tag
 def get_category_column(category_obj):
-
     return models.Asset.objects.filter(category=category_obj).count()
-
-
-
 
 
 
