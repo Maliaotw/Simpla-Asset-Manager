@@ -247,7 +247,9 @@ class User_Add_Form(forms.Form):
         dent_num = code[:len(dent.block_number)] # 部門號碼
         u = models.UserProfile.objects.filter(dent=dent).filter(code=code_num)
 
-        if dent_num == dent.block_number and u :
+        print("dent_num",dent_num)
+        print("dent.block_number",dent.block_number)
+        if dent_num != dent.block_number or u :
             self.add_error('code', "code error")
 
 
