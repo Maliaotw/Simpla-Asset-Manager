@@ -39,9 +39,8 @@
         <div class="row">
 
             <div class="col-md-4">
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#userform_add_Modal">
-                    新增用戶
-                </button>
+
+                <a class="btn btn-primary" href="{% url 'user_add' %}" role="button"> 新增用戶</a>
             </div>
 
 
@@ -112,7 +111,7 @@
                         <td>{{ user.dent }}</td>
                         <td>
 
-                            <a href="{% url 'userinfo' user.id %}"><i class="fas fa-pen"></i></a>
+                            <a href="{% url 'user_edit' user.id %}"><i class="fas fa-pen"></i></a>
                         </td>
                     </tr>
 
@@ -240,24 +239,24 @@
                 data: {'id': e.value},
 
                 success: function (callback) {
-                    //console.log(callback);
+                    console.log(callback);
 
                     if (callback.status == 'ok') {
-                        $("#userform_add_Modal [name='code']").val(callback.data);
-                        $("#userform_add_Modal [name='code']").removeAttr("disabled");
+                        $("#userform_add [name='code']").val(callback.data);
+                        $("#userform_add [name='code']").removeAttr("disabled");
                     }
                     else {
                         console.log("請求錯誤");
-                        $("#userform_add_Modal [name='code']").val("");
-                        $("#userform_add_Modal [name='code']").attr("disabled", "disabled");
+                        $("#userform_add [name='code']").val("");
+                        $("#userform_add [name='code']").attr("disabled", "disabled");
                     }
 
 
                 },
                 error: function () {
                     console.log("請求錯誤");
-                    $("#userform_add_Modal [name='code']").val("");
-                    $("#userform_add_Modal [name='code']").attr("disabled", "disabled");
+                    $("#userform_add [name='code']").val("");
+                    $("#userform_add [name='code']").attr("disabled", "disabled");
                 }
             });
         };

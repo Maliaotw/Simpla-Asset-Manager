@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, redirect
 from django.http import JsonResponse
 from django.http import QueryDict
 from asset import models
@@ -311,7 +311,6 @@ def user(request):
         search_field['sex_id'] = sex_id
         search_field['dent_id'] = dent_id
 
-
         # GET 字段 篩選
 
         if sex_id and dent_id:
@@ -400,36 +399,155 @@ def user(request):
     return render(request, 'user/index.html', locals())
 
 
-def userinfo(request, pk):
+def userinfo(request):
+    pass
+
+
+def user_add(request):
+    ret = {"status": "", "re_html": "", "msg": ""}
+
+    if request.method == 'GET':
+        forms_obj = forms.User_Add_Form()
+
+    if request.method == 'POST':
+
+        print("This is POST")
+
+        form_obj = forms.User_Add_Form(data=request.POST)
+        print(request.POST)
+
+        print(form_obj.errors)
+        #
+        fields = set(list(dict(form_obj.fields).keys()))
+        errors = set(list(form_obj.errors.keys()))
+        #
+        errors_fields = list(fields & errors)
+        success_fields = list(fields - errors)
+        print(errors_fields)
+        print(success_fields)
+        #
+        print(form_obj.errors)
+        #
+        if form_obj.is_valid():
+            print("ok")
+
+            name = form_obj.cleaned_data.get('name')
+            sex = form_obj.cleaned_data.get('sex')
+            code = form_obj.cleaned_data.get('code')
+            dent = form_obj.cleaned_data.get('dent')
+            username = form_obj.cleaned_data.get('username')
+            birthday = form_obj.cleaned_data.get('birthday')
+            in_service = form_obj.cleaned_data.get('in_service')
+            is_staff = form_obj.cleaned_data.get('is_staff')
+            password1 = form_obj.cleaned_data.get('password1')
+            password2 = form_obj.cleaned_data.get('password2')
+
+
+
+            # 創建user
+
+            # 驗證passwd
+            if password1 and password2:
+                passwd = password1
+            else:
+                passwd = "12345678"
+
+            user = User()
+            user.username = username
+            user.set_password(passwd)
+            user.is_staff = is_staff
+            user.save()
+
+            # 創建Userinfo
+
+            # 只取編號不包含部門編號
+            code = code[len(dent.block_number):]
+            models.UserProfile.objects.create(
+                user=user,
+                name=name,
+                sex=sex,
+                code=code,
+                dent=dent,
+                birthday=birthday,
+                in_service=in_service
+
+            )
+
+            ret['status'] = 'ok'
+            ret['msg'] = '新增成功'
+            ret['errors_fields'] = errors_fields
+            ret['success_fields'] = success_fields
+
+        else:
+
+            ret['status'] = 'error'
+            ret['msg'] = '用戶信息輸入不正確!'
+            ret['errors_fields'] = errors_fields
+            ret['success_fields'] = success_fields
+
+        return JsonResponse(ret)
+
+    return render(request, "user/user_add.html", locals())
+
+
+def user_edit(request, pk):
     # pk = 804
 
     userinfo_obj = models.UserProfile.objects.get(id=pk)
 
     if request.method == 'GET':
-        forms_user_obj = forms.UserForm(instance=userinfo_obj.user,request=request)
-        forms_userproinfo_obj = forms.UserProfileForm(instance=userinfo_obj,request=request)
+        forms_user_obj = forms.UserForm(instance=userinfo_obj.user, request=request)
+        forms_userproinfo_obj = forms.UserProfileForm(instance=userinfo_obj, request=request)
 
-    elif request.method == 'POST':
+    if request.method == 'POST':
 
         print(request.POST)
 
+        forms_user_obj = forms.UserForm(request.POST, instance=userinfo_obj.user, request=request)
+        forms_userproinfo_obj = forms.UserProfileForm(request.POST, instance=userinfo_obj, request=request)
 
-        forms_user_obj = forms.UserForm(request.POST,instance=userinfo_obj.user,request=request)
-        forms_userproinfo_obj = forms.UserProfileForm(request.POST,instance=userinfo_obj,request=request)
-
-
+        # 確認表單提交無誤
         if forms_user_obj.is_valid() and forms_userproinfo_obj.is_valid():
             print("ok")
+
+            # 取值
+
+            username = forms_user_obj.cleaned_data.get('username')
+            is_staff = forms_user_obj.cleaned_data.get('is_staff')
+
+            password1 = forms_user_obj.cleaned_data.get('password1')
+            password2 = forms_user_obj.cleaned_data.get('password2')
+
+            name = forms_userproinfo_obj.cleaned_data.get('name')
+            in_service = forms_userproinfo_obj.cleaned_data.get('in_service')
+            birthday = forms_userproinfo_obj.cleaned_data.get('birthday')
+            sex = forms_userproinfo_obj.cleaned_data.get('sex')
+            code = forms_userproinfo_obj.cleaned_data.get('code')
+            dent = forms_userproinfo_obj.cleaned_data.get('dent')
+
+            userinfo = forms_user_obj.save(commit=False)
+            # 修改密碼
+            if password1 and password2:
+                userinfo.user.set_password(password1)
+
+            # 修改用戶
+
+            userinfo.save()
+
+            # 修改用戶profifle
+            code = code[len(dent.block_number):]
+
+            userproinfo_obj = forms_userproinfo_obj.save(commit=False)
+            userproinfo_obj.code = code
+            userproinfo_obj.save()
+
+
         else:
             print("error")
             print(forms_user_obj.errors)
             print(forms_userproinfo_obj.errors)
 
-
-
-
-
-    return render(request, "user/userinfo.html", locals())
+    return render(request, "user/user_edit.html", locals())
 
 
 def test1(request):
@@ -450,28 +568,25 @@ def test1(request):
     if request.method == "POST":
         print(request.POST)
 
-        print("forms_obj.errors",forms_obj.errors)
+        print("forms_obj.errors", forms_obj.errors)
 
     return render(request, "test/test1.html", locals())
 
 
 def test2(request):
-
     userinfo_obj = models.UserProfile.objects.get(id=796)
     # dent_obj = models.Department.objects.all()
 
     if request.method == 'GET':
-        forms_user_obj = forms.UserForm(instance=userinfo_obj.user,request=request)
-        forms_userproinfo_obj = forms.UserProfileForm(instance=userinfo_obj,request=request)
+        forms_user_obj = forms.UserForm(instance=userinfo_obj.user, request=request)
+        forms_userproinfo_obj = forms.UserProfileForm(instance=userinfo_obj, request=request)
 
     elif request.method == 'POST':
 
         print(request.POST)
 
-
-        forms_user_obj = forms.UserForm(request.POST,instance=userinfo_obj.user,request=request)
-        forms_userproinfo_obj = forms.UserProfileForm(request.POST,instance=userinfo_obj,request=request)
-
+        forms_user_obj = forms.UserForm(request.POST, instance=userinfo_obj.user, request=request)
+        forms_userproinfo_obj = forms.UserProfileForm(request.POST, instance=userinfo_obj, request=request)
 
         if forms_user_obj.is_valid() and forms_userproinfo_obj.is_valid():
             print("ok")
@@ -480,7 +595,5 @@ def test2(request):
 
         print(forms_user_obj.errors)
         print(forms_userproinfo_obj.errors)
-
-
 
     return render(request, "test/test2.html", locals())

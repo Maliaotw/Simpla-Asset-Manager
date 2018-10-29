@@ -24,8 +24,13 @@ urlpatterns = [
     url(r'^department/', views.department, name="department"),
     url(r'^category/', views.category, name="category"),
 
-    url(r'^user/', views.user, name="user"),
-    url(r'^userinfo/(?P<pk>\d+)', views.userinfo, name="userinfo"),
+
+    # --- user ---
+    url(r'^user/$', views.user, name="user"),
+    url(r'^user/(\d+)', views.userinfo, name="userinfo"),
+    url(r'^user/add', views.user_add, name="user_add"),
+    url(r'^user/edit/(?P<pk>\d+)', views.user_edit, name="user_edit"),
+    # delete
 
     url(r'^test1/', views.test1, name="test1"),
     url(r'^test2/', views.test2, name="test2"),

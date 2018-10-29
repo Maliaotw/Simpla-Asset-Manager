@@ -98,13 +98,13 @@ class UserForm(ModelForm):
     password1 = forms.CharField(
         label="密碼",
         widget=forms.PasswordInput(attrs={"class": "col-md-10  form-control-static", "style": "margin-bottom: 10px"}),
-
+        required=False,
     )
 
     password2 = forms.CharField(
         label="確認密碼",
         widget=forms.PasswordInput(attrs={"class": "col-md-10  form-control-static", "style": "margin-bottom: 10px"}),
-
+        required=False,
     )
 
     def __init__(self, *args, **kwargs):
@@ -127,15 +127,11 @@ class UserForm(ModelForm):
                 if k in admin_readonly_fields:
                     self.fields[k].widget.attrs['disabled'] = 'ture'
 
-
-
     def clean(self):
         cleaned_data = super().clean()
         if cleaned_data.get('password1') != cleaned_data.get('password2'):
             # 全局錯誤
             raise forms.ValidationError(("密碼不一致"))
-
-
 
     class Meta:
         model = models.User
@@ -188,11 +184,80 @@ class User_Add_Form(forms.Form):
         # disabled=True
     )
 
+    birthday = forms.DateTimeField(
+        label="生日",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+
+    in_service_choice = (
+        (None, '-----'),
+        (1, '在職'),
+        (2, '離職'),
+        (3, '停職'),
+        (4, '退休'),
+    )
+
+    in_service = forms.ChoiceField(
+        label="在職狀態",
+        choices=in_service_choice,
+        widget=forms.Select(attrs={"class": "form-control"}),
+        required=True,
+    )
+
+    is_staff_choice = (
+        (None, '---'),
+        (True, '是'),
+        (False, '否'),
+    )
+
+    is_staff = forms.ChoiceField(
+        label='登入',
+        widget=forms.Select(attrs={"class": "col-md-10  form-control-static", "style": "margin-bottom: 10px"}),
+        choices=is_staff_choice,
+        required=True,
+    )
+
+    password1 = forms.CharField(
+        label="密碼",
+        widget=forms.PasswordInput(
+            attrs={"class": "col-md-10  form-control-static", "style": "margin-bottom: 10px"}),
+        required=False,
+    )
+
+    password2 = forms.CharField(
+        label="確認密碼",
+        widget=forms.PasswordInput(attrs={"class": "col-md-10  form-control-static", "style": "margin-bottom: 10px"}),
+        required=False,
+    )
+
     def clean(self):
         cleaned_data = super().clean()
+
+        # 用戶名不得重複
         user_obj = User.objects.filter(username=cleaned_data.get('username'))
         if user_obj:
             self.add_error('username', "username error")
+
+        # 員工編號不得重複
+        dent = cleaned_data.get('dent')
+
+        code = cleaned_data.get('code')
+
+        code_num = code[len(dent.block_number):] # 編號
+        dent_num = code[:len(dent.block_number)] # 部門號碼
+        u = models.UserProfile.objects.filter(dent=dent).filter(code=code_num)
+
+        if dent_num == dent.block_number and u :
+            self.add_error('code', "code error")
+
+
+
+
+        if cleaned_data.get('password1') != cleaned_data.get('password2'):
+            # 全局錯誤
+            raise forms.ValidationError(("密碼不一致"))
+
+
 
 
 class test1Form(forms.Form):

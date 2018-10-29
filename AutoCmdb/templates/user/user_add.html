@@ -1,0 +1,291 @@
+{% extends 'user/base.html' %}
+{% load asset_tags %}
+
+
+
+{% block head %}
+    <!-- CSS -->
+    <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/css/bootstrap-select.css">
+
+
+
+    <!--  JavaScript -->
+    <script src="/static/js/bootstrap-datepicker.js"></script>
+    <script src="/static/js/bootstrap-datepicker.zh-TW.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="/static/js/bootstrap-select.js"></script>
+
+    <style>
+        .col-md-2.col-form-label, .col-md-6.form-group, .col-md-10.form-control-static {
+            padding-left: 15px;
+        }
+
+        .form-control-static {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+
+    </style>
+
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+
+    <ol class="breadcrumb">
+        <li><a href="{% url 'user' %}">用戶管理</a></li>
+        <li class="active">新增用戶</li>
+
+    </ol>
+
+
+    <div class="panel panel-default" style="padding: 20px">
+        <form role="form" method="post" id="userform_add">
+            {% csrf_token %}
+
+
+            <!-- 錯誤提示-->
+            <div class="alert alert-danger">
+                <strong></strong>
+            </div>
+
+
+            <div class="form-group">
+                <label> 基本信息</label>
+            </div>
+
+
+            <div class="col-md-6 form-group has-feedback">
+                <label for="">編號</label>
+                <input type="number" name="code" class="form-control" placeholder=""
+                       value="{{ forms_obj.dent.block_number }}{{ userinfo_obj.code }}">
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+            </div>
+
+
+            <div class="col-md-6 form-group has-feedback">
+                <label class="col-form-label">用戶名</label>
+                {{ forms_obj.username }}
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+            </div>
+
+            <div class="col-md-6 form-group has-feedback">
+                <label class="col-form-label">姓名</label>
+                {{ forms_obj.name }}
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+            </div>
+
+            <div class="col-md-6 form-group has-feedback">
+                <label class="col-form-label">性別</label>
+                {{ forms_obj.sex }}
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+            </div>
+
+
+            <div class="col-md-6 form-group has-feedback">
+                <label class="col-form-label">部門</label>
+                {{ forms_obj.dent }}
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+            </div>
+
+            <div class="col-md-6 form-group has-feedback">
+                <label class="col-form-label">生日</label>
+                {{ forms_obj.birthday }}
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+            </div>
+
+            <div class="col-md-12 form-group has-feedback" style="padding-left:15px; padding-right: 15px; ">
+                <label> 在職狀態</label>
+                {{ forms_obj.in_service }}
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+            </div>
+
+
+            <div class="form-group">
+                <label> 登入功能</label>
+
+                {% if forms_obj.is_staff.value == "True" %}
+
+                    <button id="change_passwd" type="button" class="btn btn-success" style="margin-left: 20px">更改密碼
+                    </button>
+                {% endif %}
+            </div>
+
+
+            <div class="form-inline ">
+
+                <label class="col-md-2  col-form-label">狀態</label>
+                {{ forms_obj.is_staff }}
+
+            </div>
+
+
+            <div class="form-inline" style="padding-right: 15px; display: none">
+                <label class="col-md-2  col-form-label">密碼</label>
+
+                {{ forms_obj.password1 }}
+            </div>
+
+
+            <div class="form-inline" style="padding-right: 15px; ; display: none">
+                <label class="col-md-2  col-form-label">確認密碼</label>
+                {{ forms_obj.password2 }}
+            </div>
+
+            <button id="userform_submit" type="button" class="btn btn-primary center-block">新增</button>
+
+
+        </form>
+
+
+    </div>
+
+
+{% endblock %}
+
+
+
+
+
+{% block extra-js %}
+
+    <script>
+        function BeforeFormSubmit(e) {
+            $(":disabled").removeAttr("disabled");
+        }
+
+
+        $("input[name='birthday']").datepicker(
+            {
+                language: 'zh-TW',
+                format: "yyyy-mm-dd",
+                todayHighlight: true,
+
+            });
+
+        $("#change_passwd").bind("click", function (e) {
+            $("[name='password1']").closest(".form-inline").show();
+            $("[name='password2']").closest(".form-inline").show();
+        });
+
+
+        // 選擇部門後請求該用戶編號
+        function get_user_number(e) {
+            console.log(e.value);
+
+            $.ajax({
+                url: "/api/add_user_number",
+                type: "GET",
+                data: {'id': e.value},
+
+                success: function (callback) {
+                    //console.log(callback);
+
+                    if (callback.status == 'ok') {
+                        $("#userform_add [name='code']").val(callback.data);
+                        $("#userform_add [name='code']").removeAttr("disabled");
+                    }
+                    else {
+                        console.log("請求錯誤");
+                        $("#userform_add [name='code']").val("");
+                        $("#userform_add [name='code']").attr("disabled", "disabled");
+                    }
+
+
+                },
+                error: function () {
+                    console.log("請求錯誤");
+                    $("#userform_add [name='code']").val("");
+                    $("#userform_add [name='code']").attr("disabled", "disabled");
+                }
+            });
+        };
+
+
+        // bind button
+        $("#userform_submit").on("click", function (e) {
+            $("#userform_add").submit();
+        });
+
+
+        // 提交 新增資產表單
+        $("#userform_add").on("submit", function (e) {
+
+            var postData = $(this).serializeArray();
+            console.log(postData);
+
+            $.ajax({
+                url: "{% url 'user_add' %}",
+                type: "POST",
+                data: postData,
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback.status == 'ok') {
+
+                        $("#userform_add .alert-danger strong").text(callback.msg);
+                        $.each(callback.success_fields, function (i, val) {
+
+                            input_tag = $("#userform_add [name='" + val + "']");
+                            div_tag = input_tag.closest("div");
+                            div_tag.removeClass("has-error").addClass("has-success");
+                            div_tag.find("span").removeClass("glyphicon-remove").addClass("glyphicon-ok");
+
+                        });
+
+
+                    } else {
+                        $("#userform_add .alert-danger").show();
+                        $("#userform_add .alert-danger strong").text(callback.msg);
+
+                        console.log(callback.errors_fields);
+                        console.log(callback.success_fields);
+
+                        $.each(callback.errors_fields, function (i, val) {
+
+                            input_tag = $("#userform_add [name='" + val + "']");
+                            div_tag = input_tag.closest("div");
+                            div_tag.removeClass("has-success").addClass("has-error");
+                            div_tag.find("span").removeClass("glyphicon-ok").addClass("glyphicon-remove");
+
+
+                        });
+
+                        $.each(callback.success_fields, function (i, val) {
+
+                            input_tag = $("#userform_add [name='" + val + "']");
+                            div_tag = input_tag.closest("div");
+                            div_tag.removeClass("has-error").addClass("has-success");
+                            div_tag.find("span").removeClass("glyphicon-remove").addClass("glyphicon-ok");
+
+                        });
+
+                    }
+
+                },
+                error: function () {
+
+                }
+            });
+            e.preventDefault();
+        });
+
+
+    </script>
+
+{% endblock %}
+
+
+
+
+
+
+
