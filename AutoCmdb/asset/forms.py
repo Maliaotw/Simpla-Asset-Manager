@@ -181,6 +181,7 @@ class User_Add_Form(forms.Form):
     code = forms.CharField(
         label="編號",
         widget=forms.TextInput(attrs={"class": "form-control", "disabled": "disabled"}),
+        required=True,
         # disabled=True
     )
 
@@ -212,7 +213,8 @@ class User_Add_Form(forms.Form):
 
     is_staff = forms.ChoiceField(
         label='登入',
-        widget=forms.Select(attrs={"class": "col-md-10  form-control-static", "style": "margin-bottom: 10px"}),
+        widget=forms.Select(attrs={"class": "col-md-10  form-control-static", "style": "margin-bottom: 10px",
+                                   "onchange": "ch_passwd_ele(this)"}),
         choices=is_staff_choice,
         required=True,
     )
@@ -240,26 +242,25 @@ class User_Add_Form(forms.Form):
 
         # 員工編號不得重複
         dent = cleaned_data.get('dent')
-
         code = cleaned_data.get('code')
 
-        code_num = code[len(dent.block_number):] # 編號
-        dent_num = code[:len(dent.block_number)] # 部門號碼
+        code_num = code[len(dent.block_number):]  # 編號
+        dent_num = code[:len(dent.block_number)]  # 部門號碼
         u = models.UserProfile.objects.filter(dent=dent).filter(code=code_num)
 
-        print("dent_num",dent_num)
-        print("dent.block_number",dent.block_number)
-        if dent_num != dent.block_number or u :
+        print("dent_num", dent_num)
+        print("dent.block_number", dent.block_number)
+        if dent_num != dent.block_number or u:
             self.add_error('code', "code error")
-
-
-
 
         if cleaned_data.get('password1') != cleaned_data.get('password2'):
             # 全局錯誤
             raise forms.ValidationError(("密碼不一致"))
 
+    def __init__(self, *args, **kwargs):
+        super(User_Add_Form, self).__init__(*args, **kwargs)
 
+        self.fields["code"].required = True
 
 
 class test1Form(forms.Form):
