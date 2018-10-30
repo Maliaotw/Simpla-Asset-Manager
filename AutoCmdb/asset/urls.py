@@ -20,14 +20,20 @@ from asset import views
 
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
-    url(r'^index', views.index, name="asset"),
-    url(r'^department/', views.department, name="department"),
-    url(r'^category/', views.category, name="category"),
+
+    # --- asset ---
+    url(r'^asset/$', views.asset, name="asset"),
+    url(r'^asset/(\d+)$', views.asset_info, name="asset_info"),
+    url(r'^asset/add', views.asset_add, name="asset_add"),
+    url(r'^asset/edit/(?P<pk>\d+)', views.asset_edit, name="asset_edit"),
+
+    url(r'^department/$', views.department, name="department"),
+    url(r'^category/$', views.category, name="category"),
 
 
     # --- user ---
     url(r'^user/$', views.user, name="user"),
-    url(r'^user/(\d+)', views.userinfo, name="userinfo"),
+    url(r'^user/(\d+)', views.user_info, name="user_info"),
     url(r'^user/add', views.user_add, name="user_add"),
     url(r'^user/edit/(?P<pk>\d+)', views.user_edit, name="user_edit"),
     # delete

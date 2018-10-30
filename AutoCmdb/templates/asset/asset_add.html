@@ -1,0 +1,318 @@
+{% extends 'asset/base.html' %}
+{% load asset_tags %}
+
+
+
+{% block head %}
+    <!-- CSS -->
+    <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/css/bootstrap-select.css">
+
+    <!--  JavaScript -->
+    <script src="/static/js/bootstrap-datepicker.js"></script>
+    <script src="/static/js/bootstrap-datepicker.zh-TW.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="/static/js/bootstrap-select.js"></script>
+
+    <style>
+        .col-md-2.col-form-label, .col-md-6.form-group, .col-md-10.form-control-static {
+            padding-left: 15px;
+        }
+
+        .form-control-static {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+    <ol class="breadcrumb">
+        <li><a href="{% url 'asset' %}">資產管理</a></li>
+        <li class="active">新增資產</li>
+    </ol>
+
+
+
+
+    <div class="panel panel-default" style="padding: 20px">
+        <form role="form" method="post" id="form">
+            {% csrf_token %}
+
+
+            <!-- 錯誤提示-->
+            <div class="alert" style="display: none">
+                <strong></strong>
+            </div>
+
+
+            <div class="form-group">
+                <label> 基本信息</label>
+
+
+            </div>
+
+            <div class="row" style="padding-left: 15px">
+
+                <div class="col-md-6 form-group has-feedback">
+                    {{ forms_obj.category.label_tag }}
+                    {{ forms_obj.category }}
+                    <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+                </div>
+
+                <div class="col-md-6 form-group has-feedback">
+                    {{ forms_obj.sn.label_tag }}
+                    {{ forms_obj.sn }}
+                    <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                </div>
+
+
+                <div class="col-md-6 form-group has-feedback">
+                    {{ forms_obj.purchase_date.label_tag }}
+                    {{ forms_obj.purchase_date }}
+                    <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                </div>
+
+                <div class="col-md-6 form-group has-feedback">
+                    {{ forms_obj.price.label_tag }}
+                    {{ forms_obj.price }}
+                    <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                </div>
+
+
+            </div>
+
+
+            <div class="form-group">
+                <label> 使用狀態</label>
+            </div>
+
+            <div class="row" style="padding-left: 15px">
+
+
+                <div class="col-md-12 form-group has-feedback">
+                    {{ forms_obj.status.label_tag }}
+                    {{ forms_obj.status }}
+                    <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                </div>
+
+                <div class="col-md-6 form-group has-feedback">
+                    {{ forms_obj.department.label_tag }}
+                    {{ forms_obj.department }}
+                    <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                </div>
+
+
+                <div class="col-md-6 form-group has-feedback">
+                    {{ forms_obj.manager.label_tag }}
+                    {{ forms_obj.manager }}
+                    <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                </div>
+
+
+            </div>
+
+            <div class="row">
+
+                <div class="form-group">
+                    <button id="submit" type="button" class="btn btn-primary center-block">新增</button>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+
+
+
+
+
+
+{% endblock %}
+
+
+
+
+
+{% block extra-js %}
+
+    <script>
+
+
+        $("#id_manager").find('option')
+            .remove()
+            .end()
+            .append('<option value="">--------</option>')
+            .val('')
+        ;
+
+
+        function BeforeFormSubmit(e) {
+            $(":disabled").removeAttr("disabled");
+        }
+
+
+        $('#id_purchase_date').datepicker(
+            {
+                language: 'zh-TW',
+                format: "yyyy-mm-dd",
+                todayHighlight: true,
+
+            });
+
+
+        // 選擇類型後請求該分類數量
+        function get_category(e) {
+            //console.log(e);
+            //console.log($(this));
+            //console.log(e.value);
+
+            $.ajax({
+                url: "/api/category",
+                type: "GET",
+                data: {'cate': e.value},
+
+                success: function (callback) {
+                    //console.log(callback);
+                    $("input[name='sn']").removeAttr("disabled");
+                    $("input[name='sn']").val(callback.number);
+                },
+                error: function () {
+                }
+            });
+
+        };
+
+
+        // 選擇部門後請求關聯使用資料
+        function get_dent_user(e) {
+            //console.log(e);
+            //console.log($(this));
+            //console.log(e.value);
+
+            $.ajax({
+                url: "/api/dent_user",
+                type: "GET",
+                data: {'dent': e.value},
+                async: false,
+
+                success: function (callback) {
+                    window.dent_user = {
+                        'status': 'ok',
+                        'data': callback
+                    };
+                    console.log(window.dent_user);
+                },
+                error: function () {
+
+                }
+            });
+        };
+
+
+        // 新增資產 關聯用戶
+        function add_assetform_user(e) {
+            get_dent_user(e);
+            dent_user = window.dent_user;
+            //console.log(dent_user);
+            if (dent_user.status == 'ok') {
+                // 解開#user_add select選項 disabled
+                $("#id_manager").removeAttr("disabled");
+
+                console.log('add_assetform_user');
+
+                $("#id_manager").find('option')
+                    .remove()
+                    .end()
+                    .append('<option value="">--------</option>')
+                    .val('')
+                ;
+
+                users = dent_user.data.users;
+                owner = dent_user.data.owner;
+                $.each(users, function (i, item) {
+                        //console.log(item);
+
+                        if (item.code == owner.code) {
+                            //console.log(item.code);
+                            //console.log(owner.code);
+
+                            $("#id_manager").append($('<option>', {
+                                value: item.id,
+                                text: item.user + "(" + item.code + ")",
+                                selected: true,
+                            }));
+                        } else {
+
+                            $("#id_manager").append($('<option>', {
+                                value: item.id,
+                                text: item.user + "(" + item.code + ")"
+                            }));
+                        }
+                    }
+                );
+            }
+
+        }
+
+
+        // 檢查狀態
+        function ch_status_ele(e) {
+
+            if (e.value == "2") {
+                $("#id_department").removeAttr("disabled").val("");
+                $("#id_manager").removeAttr("disabled").val("");
+
+
+            } else {
+                $("#id_department").attr("disabled", "disabled").val("");
+                $("#id_manager").attr("disabled", "disabled").val("");
+
+            }
+
+        }
+
+
+        // bind button
+        $("#submit").on("click", function (e) {
+            $("#form").submit();
+        });
+
+        // 提交 新增資產表單
+        $("#form").on("submit", function (e) {
+
+            var postData = $(this).serializeArray();
+            console.log(postData);
+
+            $.ajax({
+                url: "{% url 'asset_add' %}",
+                type: "POST",
+                data: postData,
+                success: function (callback) {
+                    console.log(callback);
+                }
+
+            });
+
+        });
+
+
+    </script>
+
+{% endblock %}
+
+
+
+
+
+
+

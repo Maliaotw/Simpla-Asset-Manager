@@ -4,10 +4,86 @@ from django import forms
 from django.contrib.auth.models import User
 
 
-class AssetForm(ModelForm):
+class Asset_Add_Form(ModelForm):
     '''
     資產表單
     '''
+
+    sn = forms.CharField(
+        label="資產編號",
+        widget=forms.TextInput(
+            attrs={"disabled": 'ture'}
+        )
+    )
+
+    category = forms.ModelChoiceField(
+        label="類型",
+        queryset=models.Catagory.objects.all(),
+        widget=forms.Select(attrs={"onchange": "get_category(this)"}),
+        required=True,
+
+    )
+
+    department = forms.ModelChoiceField(
+        label="部門",
+        queryset=models.Department.objects.all(),
+        widget=forms.Select(attrs={"onchange": "add_assetform_user(this)", "disabled": 'ture'}),
+        required=True,
+
+    )
+
+    manager = forms.ModelChoiceField(
+        label='負責人/使用者',
+        queryset=models.UserProfile.objects.all(),
+        widget=forms.Select(attrs={"style": "margin-bottom: 10px", "disabled": 'ture'}),
+
+        required=True,
+    )
+
+    status_choice = (
+        (1, '未使用'),
+        (2, '使用中'),
+        (3, '遺失'),
+        (4, '報廢'),
+    )
+
+    status = forms.ChoiceField(
+        label='狀態',
+        widget=forms.Select(attrs={"onchange": "ch_status_ele(this)"}),
+        choices=status_choice,
+        required=True,
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+
+        super(Asset_Add_Form, self).__init__(*args, **kwargs)
+
+        admin_readonly_fields = ()
+        user_readonly_fields = ()
+
+        # print(self.request)
+
+        # 對所有字段添加Css屬性
+        for k, v in self.fields.items():
+
+            if self.request.user.is_anonymous:
+                if k in user_readonly_fields:
+                    self.fields[k].widget.attrs['disabled'] = 'ture'
+
+
+            else:
+                if k in admin_readonly_fields:
+                    self.fields[k].widget.attrs['disabled'] = 'ture'
+
+            self.fields[k].widget.attrs['class'] = 'form-control'
+
+    def clean(self):
+
+        cleaned_data = super().clean()
+
+
+        return cleaned_data
 
     class Meta:
         model = models.Asset

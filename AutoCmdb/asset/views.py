@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 
 # Create your views here.
 
-def index(request):
+def asset(request):
     search_field = {}
 
     category_obj = models.Catagory.objects.all()
@@ -125,6 +125,43 @@ def index(request):
         return JsonResponse(ret)
 
     return render(request, "asset/index.html", locals())
+
+
+def asset_add(request):
+    ret = {"status": "", "re_html": "", "msg": ""}
+
+    if request.method == 'GET':
+        forms_obj = forms.Asset_Add_Form(request=request)
+
+
+    elif request.method == 'POST':
+
+        print(request.POST)
+        forms_obj = forms.Asset_Add_Form(request.POST,request=request)
+
+        if forms_obj.is_valid():
+            print("ok")
+        else:
+            print("error")
+
+            print(forms_obj.errors)
+
+        return JsonResponse(ret)
+
+
+    return render(request, "asset/asset_add.html", locals())
+
+
+
+def asset_edit(request):
+    pass
+
+
+def asset_info(request):
+    pass
+
+
+
 
 
 def department(request):
@@ -399,7 +436,7 @@ def user(request):
     return render(request, 'user/index.html', locals())
 
 
-def userinfo(request):
+def user_info(request):
     pass
 
 
