@@ -37,7 +37,7 @@
 
     <ol class="breadcrumb">
         <li><a href="{% url 'asset' %}">資產管理</a></li>
-        <li class="active">新增資產</li>
+        <li class="active">更改資產</li>
     </ol>
 
 
@@ -143,19 +143,20 @@
 
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <h4 class="modal-title">新增成功</h4>
+                    <h4 class="modal-title">修改成功</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
 
                 <!-- Modal body -->
                 <div class="modal-body">
-                    是否還需要繼續新增資料
+                    是否還需要繼續修改資料
                 </div>
 
                 <!-- Modal footer -->
                 <div class="modal-footer">
                     <a href="{% url 'asset' %}" class="btn btn-primary" role="button">返回列表</a>
-                    <a href="{% url 'asset_add' %}" class="btn btn-success" role="button">繼續新增</a>
+                    <a href="{% url 'asset_edit' pk %}" class="btn btn-success" role="button">繼續修改</a>
+{#                    <button type="button" class="btn btn-success" data-dismiss="modal">繼續修改</button>#}
                 </div>
 
             </div>
@@ -325,7 +326,7 @@
             console.log(postData);
 
             $.ajax({
-                url: "{% url 'asset_add' %}",
+                url: "{% url 'asset_edit' pk %}",
                 type: "POST",
                 data: postData,
                 success: function (callback) {

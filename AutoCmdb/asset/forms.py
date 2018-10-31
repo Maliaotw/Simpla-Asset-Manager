@@ -4,7 +4,7 @@ from django import forms
 from django.contrib.auth.models import User
 
 
-class Asset_Add_Form(ModelForm):
+class AssetForm(ModelForm):
     '''
     資產表單
     '''
@@ -12,7 +12,7 @@ class Asset_Add_Form(ModelForm):
     sn = forms.CharField(
         label="資產編號",
         widget=forms.TextInput(
-            attrs={"disabled": 'ture'}
+            attrs={}
         )
     )
 
@@ -28,16 +28,14 @@ class Asset_Add_Form(ModelForm):
         label="部門",
         queryset=models.Department.objects.all(),
         widget=forms.Select(attrs={"onchange": "add_assetform_user(this)", "disabled": 'ture'}),
-        required=True,
-
+        required=False,
     )
 
     manager = forms.ModelChoiceField(
         label='負責人/使用者',
         queryset=models.UserProfile.objects.all(),
         widget=forms.Select(attrs={"style": "margin-bottom: 10px", "disabled": 'ture'}),
-
-        required=True,
+        required=False,
     )
 
     status_choice = (
@@ -57,7 +55,7 @@ class Asset_Add_Form(ModelForm):
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
 
-        super(Asset_Add_Form, self).__init__(*args, **kwargs)
+        super(AssetForm, self).__init__(*args, **kwargs)
 
         admin_readonly_fields = ()
         user_readonly_fields = ()
@@ -78,16 +76,66 @@ class Asset_Add_Form(ModelForm):
 
             self.fields[k].widget.attrs['class'] = 'form-control'
 
-    def clean(self):
-
-        cleaned_data = super().clean()
-
-
-        return cleaned_data
-
     class Meta:
         model = models.Asset
         fields = '__all__'
+
+
+class Asset_Add_Form(AssetForm):
+    '''
+    資產表單
+    '''
+
+    sn = forms.CharField(
+        label="資產編號",
+        widget=forms.TextInput(
+            attrs={"disabled": 'ture'}
+        )
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        # 驗證編號是否重複
+
+        # 先找類型在驗證編號
+
+        category = cleaned_data.get("category")
+        sn = cleaned_data.get("sn")
+
+        sn_num = models.Asset.objects.filter(category=category).filter(sn=sn)
+
+        if sn_num:
+            self.add_error('sn', "sn error")
+
+        return cleaned_data
+
+
+class Asset_Edit_Form(AssetForm):
+
+
+
+
+
+
+    department = forms.ModelChoiceField(
+        label="部門",
+        queryset=models.Department.objects.all(),
+        widget=forms.Select(attrs={"onchange": "add_assetform_user(this)"}),
+        required=False,
+    )
+
+    manager = forms.ModelChoiceField(
+        label='負責人/使用者',
+        queryset=models.UserProfile.objects.all(),
+        widget=forms.Select(attrs={"style": "margin-bottom: 10px"}),
+        required=False,
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        return cleaned_data
 
 
 class DentForm(ModelForm):
@@ -204,6 +252,7 @@ class UserForm(ModelForm):
                     self.fields[k].widget.attrs['disabled'] = 'ture'
 
     def clean(self):
+
         cleaned_data = super().clean()
         if cleaned_data.get('password1') != cleaned_data.get('password2'):
             # 全局錯誤

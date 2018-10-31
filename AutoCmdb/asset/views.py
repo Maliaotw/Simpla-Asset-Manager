@@ -139,10 +139,33 @@ def asset_add(request):
         print(request.POST)
         forms_obj = forms.Asset_Add_Form(request.POST,request=request)
 
+        print(forms_obj.errors)
+        #
+        fields = set(list(dict(forms_obj.fields).keys()))
+        errors = set(list(forms_obj.errors.keys()))
+        #
+        errors_fields = list(fields & errors)
+        success_fields = list(fields - errors)
+        print(errors_fields)
+        print(success_fields)
+        #
+
         if forms_obj.is_valid():
             print("ok")
+            ret['status'] = 'ok'
+            ret['msg'] = '新增成功'
+            ret['errors_fields'] = errors_fields
+            ret['success_fields'] = success_fields
+
+            forms_obj.save()
+
         else:
             print("error")
+            ret['status'] = 'error'
+            ret['msg'] = '輸入不正確!'
+            ret['errors_fields'] = errors_fields
+            ret['success_fields'] = success_fields
+
 
             print(forms_obj.errors)
 
@@ -153,12 +176,57 @@ def asset_add(request):
 
 
 
-def asset_edit(request):
-    pass
+def asset_edit(request,pk):
+    ret = {"status": "", "re_html": "", "msg": ""}
+
+    asset_obj = models.Asset.objects.get(id=pk)
+
+    if request.method == 'GET':
+
+        forms_obj = forms.Asset_Edit_Form(instance=asset_obj, request=request)
+
+
+    if request.method == 'POST':
+
+        forms_obj = forms.Asset_Edit_Form(data=request.POST,instance=asset_obj, request=request)
+
+        print(forms_obj.errors)
+
+        fields = set(list(dict(forms_obj.fields).keys()))
+        errors = set(list(forms_obj.errors.keys()))
+
+        errors_fields = list(fields & errors)
+        success_fields = list(fields - errors)
+        print(errors_fields)
+        print(success_fields)
+
+
+        if forms_obj.is_valid():
+            print("ok")
+            ret['status'] = 'ok'
+            ret['msg'] = '修改成功'
+            ret['errors_fields'] = errors_fields
+            ret['success_fields'] = success_fields
+            forms_obj.save()
+        else:
+            print("error")
+            ret['status'] = 'error'
+            ret['msg'] = '輸入不正確!'
+            ret['errors_fields'] = errors_fields
+            ret['success_fields'] = success_fields
+
+        return JsonResponse(ret)
+
+
+    return render(request, "asset/asset_edit.html", locals())
+
+
 
 
 def asset_info(request):
     pass
+
+
 
 
 
@@ -378,6 +446,7 @@ def user(request):
 
         form_obj = forms.User_Add_Form(data=request.POST)
 
+        # 驗證錯誤及正常字段
         fields = set(list(dict(form_obj.fields).keys()))
         errors = set(list(form_obj.errors.keys()))
 
@@ -480,7 +549,6 @@ def user_add(request):
             password2 = form_obj.cleaned_data.get('password2')
 
 
-
             # 創建user
 
             # 驗證passwd
@@ -535,6 +603,7 @@ def user_edit(request, pk):
     if request.method == 'GET':
         forms_user_obj = forms.UserForm(instance=userinfo_obj.user, request=request)
         forms_userproinfo_obj = forms.UserProfileForm(instance=userinfo_obj, request=request)
+
 
     if request.method == 'POST':
 
