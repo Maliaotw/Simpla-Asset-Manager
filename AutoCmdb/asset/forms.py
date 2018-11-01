@@ -80,7 +80,6 @@ class AssetForm(ModelForm):
         model = models.Asset
         fields = '__all__'
 
-
 class Asset_Add_Form(AssetForm):
     '''
     資產表單
@@ -113,10 +112,20 @@ class Asset_Add_Form(AssetForm):
 
 class Asset_Edit_Form(AssetForm):
 
+    sn = forms.CharField(
+        label="資產編號",
+        widget=forms.TextInput(
+            attrs={"readonly": 'ture'}
+        )
+    )
 
+    category = forms.ModelChoiceField(
+        label="類型",
+        queryset=models.Catagory.objects.all(),
+        widget=forms.Select(attrs={"onchange": "get_category(this)","readonly": 'ture'}),
+        required=True,
 
-
-
+    )
 
     department = forms.ModelChoiceField(
         label="部門",

@@ -1,13 +1,17 @@
 from django.shortcuts import render, HttpResponse, redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
 from django.http import QueryDict
 from asset import models
 from asset import forms
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.models import User
+import pandas as pd
 
 
 # Create your views here.
+
+
+# --- 資產 ---
 
 def asset(request):
     search_field = {}
@@ -137,7 +141,7 @@ def asset_add(request):
     elif request.method == 'POST':
 
         print(request.POST)
-        forms_obj = forms.Asset_Add_Form(request.POST,request=request)
+        forms_obj = forms.Asset_Add_Form(request.POST, request=request)
 
         print(forms_obj.errors)
         #
@@ -166,29 +170,24 @@ def asset_add(request):
             ret['errors_fields'] = errors_fields
             ret['success_fields'] = success_fields
 
-
             print(forms_obj.errors)
 
         return JsonResponse(ret)
 
-
     return render(request, "asset/asset_add.html", locals())
 
 
-
-def asset_edit(request,pk):
+def asset_edit(request, pk):
     ret = {"status": "", "re_html": "", "msg": ""}
 
     asset_obj = models.Asset.objects.get(id=pk)
 
     if request.method == 'GET':
-
         forms_obj = forms.Asset_Edit_Form(instance=asset_obj, request=request)
-
 
     if request.method == 'POST':
 
-        forms_obj = forms.Asset_Edit_Form(data=request.POST,instance=asset_obj, request=request)
+        forms_obj = forms.Asset_Edit_Form(data=request.POST, instance=asset_obj, request=request)
 
         print(forms_obj.errors)
 
@@ -199,7 +198,6 @@ def asset_edit(request,pk):
         success_fields = list(fields - errors)
         print(errors_fields)
         print(success_fields)
-
 
         if forms_obj.is_valid():
             print("ok")
@@ -217,20 +215,62 @@ def asset_edit(request,pk):
 
         return JsonResponse(ret)
 
-
     return render(request, "asset/asset_edit.html", locals())
 
 
+def asset_input(request):
+    
+    if request.method == 'POST':
+        return HttpResponse("ok")
+    
+
+    return render(request, "asset/asset_input.html", locals())
 
 
-def asset_info(request):
-    pass
+def asset_output(request):
+    import csv
 
+    a = models.Asset.objects.all()
 
+    opts = models.Asset.objects.all().model._meta
+    model = models.Asset.objects.all().model
+    response = HttpResponse(content_type='text/csv; charset=cp936')
 
+    # force download.
+    response['Content-Disposition'] = 'attachment;filename=export.csv'
+    # the csv writer
+    writer = csv.writer(response)
 
+    # ['ID', '資產編號', '價格', '類型', '部門', '負責人', '購買日期', '狀態', '更新日期', '創建日期']
+    row_names = [field.verbose_name for field in opts.fields]
+    print(row_names)
 
+    # ['id', 'sn', 'price', 'category', 'department', 'manager', 'purchase_date', 'status', 'latest_date', 'create_date']
+    field_names = [field.name for field in opts.fields]
+    print(field_names)
 
+    # Write a first row with header information
+    writer.writerow(row_names)
+    # Write data rows
+    for obj in models.Asset.objects.all():
+
+        ret = []
+        ret.append(obj.id)
+        sn = "%s-%s" % (obj.category.code,obj.sn)
+        ret.append(sn)
+        ret.append(obj.price)
+        ret.append(obj.category)
+        ret.append(obj.department)
+        ret.append(obj.manager)
+        ret.append(obj.purchase_date)
+        ret.append(obj.get_status_display())
+        ret.append(obj.latest_date)
+        ret.append(obj.create_date)
+        writer.writerow(ret)
+
+    return response
+
+# --- 部門 ---
 
 def department(request):
     ret = {"status": "", "re_html": "", "msg": ""}
@@ -304,8 +344,18 @@ def department(request):
 
         return JsonResponse(ret)
 
-    return render(request, "asset/department.html", locals())
+    return render(request, "department/index.html", locals())
 
+
+def department_input(request):
+    pass
+
+
+def department_output(request):
+    pass
+
+
+# --- 類型 ---
 
 def category(request):
     ret = {"status": "", "re_html": "", "msg": ""}
@@ -389,8 +439,18 @@ def category(request):
 
         return JsonResponse(ret)
 
-    return render(request, "asset/category.html", locals())
+    return render(request, "category/index.html", locals())
 
+
+def category_input(request):
+    pass
+
+
+def category_output(request):
+    pass
+
+
+# --- 用戶 ---
 
 def user(request):
     ret = {"status": "", "re_html": "", "msg": ""}
@@ -548,7 +608,6 @@ def user_add(request):
             password1 = form_obj.cleaned_data.get('password1')
             password2 = form_obj.cleaned_data.get('password2')
 
-
             # 創建user
 
             # 驗證passwd
@@ -604,7 +663,6 @@ def user_edit(request, pk):
         forms_user_obj = forms.UserForm(instance=userinfo_obj.user, request=request)
         forms_userproinfo_obj = forms.UserProfileForm(instance=userinfo_obj, request=request)
 
-
     if request.method == 'POST':
 
         print(request.POST)
@@ -655,6 +713,16 @@ def user_edit(request, pk):
 
     return render(request, "user/user_edit.html", locals())
 
+
+def user_input(request):
+    pass
+
+
+def user_output(request):
+    pass
+
+
+# --- 測試 ---
 
 def test1(request):
     print("this is test1")

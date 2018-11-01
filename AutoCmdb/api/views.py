@@ -49,6 +49,8 @@ def category(request):
 
     c = Catagory.objects.get(id=cate_id)
     a = Asset.objects.filter(category=c).count() + 1
+    
+    print(a)
     data = {
         'count': a,
         'number': "%03d" % a
@@ -57,6 +59,12 @@ def category(request):
 
 
 def dent_user(request):
+    '''
+    前端選擇部門返回關聯所有部門用戶
+    :param request:
+    :return:
+    '''
+
     ret = {
         'msg': '',
         'users': '',
@@ -67,16 +75,18 @@ def dent_user(request):
 
     dent = Department.objects.get(id=dent_id)
     users = UserProfile.objects.filter(dent=dent)
-    # print(users)
+    print(dent)
+    print(dent.user)
 
     # 負責人
 
     if dent.user:
         ret['owner'] = {
             'user': dent.user.name,
-            'code': '%s%s' % (dent.block_number, dent.user.code),
+            'code': '%s%s' % (dent.user.dent.block_number, dent.user.code),
             'id': dent.user.user.id,
         }
+    # dent.user.dent.block_number
 
     # 遍歷用戶
     user_list = []

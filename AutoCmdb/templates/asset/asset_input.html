@@ -1,0 +1,103 @@
+{% extends 'asset/base.html' %}
+{% load asset_tags %}
+
+
+
+{% block head %}
+    <!-- CSS -->
+    <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/css/bootstrap-select.css">
+
+
+
+
+    <!--  JavaScript -->
+    <script src="/static/js/bootstrap-datepicker.js"></script>
+    <script src="/static/js/bootstrap-datepicker.zh-TW.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="/static/js/bootstrap-select.js"></script>
+
+
+
+
+    <link rel="stylesheet" href="/static/css/fileinput.css">
+
+    <script src="/static/js/fileinput.js"></script>
+
+
+    <style>
+        .col-md-2.col-form-label, .col-md-6.form-group, .col-md-10.form-control-static {
+            padding-left: 15px;
+        }
+
+        .form-control-static {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+    <ol class="breadcrumb">
+        <li class="active">資產匯入</li>
+
+    </ol>
+
+
+
+
+    <div class="panel panel-default" style="padding: 20px">
+
+        你可以在這裡下載`範例檔案`, 或是直接上傳檔案進行匯入。
+
+        <input id="input-b2" name="input-b2" type="file" class="file" data-show-preview="false"
+               data-form-data='{"csrfmiddlewaretoken": "{{ csrf_token }}"}'>
+
+
+    </div>
+
+
+
+
+{% endblock %}
+
+
+
+
+
+{% block extra-js %}
+
+    <script>
+
+
+        $('[name="csrfmiddlewaretoken"]').val();
+
+
+        $("#input-b2").fileinput({
+            language: "zh",
+            allowedFileExtensions: ["csv"],
+
+            mainClass: "input-group-lg", //文件输入框为大型号
+            uploadUrl: "{% url 'asset_input' %}" //上传图片的服务器地址
+        }).on('fileuploaded', function (event, data, previewId, index) {
+            console.log("asset_input")
+        });
+
+    </script>
+
+{% endblock %}
+
+
+
+
+
+
+

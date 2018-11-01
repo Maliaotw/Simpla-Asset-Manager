@@ -124,7 +124,7 @@
             <div class="row">
 
                 <div class="form-group">
-                    <button id="submit" type="button" class="btn btn-primary center-block">新增</button>
+                    <button id="submit" type="button" class="btn btn-primary center-block">更改</button>
                 </div>
             </div>
 
@@ -156,7 +156,7 @@
                 <div class="modal-footer">
                     <a href="{% url 'asset' %}" class="btn btn-primary" role="button">返回列表</a>
                     <a href="{% url 'asset_edit' pk %}" class="btn btn-success" role="button">繼續修改</a>
-{#                    <button type="button" class="btn btn-success" data-dismiss="modal">繼續修改</button>#}
+                    {#                    <button type="button" class="btn btn-success" data-dismiss="modal">繼續修改</button>#}
                 </div>
 
             </div>
@@ -271,6 +271,17 @@
 
                 users = dent_user.data.users;
                 owner = dent_user.data.owner;
+
+                console.log(owner);
+                if (owner) {
+                    $("#id_manager").append($('<option>', {
+                        value: owner.id,
+                        text: owner.user + "(" + owner.code + ")",
+                        selected: true,
+                    }));
+                }
+
+
                 $.each(users, function (i, item) {
                         //console.log(item);
 
@@ -283,7 +294,8 @@
                                 text: item.user + "(" + item.code + ")",
                                 selected: true,
                             }));
-                        } else {
+                        }
+                        else {
 
                             $("#id_manager").append($('<option>', {
                                 value: item.id,

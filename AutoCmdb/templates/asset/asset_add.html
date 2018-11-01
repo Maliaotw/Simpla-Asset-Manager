@@ -270,6 +270,17 @@
 
                 users = dent_user.data.users;
                 owner = dent_user.data.owner;
+
+                console.log(owner);
+                if (owner) {
+                    $("#id_manager").append($('<option>', {
+                        value: owner.id,
+                        text: owner.user + "(" + owner.code + ")",
+                        selected: true,
+                    }));
+                }
+
+
                 $.each(users, function (i, item) {
                         //console.log(item);
 
@@ -277,11 +288,7 @@
                             //console.log(item.code);
                             //console.log(owner.code);
 
-                            $("#id_manager").append($('<option>', {
-                                value: item.id,
-                                text: item.user + "(" + item.code + ")",
-                                selected: true,
-                            }));
+
                         } else {
 
                             $("#id_manager").append($('<option>', {

@@ -23,9 +23,14 @@ urlpatterns = [
 
     # --- asset ---
     url(r'^asset/$', views.asset, name="asset"),
-    url(r'^asset/(\d+)$', views.asset_info, name="asset_info"),
+
     url(r'^asset/add', views.asset_add, name="asset_add"),
     url(r'^asset/edit/(?P<pk>\d+)', views.asset_edit, name="asset_edit"),
+    url(r'^asset/asset_input', views.asset_input, name="asset_input"),
+    url(r'^asset/asset_output', views.asset_output, name="asset_output"),
+
+
+
 
     url(r'^department/$', views.department, name="department"),
     url(r'^category/$', views.category, name="category"),
