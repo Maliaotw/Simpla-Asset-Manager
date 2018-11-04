@@ -99,13 +99,13 @@ class Asset(models.Model):
     purchase_date = models.DateTimeField(verbose_name='購買日期', null=True, blank=True)
 
     status_choice = (
-        (1, '未使用'),
-        (2, '使用中'),
-        (3, '遺失'),
-        (4, '報廢'),
+        ('未使用', '未使用'),
+        ('使用中', '使用中'),
+        ('遺失', '遺失'),
+        ('報廢', '報廢'),
     )
 
-    status = models.IntegerField(verbose_name='狀態',choices=status_choice)
+    status = models.CharField(verbose_name='狀態',max_length=16,choices=status_choice,default='未使用')
 
 
     latest_date = models.DateTimeField(verbose_name='更新日期', auto_now=True)

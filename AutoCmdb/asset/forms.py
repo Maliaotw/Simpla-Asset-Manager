@@ -39,10 +39,10 @@ class AssetForm(ModelForm):
     )
 
     status_choice = (
-        (1, '未使用'),
-        (2, '使用中'),
-        (3, '遺失'),
-        (4, '報廢'),
+        ('未使用', '未使用'),
+        ('使用中', '使用中'),
+        ('遺失', '遺失'),
+        ('報廢', '報廢'),
     )
 
     status = forms.ChoiceField(

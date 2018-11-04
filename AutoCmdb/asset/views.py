@@ -6,6 +6,9 @@ from asset import forms
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.models import User
 import pandas as pd
+import csv
+import re
+import datetime
 
 
 # Create your views here.
@@ -219,18 +222,127 @@ def asset_edit(request, pk):
 
 
 def asset_input(request):
-    
-    if request.method == 'POST':
-        return HttpResponse("ok")
-    
+    ret = {'status': '', "msg": ''}
 
-    return render(request, "asset/asset_input.html", locals())
+
+    if request.method == 'GET':
+
+        return render(request, "asset/asset_input.html", locals())
+
+    if request.method == 'POST':
+
+        # 存取檔案
+        print(request)
+        file = request.FILES['file']
+        with open(file.name, 'wb+') as destination:
+            for chunk in file.chunks():
+                destination.write(chunk)
+
+        # 分析
+        data_ret = []
+
+        f = open(file.name, 'r')
+        print(csv.DictReader(f).line_num)
+        rows = csv.DictReader(f)
+        for row in rows:
+
+            print("資產編號", row['資產編號'])
+            print("價格", row['價格'])
+            print("類型", row['類型'])
+            print("部門", row['部門'])
+            print("負責人", row['負責人'])
+            print("購買日期", row['購買日期'])
+            print("狀態", row['狀態'])
+
+            sn = row['資產編號']
+            price = row['價格']
+            category = row['類型']
+            department = row['部門']
+            manager = row['負責人']
+            purchase_date = row['購買日期']
+            status = row['狀態']
+
+            cate_code1, sn = sn.split("-")
+
+            # 找到類型對象
+            cate_name, cate_code2 = category.replace(")", "").split("(")
+            if cate_code1 == cate_code2:
+                cate_obj = models.Catagory.objects.filter(code=cate_code1)
+                if cate_obj:
+                    category = cate_obj.first()
+                else:
+                    ret['status'] = 'error'
+                    ret['msg'] = '類型錯誤'
+                    data_ret = []
+                    break
+            else:
+                ret['status'] = 'error'
+                ret['msg'] = '類型錯誤'
+                data_ret = []
+                break
+
+            # 切割資產編號
+            sn_obj = models.Asset.objects.filter(category=category).filter(sn=sn)
+            if sn_obj:
+                # print(sn_obj)
+                ret['status'] = 'error'
+                ret['msg'] = '資產編號重複'
+                data_ret = []
+                break
+
+            # 找到部門對象
+            dent_name, dent_code = department.replace(")", "").split("(")
+            dent_obj = models.Department.objects.filter(code=dent_code)
+            if dent_obj:
+                department = dent_obj.first()
+            else:
+                ret['status'] = 'error'
+                ret['msg'] = '部門錯誤'
+                data_ret = []
+                break
+
+
+            # 找到負責人 對象
+            manager_name, manager_code = manager.replace(")", "").split("(")
+            manager_obj = models.UserProfile.objects.filter(name=manager_name)
+            if manager_obj:
+                manager = manager_obj.first()
+            else:
+                ret['status'] = 'error'
+                ret['msg'] = '負責人錯誤'
+                data_ret = []
+                break
+
+            data = {
+                "sn": sn,
+                "price": price,
+                "category": category,
+                "department": department,
+                "manager": manager,
+                "purchase_date": datetime.datetime.strptime(purchase_date, "%Y/%m/%d"),
+                "status": status,
+
+            }
+            data_ret.append(data)
+
+        # 匯入
+        if ret['status'] == 'error':
+            pass
+        else:
+            for data in data_ret:
+                models.Asset.objects.create(**data)
+            ret['status'] = 'ok'
+            ret['msg'] = '匯入成功'
+
+
+        # 必須傳回JSON
+        return JsonResponse(ret)
+
+
 
 
 def asset_output(request):
     import csv
-
-    a = models.Asset.objects.all()
 
     opts = models.Asset.objects.all().model._meta
     model = models.Asset.objects.all().model
@@ -253,22 +365,22 @@ def asset_output(request):
     writer.writerow(row_names)
     # Write data rows
     for obj in models.Asset.objects.all():
-
         ret = []
         ret.append(obj.id)
-        sn = "%s-%s" % (obj.category.code,obj.sn)
+        sn = "%s-%s" % (obj.category.code, obj.sn)
         ret.append(sn)
         ret.append(obj.price)
         ret.append(obj.category)
         ret.append(obj.department)
         ret.append(obj.manager)
-        ret.append(obj.purchase_date)
+        ret.append(obj.purchase_date.strftime("%Y/%m%d") if obj.purchase_date else "")
         ret.append(obj.get_status_display())
-        ret.append(obj.latest_date)
-        ret.append(obj.create_date)
+        ret.append(obj.latest_date.strftime("%Y/%m%d") if obj.latest_date else "")
+        ret.append(obj.create_date.strftime("%Y/%m%d") if obj.create_date else "")
         writer.writerow(ret)
 
     return response
+
 
 # --- 部門 ---
 
