@@ -9,10 +9,7 @@ import pandas as pd
 import csv
 import re
 import datetime
-
-
-# Create your views here.
-
+import csv
 
 # --- 資產 ---
 
@@ -342,10 +339,8 @@ def asset_input(request):
 
 
 def asset_output(request):
-    import csv
 
     opts = models.Asset.objects.all().model._meta
-    model = models.Asset.objects.all().model
     response = HttpResponse(content_type='text/csv; charset=cp936')
 
     # force download.
@@ -373,10 +368,10 @@ def asset_output(request):
         ret.append(obj.category)
         ret.append(obj.department)
         ret.append(obj.manager)
-        ret.append(obj.purchase_date.strftime("%Y/%m%d") if obj.purchase_date else "")
+        ret.append(obj.purchase_date.strftime("%Y/%m/%d") if obj.purchase_date else "")
         ret.append(obj.get_status_display())
-        ret.append(obj.latest_date.strftime("%Y/%m%d") if obj.latest_date else "")
-        ret.append(obj.create_date.strftime("%Y/%m%d") if obj.create_date else "")
+        ret.append(obj.latest_date.strftime("%Y/%m/%d") if obj.latest_date else "")
+        ret.append(obj.create_date.strftime("%Y/%m/%d") if obj.create_date else "")
         writer.writerow(ret)
 
     return response
@@ -581,19 +576,19 @@ def user(request):
     if request.GET:
         # GET 字段
         name = request.GET.get("name", '')
-        sex_id = request.GET.get("sex_id", '')
+        sex = request.GET.get("sex", '')
         dent_id = request.GET.get("dent_id", '')
 
         search_field['name'] = name
-        search_field['sex_id'] = sex_id
+        search_field['sex'] = sex
         search_field['dent_id'] = dent_id
 
         # GET 字段 篩選
 
-        if sex_id and dent_id:
-            user_obj = models.UserProfile.objects.filter(name__contains=name, sex=sex_id, dent_id=dent_id)
-        elif sex_id:
-            user_obj = models.UserProfile.objects.filter(name__contains=name, sex=sex_id)
+        if sex and dent_id:
+            user_obj = models.UserProfile.objects.filter(name__contains=name, sex=sex, dent_id=dent_id)
+        elif sex:
+            user_obj = models.UserProfile.objects.filter(name__contains=name, sex=sex)
         elif dent_id:
             user_obj = models.UserProfile.objects.filter(name__contains=name, dent_id=dent_id)
         else:
@@ -827,11 +822,165 @@ def user_edit(request, pk):
 
 
 def user_input(request):
-    pass
+    ret = {'status': '', "msg": ''}
+
+    if request.method == 'GET':
+        return render(request, "user/user_input.html", locals())
+
+    if request.method == 'POST':
+
+        # 存取檔案
+        print(request)
+        file = request.FILES['file']
+        with open(file.name, 'wb+') as destination:
+            for chunk in file.chunks():
+                destination.write(chunk)
+
+        # 分析
+        data_ret = []
+
+        f = open(file.name, 'r')
+        print(csv.DictReader(f).line_num)
+        rows = csv.DictReader(f)
+        for row in rows:
+
+            print("用户名", row['用户名'])
+            print("姓名", row['姓名'])
+            print("員工編號", row['員工編號'])
+            print("性別", row['性別'])
+            print("部門", row['部門'])
+            print("在職狀態", row['在職狀態'])
+            print("生日日期", row['生日日期'])
+
+            verbose_name = ['用户名','姓名','員工編號','性別','部門','在職狀態','生日日期']
+            field_name = ['username','name','code','']
+
+            username = row['用户名']
+            name = row['姓名']
+            code = row['員工編號']
+            sex = row['性別']
+            dent = row['部門']
+            in_service = row['在職狀態']
+            birthday = row['生日日期']
+
+            dent = models.Department.objects.filter(name=dent)
+            birthday = datetime.datetime.strptime(birthday, '%Y/%m/%d')
+
+            is_staff_coice = {'是': True, '否': False}
+            if data['is_staff'] in list(is_staff_coice.keys()):
+                data['is_staff'] = is_staff_coice[data['is_staff']]
+
+            forms_obj = forms.User_Add_Form(data=data)
+            print(forms_obj.errors)
+            for e in forms_obj.errors:
+                print(e)
+
+            # 找到類型對象
+            cate_name, cate_code2 = category.replace(")", "").split("(")
+            if cate_code1 == cate_code2:
+                cate_obj = models.Catagory.objects.filter(code=cate_code1)
+                if cate_obj:
+                    category = cate_obj.first()
+                else:
+                    ret['status'] = 'error'
+                    ret['msg'] = '類型錯誤'
+                    data_ret = []
+                    break
+            else:
+                ret['status'] = 'error'
+                ret['msg'] = '類型錯誤'
+                data_ret = []
+                break
+
+            # 切割資產編號
+            sn_obj = models.Asset.objects.filter(category=category).filter(sn=sn)
+            if sn_obj:
+                # print(sn_obj)
+                ret['status'] = 'error'
+                ret['msg'] = '資產編號重複'
+                data_ret = []
+                break
+
+            # 找到部門對象
+            dent_name, dent_code = department.replace(")", "").split("(")
+            dent_obj = models.Department.objects.filter(code=dent_code)
+            if dent_obj:
+                department = dent_obj.first()
+            else:
+                ret['status'] = 'error'
+                ret['msg'] = '部門錯誤'
+                data_ret = []
+                break
+
+            # 找到負責人 對象
+            manager_name, manager_code = manager.replace(")", "").split("(")
+            manager_obj = models.UserProfile.objects.filter(name=manager_name)
+            if manager_obj:
+                manager = manager_obj.first()
+            else:
+                ret['status'] = 'error'
+                ret['msg'] = '負責人錯誤'
+                data_ret = []
+                break
+
+            data = {
+                "sn": sn,
+                "price": price,
+                "category": category,
+                "department": department,
+                "manager": manager,
+                "purchase_date": datetime.datetime.strptime(purchase_date, "%Y/%m/%d"),
+                "status": status,
+
+            }
+            data_ret.append(data)
+
+        # 匯入
+        if ret['status'] == 'error':
+            pass
+        else:
+            for data in data_ret:
+                models.Asset.objects.create(**data)
+            ret['status'] = 'ok'
+            ret['msg'] = '匯入成功'
+
+        # 必須傳回JSON
+        return JsonResponse(ret)
 
 
 def user_output(request):
-    pass
+    opts = models.UserProfile.objects.all().model._meta
+    response = HttpResponse(content_type='text/csv; charset=cp936')
+
+    # force download.
+    response['Content-Disposition'] = 'attachment;filename=export.csv'
+    # the csv writer
+    writer = csv.writer(response)
+
+    # ID user 姓名 員工編號 性別 部門 在職狀態 生日日期
+    row_names = [field.verbose_name for field in opts.fields]
+    print(row_names)
+
+    # ['id', 'sn', 'price', 'category', 'department', 'manager', 'purchase_date', 'status', 'latest_date', 'create_date']
+    field_names = [field.name for field in opts.fields]
+    print(field_names)
+
+    # Write a first row with header information
+    writer.writerow(row_names)
+    # Write data rows
+    for obj in models.UserProfile.objects.all():
+        ret = []
+        ret.append(obj.id)
+        ret.append(obj.user.username)
+        ret.append(obj.name)
+        ret.append(str("{}{}".format(obj.dent.block_number,obj.code)))
+        ret.append(obj.sex)
+        ret.append(obj.dent.name)
+        ret.append(obj.in_service)
+        ret.append(obj.birthday.strftime("%Y/%m/%d") if obj.birthday else "")
+        writer.writerow(ret)
+
+    return response
 
 
 # --- 測試 ---

@@ -41,6 +41,10 @@ urlpatterns = [
     url(r'^user/(\d+)', views.user_info, name="user_info"),
     url(r'^user/add', views.user_add, name="user_add"),
     url(r'^user/edit/(?P<pk>\d+)', views.user_edit, name="user_edit"),
+    url(r'^user/user_input', views.user_input, name="user_input"),
+    url(r'^user/user_output', views.user_output, name="user_output"),
+
+
     # delete
 
     url(r'^test1/', views.test1, name="test1"),

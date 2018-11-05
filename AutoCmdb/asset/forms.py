@@ -80,7 +80,11 @@ class AssetForm(ModelForm):
         model = models.Asset
         fields = '__all__'
 
+
+
+
 class Asset_Add_Form(AssetForm):
+
     '''
     資產表單
     '''
@@ -292,8 +296,8 @@ class User_Add_Form(forms.Form):
 
     sex_choice = (
         (None, '-----'),
-        (1, '男'),
-        (2, '女'),
+        ('男', '男'),
+        ('女', '女'),
     )
 
     sex = forms.ChoiceField(
@@ -326,10 +330,10 @@ class User_Add_Form(forms.Form):
 
     in_service_choice = (
         (None, '-----'),
-        (1, '在職'),
-        (2, '離職'),
-        (3, '停職'),
-        (4, '退休'),
+        ('在職', '在職'),
+        ('離職', '離職'),
+        ('停職', '停職'),
+        ('退休', '退休'),
     )
 
     in_service = forms.ChoiceField(

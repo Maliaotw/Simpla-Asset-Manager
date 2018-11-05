@@ -58,7 +58,7 @@
 
                     <div class="form-group">
                         <label class="col-form-label">性別</label>
-                        <select class="selectpicker" name='sex_id' data-width="fit">
+                        <select class="selectpicker" name='sex' data-width="fit">
                             <option value="">-------</option>
                             {% for sex in sex_obj %}
                                 <option value="{{ sex.0 }}">{{ sex.1 }}</option>
@@ -107,7 +107,7 @@
                         <td>{{ user.dent.block_number }}{{ user.code }}</td>
                         <td>{{ user.name }}</td>
                         <td>{{ user.user.username }}</td>
-                        <td>{{ user.get_sex_display }}</td>
+                        <td>{{ user.sex }}</td>
                         <td>{{ user.dent }}</td>
                         <td>
 
@@ -206,8 +206,8 @@
         });
 
         $(document).ready(function () {
-
-            $(".selectpicker[name='sex_id']").selectpicker('val', {{ sex_id }});
+            console.log('{{ sex }}');
+            $(".selectpicker[name='sex']").selectpicker('val', '{{ sex }}');
             $(".selectpicker[name='dent_id']").selectpicker('val', {{ dent_id }});
 
 
@@ -307,8 +307,6 @@
                             div_tag.find("span").removeClass("glyphicon-remove").addClass("glyphicon-ok");
 
                         });
-
-
 
 
                     }

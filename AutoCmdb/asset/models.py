@@ -9,28 +9,27 @@ class UserProfile(models.Model):
     用戶
     '''
 
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User,verbose_name="用户名")
     name = models.CharField(max_length=64, verbose_name="姓名")
     code = models.CharField(max_length=64, verbose_name='員工編號', blank=True, null=True)
 
     sex_choice = (
-        (1, '男'),
-        (2, '女'),
+        ('男', '男'),
+        ('女', '女'),
     )
 
-    sex = models.IntegerField(choices=sex_choice ,verbose_name='性別')
+    sex = models.CharField(verbose_name='性別', choices=sex_choice ,max_length=16)
     dent = models.ForeignKey('Department', verbose_name='部門', blank=True, null=True)
 
     in_service_choice = (
-        (1, '在職'),
-        (2, '離職'),
-        (3, '停職'),
-        (4, '退休'),
+        ('在職', '在職'),
+        ('離職', '離職'),
+        ('停職', '停職'),
+        ('退休', '退休'),
     )
 
 
-
-    in_service = models.IntegerField(choices=in_service_choice ,verbose_name='在職狀態')
+    in_service = models.CharField(verbose_name='在職狀態',choices=in_service_choice,max_length=16)
     birthday = models.DateTimeField(null=True, blank=True, verbose_name='生日日期')
 
 
