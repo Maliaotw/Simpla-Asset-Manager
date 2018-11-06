@@ -116,7 +116,7 @@ def add_user_number(request):
         dent_obj = Department.objects.get(id=dent_id)
 
         # 部門人數
-        user_count = UserProfile.objects.filter(dent=dent_obj).count() + 1
+        user_count = UserProfile.objects.filter(dent_id=dent_id).count() + 1
 
         # 部門編號
         block_number = dent_obj.block_number
@@ -129,7 +129,7 @@ def add_user_number(request):
 
         num = num_format % (user_count)  # block_numer
 
-        print(block_number + num)
+        print("block_number + num",block_number + num)
         ret['data'] = block_number + num
         ret['status'] = 'ok'
 

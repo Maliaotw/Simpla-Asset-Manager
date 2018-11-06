@@ -704,45 +704,7 @@ def user_add(request):
         if form_obj.is_valid():
             print("ok")
 
-            name = form_obj.cleaned_data.get('name')
-            sex = form_obj.cleaned_data.get('sex')
-            code = form_obj.cleaned_data.get('code')
-            dent = form_obj.cleaned_data.get('dent')
-            username = form_obj.cleaned_data.get('username')
-            birthday = form_obj.cleaned_data.get('birthday')
-            in_service = form_obj.cleaned_data.get('in_service')
-            is_staff = form_obj.cleaned_data.get('is_staff')
-            password1 = form_obj.cleaned_data.get('password1')
-            password2 = form_obj.cleaned_data.get('password2')
-
-            # 創建user
-
-            # 驗證passwd
-            if password1 and password2:
-                passwd = password1
-            else:
-                passwd = "12345678"
-
-            user = User()
-            user.username = username
-            user.set_password(passwd)
-            user.is_staff = is_staff
-            user.save()
-
-            # 創建Userinfo
-
-            # 只取編號不包含部門編號
-            code = code[len(dent.block_number):]
-            models.UserProfile.objects.create(
-                user=user,
-                name=name,
-                sex=sex,
-                code=code,
-                dent=dent,
-                birthday=birthday,
-                in_service=in_service
-
-            )
+            form_obj.save()
 
             ret['status'] = 'ok'
             ret['msg'] = '新增成功'
@@ -844,105 +806,45 @@ def user_input(request):
         rows = csv.DictReader(f)
         for row in rows:
 
-            print("用户名", row['用户名'])
-            print("姓名", row['姓名'])
-            print("員工編號", row['員工編號'])
-            print("性別", row['性別'])
-            print("部門", row['部門'])
-            print("在職狀態", row['在職狀態'])
-            print("生日日期", row['生日日期'])
+            verbose_name = ['用户名','姓名','員工編號','性別','部門','在職狀態','生日日期','登入']
+            field_name = ['username','name','code','sex','dent','in_service','birthday','is_staff']
 
-            verbose_name = ['用户名','姓名','員工編號','性別','部門','在職狀態','生日日期']
-            field_name = ['username','name','code','']
+            keys = {k: name for k, name in zip(field_name, verbose_name)}
+            data = {k: row[name] for k, name in zip(field_name, verbose_name)}
 
-            username = row['用户名']
-            name = row['姓名']
-            code = row['員工編號']
-            sex = row['性別']
-            dent = row['部門']
-            in_service = row['在職狀態']
-            birthday = row['生日日期']
-
-            dent = models.Department.objects.filter(name=dent)
-            birthday = datetime.datetime.strptime(birthday, '%Y/%m/%d')
+            data['dent'] = models.Department.objects.filter(name=data['dent'])
+            data['birthday'] = datetime.datetime.strptime(data['birthday'], '%Y/%m/%d')
 
             is_staff_coice = {'是': True, '否': False}
             if data['is_staff'] in list(is_staff_coice.keys()):
                 data['is_staff'] = is_staff_coice[data['is_staff']]
 
             forms_obj = forms.User_Add_Form(data=data)
-            print(forms_obj.errors)
-            for e in forms_obj.errors:
-                print(e)
 
-            # 找到類型對象
-            cate_name, cate_code2 = category.replace(")", "").split("(")
-            if cate_code1 == cate_code2:
-                cate_obj = models.Catagory.objects.filter(code=cate_code1)
-                if cate_obj:
-                    category = cate_obj.first()
-                else:
+            if forms_obj.is_valid():
+                data_ret.append(forms_obj)
+
+            else:
+                print(forms_obj.errors)
+                for e in forms_obj.errors:
+                    print(e, data[e], keys[e])
                     ret['status'] = 'error'
-                    ret['msg'] = '類型錯誤'
-                    data_ret = []
+                    ret['msg'] = '%s"%s"錯誤' % (keys[e],data[e])
+                    data_ret =[]
                     break
-            else:
-                ret['status'] = 'error'
-                ret['msg'] = '類型錯誤'
-                data_ret = []
-                break
 
-            # 切割資產編號
-            sn_obj = models.Asset.objects.filter(category=category).filter(sn=sn)
-            if sn_obj:
-                # print(sn_obj)
-                ret['status'] = 'error'
-                ret['msg'] = '資產編號重複'
-                data_ret = []
-                break
-
-            # 找到部門對象
-            dent_name, dent_code = department.replace(")", "").split("(")
-            dent_obj = models.Department.objects.filter(code=dent_code)
-            if dent_obj:
-                department = dent_obj.first()
-            else:
-                ret['status'] = 'error'
-                ret['msg'] = '部門錯誤'
-                data_ret = []
-                break
-
-            # 找到負責人 對象
-            manager_name, manager_code = manager.replace(")", "").split("(")
-            manager_obj = models.UserProfile.objects.filter(name=manager_name)
-            if manager_obj:
-                manager = manager_obj.first()
-            else:
-                ret['status'] = 'error'
-                ret['msg'] = '負責人錯誤'
-                data_ret = []
-                break
-
-            data = {
-                "sn": sn,
-                "price": price,
-                "category": category,
-                "department": department,
-                "manager": manager,
-                "purchase_date": datetime.datetime.strptime(purchase_date, "%Y/%m/%d"),
-                "status": status,
-
-            }
-            data_ret.append(data)
 
         # 匯入
         if ret['status'] == 'error':
             pass
         else:
-            for data in data_ret:
-                models.Asset.objects.create(**data)
+            print("data_ret",data_ret)
+            for form in data_ret:
+                # print(form)
+                form.save()
             ret['status'] = 'ok'
             ret['msg'] = '匯入成功'
+
 
         # 必須傳回JSON
         return JsonResponse(ret)

@@ -81,10 +81,7 @@ class AssetForm(ModelForm):
         fields = '__all__'
 
 
-
-
 class Asset_Add_Form(AssetForm):
-
     '''
     資產表單
     '''
@@ -115,7 +112,6 @@ class Asset_Add_Form(AssetForm):
 
 
 class Asset_Edit_Form(AssetForm):
-
     sn = forms.CharField(
         label="資產編號",
         widget=forms.TextInput(
@@ -126,7 +122,7 @@ class Asset_Edit_Form(AssetForm):
     category = forms.ModelChoiceField(
         label="類型",
         queryset=models.Catagory.objects.all(),
-        widget=forms.Select(attrs={"onchange": "get_category(this)","readonly": 'ture'}),
+        widget=forms.Select(attrs={"onchange": "get_category(this)", "readonly": 'ture'}),
         required=True,
 
     )
@@ -370,6 +366,31 @@ class User_Add_Form(forms.Form):
         required=False,
     )
 
+    def save(self, *args, **kwargs):
+
+
+        if self.password1 and self.password2:
+            passwd = self.password1
+        else:
+            passwd = "12345678"
+
+        user = User()
+        user.username = self.cleaned_data['username']
+        user.set_password(passwd)
+        user.is_staff = self.cleaned_data['is_staff']
+        user.save()
+
+        models.UserProfile.objects.create(
+            user=user,
+            name=self.cleaned_data['name'],
+            sex=self.cleaned_data['sex'],
+            code=self.code,
+            dent=self.cleaned_data['dent'],
+            birthday=self.cleaned_data['birthday'],
+            in_service=self.cleaned_data['in_service']
+        )
+
+
     def clean(self):
         cleaned_data = super().clean()
 
@@ -386,12 +407,14 @@ class User_Add_Form(forms.Form):
         dent_num = code[:len(dent.block_number)]  # 部門號碼
         u = models.UserProfile.objects.filter(dent=dent).filter(code=code_num)
 
-        print("dent_num", dent_num)
-        print("dent.block_number", dent.block_number)
         if dent_num != dent.block_number or u:
             self.add_error('code', "code error")
+        else:
+            self.code = code_num
 
-        if cleaned_data.get('password1') != cleaned_data.get('password2'):
+        self.password1 = cleaned_data.get('password1', '')
+        self.password2 = cleaned_data.get('password2', '')
+        if self.password1 != self.password2:
             # 全局錯誤
             raise forms.ValidationError(("密碼不一致"))
 
