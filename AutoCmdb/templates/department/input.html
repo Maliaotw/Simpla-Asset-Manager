@@ -1,7 +1,7 @@
-{% extends 'asset/base.html' %}
+{% extends 'department/base.html' %}
 {% load asset_tags %}
 
-
+{% block title %}匯入部門{% endblock %}
 
 {% block head %}
     <!-- CSS -->
@@ -35,7 +35,7 @@
 {% block content %}
 
     <ol class="breadcrumb">
-        <li class="active">用戶匯入</li>
+        <li class="active">部門匯入</li>
 
     </ol>
 
@@ -71,8 +71,8 @@
 
                 <!-- Modal footer -->
                 <div class="modal-footer">
-                    <a href="{% url 'user' %}" class="btn btn-primary" role="button">返回列表</a>
-                    <a href="{% url 'user_input' %}" class="btn btn-success" role="button">繼續上傳</a>
+                    <a href="{% url 'department' %}" class="btn btn-primary" role="button">返回列表</a>
+                    <a href="{% url 'department_input' %}" class="btn btn-success" role="button">繼續上傳</a>
 
                 </div>
 
@@ -99,7 +99,7 @@
             language: "zh-TW",
             allowedFileExtensions: ["csv"],
             mainClass: "input-group-lg", //文件输入框为大型号
-            uploadUrl: "{% url 'user_input' %}", //上传图片的服务器地址
+            uploadUrl: "{% url 'department_input' %}", //上传图片的服务器地址
             uploadExtraData: {
                 "csrfmiddlewaretoken": csrftoken //帶上CSRF参数
             },

@@ -1,7 +1,7 @@
-{% extends 'asset/base.html' %}
+{% extends 'user/base.html' %}
 {% load asset_tags %}
 
-
+{% block title %}匯入用戶{% endblock %}
 
 {% block head %}
     <!-- CSS -->
@@ -35,7 +35,7 @@
 {% block content %}
 
     <ol class="breadcrumb">
-        <li class="active">資產匯入</li>
+        <li class="active">用戶匯入</li>
 
     </ol>
 
@@ -71,8 +71,8 @@
 
                 <!-- Modal footer -->
                 <div class="modal-footer">
-                    <a href="{% url 'asset' %}" class="btn btn-primary" role="button">返回列表</a>
-                    <a href="{% url 'asset_input' %}" class="btn btn-success" role="button">繼續上傳</a>
+                    <a href="{% url 'user' %}" class="btn btn-primary" role="button">返回列表</a>
+                    <a href="{% url 'user_input' %}" class="btn btn-success" role="button">繼續上傳</a>
 
                 </div>
 
@@ -99,7 +99,7 @@
             language: "zh-TW",
             allowedFileExtensions: ["csv"],
             mainClass: "input-group-lg", //文件输入框为大型号
-            uploadUrl: "{% url 'asset_input' %}", //上传图片的服务器地址
+            uploadUrl: "{% url 'user_input' %}", //上传图片的服务器地址
             uploadExtraData: {
                 "csrfmiddlewaretoken": csrftoken //帶上CSRF参数
             },
@@ -110,7 +110,6 @@
         // 上傳成功
         $("#input-b2").on('fileuploaded', function (event, data, previewId, index) {
             console.log("asset_input fileuploaded");
-            console.log(data);
 
             if (data.response.status == 'ok') {
                 console.log("response ok");
@@ -118,17 +117,15 @@
                 $("#Modal").modal("show");
                 $(".modal-title").text("匯入成功");
                 $(".modal-body").text("你可以繼續上傳或返回列表。");
+
             } else {
                 console.log("response error");
-
                 $("#Modal").modal("show");
                 $(".modal-title").text("匯入失敗");
                 $(".modal-title").css({'color':'red'});
                 $(".modal-body").html("你可以再次上傳或返回列表<br><i class='fa fa-exclamation-triangle'></i>錯誤訊息 : <b>"+ data.response.msg + "</b>");
             }
-
         });
-
 
     </script>
 

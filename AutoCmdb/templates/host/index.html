@@ -1,7 +1,13 @@
 {% extends 'host/base.html' %}
+{% load asset_tags %}
 
 
+{% block title %}主機列表{% endblock %}
 
+{% block head %}
+
+
+{% endblock %}
 
 
 
@@ -9,45 +15,64 @@
 
 
 
-    <h2 class="sub-header">主機列表</h2>
-    <div class="table-responsive">
-        <table class="table">
-            <thead>
-            <tr>
-                <th>主機編號</th>
-                <th>類型</th>
-                <th>型號</th>
-                <th>管理IP</th>
-                <th>作業系統</th>
-                <th>所在位置</th>
-                <th>運維負責人</th>
-                <th>所屬部門</th>
-                <th>關聯資產</th>
+    <ol class="breadcrumb">
+        <li><a href="#">主機列表</a></li>
+
+    </ol>
+
+    <div class="panel panel-default" style="padding: 20px">
 
 
-            </tr>
-            </thead>
-            <tbody>
-            {% for host in host_obj %}
+        <div class="row">
 
+
+        </div>
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
                 <tr>
-                    <td>{{ host.number }}</td>
-                    <td>{{ host.get_host_type_id_display }}</td>
-                    <td>{{ host.manufacturer }} {{ host.model }}</td>
-                    <td>{{ host.manage_ip }}</td>
-                    <td>{{ host.os_platform }}</td>
-                    <td>{{ host.location }}</td>
-                    <td>{{ host.ops_owner }}</td>
-                    <td>{{ host.asset.department.name | default:"None"}}</td>
-                    <td>{{ host.asset }}</td>
-
-
+                    <th>主機編號</th>
+                    <th>類型</th>
+                    <th>型號</th>
+                    <th>管理IP</th>
+                    <th>作業系統</th>
+                    <th>所在位置</th>
+                    <th>運維負責人</th>
+                    <th>所屬部門</th>
+                    <th>關聯資產</th>
                 </tr>
-            {% endfor %}
+                </thead>
+                <tbody>
+                {% for host in host_obj %}
+                    <tr>
+                        <td>{{ host.number }}</td>
+                        <td>{{ host.get_host_type_id_display }}</td>
+                        <td>{{ host.manufacturer }} {{ host.model }}</td>
+                        <td>{{ host.manage_ip }}</td>
+                        <td>{{ host.os_platform }}</td>
+                        <td>{{ host.location }}</td>
+                        <td>{{ host.ops_owner }}</td>
+                        <td>{{ host.asset.department.name | default:"None" }}</td>
+                        <td>{{ host.asset }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
 
 
-            </tbody>
-        </table>
+                <tfoot>
+                <th colspan="7">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination pull-right">
+                            {% get_pageer host_obj search_field %}
+                        </ul>
+                    </nav>
+                </th>
+                </tfoot>
+
+
+            </table>
+        </div>
     </div>
 
 

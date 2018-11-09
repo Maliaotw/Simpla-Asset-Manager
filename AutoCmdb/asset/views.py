@@ -11,6 +11,7 @@ import re
 import datetime
 import csv
 
+
 # --- 資產 ---
 
 def asset(request):
@@ -221,10 +222,8 @@ def asset_edit(request, pk):
 def asset_input(request):
     ret = {'status': '', "msg": ''}
 
-
     if request.method == 'GET':
-
-        return render(request, "asset/asset_input.html", locals())
+        return render(request, "asset/input.html", locals())
 
     if request.method == 'POST':
 
@@ -243,108 +242,69 @@ def asset_input(request):
         rows = csv.DictReader(f)
         for row in rows:
 
-            print("資產編號", row['資產編號'])
-            print("價格", row['價格'])
-            print("類型", row['類型'])
-            print("部門", row['部門'])
-            print("負責人", row['負責人'])
-            print("購買日期", row['購買日期'])
-            print("狀態", row['狀態'])
+            verbose_name = ['資產編號', '價格', '類型', '部門', '負責人', '購買日期', '狀態']
+            field_name = ['sn', 'price', 'category', 'department', 'manager', 'purchase_date', 'status']
 
-            sn = row['資產編號']
-            price = row['價格']
-            category = row['類型']
-            department = row['部門']
-            manager = row['負責人']
-            purchase_date = row['購買日期']
-            status = row['狀態']
+            keys = {k: name for k, name in zip(field_name, verbose_name)}
+            data = {k: row[name] for k, name in zip(field_name, verbose_name)}
 
-            cate_code1, sn = sn.split("-")
+            # PC-066
+            cate_code1, data['sn'] = data['sn'].split("-")
 
             # 找到類型對象
-            cate_name, cate_code2 = category.replace(")", "").split("(")
+            cate_name, cate_code2 = data['category'].replace(")", "").split("(")
             if cate_code1 == cate_code2:
-                cate_obj = models.Catagory.objects.filter(code=cate_code1)
-                if cate_obj:
-                    category = cate_obj.first()
-                else:
-                    ret['status'] = 'error'
-                    ret['msg'] = '類型錯誤'
-                    data_ret = []
-                    break
-            else:
-                ret['status'] = 'error'
-                ret['msg'] = '類型錯誤'
-                data_ret = []
-                break
-
-            # 切割資產編號
-            sn_obj = models.Asset.objects.filter(category=category).filter(sn=sn)
-            if sn_obj:
-                # print(sn_obj)
-                ret['status'] = 'error'
-                ret['msg'] = '資產編號重複'
-                data_ret = []
-                break
+                data['category'] = models.Catagory.objects.filter(code=cate_code1)
 
             # 找到部門對象
-            dent_name, dent_code = department.replace(")", "").split("(")
-            dent_obj = models.Department.objects.filter(code=dent_code)
-            if dent_obj:
-                department = dent_obj.first()
-            else:
-                ret['status'] = 'error'
-                ret['msg'] = '部門錯誤'
-                data_ret = []
-                break
+            if data['department']:
+                dent_name, dent_code = data['department'].replace(")", "").split("(")
+                data['department'] = models.Department.objects.filter(code=dent_code)
 
 
             # 找到負責人 對象
-            manager_name, manager_code = manager.replace(")", "").split("(")
-            manager_obj = models.UserProfile.objects.filter(name=manager_name)
-            if manager_obj:
-                manager = manager_obj.first()
+            if data['manager']:
+                manager_name, manager_code = data['manager'].replace(")", "").split("(")
+                data['manager'] = models.UserProfile.objects.filter(name=manager_name)
+
+            # 購買日期
+            data['purchase_date'] = datetime.datetime.strptime(data['purchase_date'], '%Y/%m/%d')
+
+            forms_obj = forms.Asset_Add_Form(data=data,request=request)
+
+            if forms_obj.is_valid():
+                data_ret.append(forms_obj)
+
             else:
-                ret['status'] = 'error'
-                ret['msg'] = '負責人錯誤'
-                data_ret = []
-                break
-
-            data = {
-                "sn": sn,
-                "price": price,
-                "category": category,
-                "department": department,
-                "manager": manager,
-                "purchase_date": datetime.datetime.strptime(purchase_date, "%Y/%m/%d"),
-                "status": status,
-
-            }
-            data_ret.append(data)
+                print(forms_obj.errors)
+                for e in forms_obj.errors:
+                    print(e, data[e], keys[e])
+                    ret['status'] = 'error'
+                    ret['msg'] = '%s"%s"錯誤' % (keys[e], data[e])
+                    data_ret = []
+                    break
 
         # 匯入
         if ret['status'] == 'error':
             pass
         else:
-            for data in data_ret:
-                models.Asset.objects.create(**data)
+            print("data_ret", data_ret)
+            for form in data_ret:
+                # print(form)
+                form.save()
             ret['status'] = 'ok'
             ret['msg'] = '匯入成功'
-
 
         # 必須傳回JSON
         return JsonResponse(ret)
 
 
-
-
 def asset_output(request):
-
     opts = models.Asset.objects.all().model._meta
     response = HttpResponse(content_type='text/csv; charset=cp936')
 
     # force download.
-    response['Content-Disposition'] = 'attachment;filename=export.csv'
+    response['Content-Disposition'] = 'attachment;filename=asset.csv'
     # the csv writer
     writer = csv.writer(response)
 
@@ -455,11 +415,90 @@ def department(request):
 
 
 def department_input(request):
-    pass
+    ret = {'status': '', "msg": ''}
+
+    if request.method == 'GET':
+        return render(request, "department/input.html", locals())
+
+    if request.method == 'POST':
+        # 存取檔案
+        print(request)
+        file = request.FILES['file']
+        with open(file.name, 'wb+') as destination:
+            for chunk in file.chunks():
+                destination.write(chunk)
+
+        # 分析
+        data_ret = []
+
+        f = open(file.name, 'r')
+        print(csv.DictReader(f).line_num)
+        rows = csv.DictReader(f)
+        for row in rows:
+            verbose_name = ['部門名稱', '部門簡稱', '部門工/代號', '部門工/代號碼長度', '部門負責人']
+            field_name = ['name', 'code', 'block_number', 'block_number_len', 'user']
+
+            keys = {k: name for k, name in zip(field_name, verbose_name)}
+            data = {k: row[name] for k, name in zip(field_name, verbose_name)}
+
+            # 找到負責人 對象
+            if data['user']:
+                manager_name, manager_code = data['user'].replace(")", "").split("(")
+                data['user'] = models.UserProfile.objects.filter(name=manager_name)
+
+
+            forms_obj = forms.DentForm(data=data)
+
+            if forms_obj.is_valid():
+                data_ret.append(forms_obj)
+
+            else:
+                print(forms_obj.errors)
+                for e in forms_obj.errors:
+                    print(e, data[e], keys[e])
+                    ret['status'] = 'error'
+                    ret['msg'] = '%s"%s"錯誤' % (keys[e], data[e])
+                    data_ret = []
+                    break
+
+            # 匯入
+        if ret['status'] == 'error':
+            pass
+        else:
+            print("data_ret", data_ret)
+            for form in data_ret:
+                # print(form)
+                form.save()
+            ret['status'] = 'ok'
+            ret['msg'] = '匯入成功'
+
+            # 必須傳回JSON
+        return JsonResponse(ret)
 
 
 def department_output(request):
-    pass
+    opts = models.Department.objects.all().model._meta
+    response = HttpResponse(content_type='text/csv; charset=cp936')
+
+    # force download.
+    response['Content-Disposition'] = 'attachment;filename=department.csv'
+    # the csv writer
+    writer = csv.writer(response)
+
+    # ['ID', '部門名稱', '部門簡稱', '部門工/代號', '部門工/代號碼長度', '部門負責人']
+    row_names = [field.verbose_name for field in opts.fields]
+    # print(row_names)
+
+    # ['id', 'name', 'code', 'block_number', 'block_number_len', 'user']
+    field_names = [field.name for field in opts.fields]
+    # print(field_names)
+
+    # Write a first row with header information
+    writer.writerow(row_names)
+
+    ret = [writer.writerow([getattr(obj,field) for field in field_names]) for obj in models.Department.objects.all()]
+
+    return response
 
 
 # --- 類型 ---
@@ -550,11 +589,85 @@ def category(request):
 
 
 def category_input(request):
-    pass
+    ret = {'status': '', "msg": ''}
+
+    if request.method == 'GET':
+        return render(request, "category/input.html", locals())
+
+    if request.method == 'POST':
+        # 存取檔案
+        print(request)
+        file = request.FILES['file']
+        with open(file.name, 'wb+') as destination:
+            for chunk in file.chunks():
+                destination.write(chunk)
+
+        # 分析
+        data_ret = []
+
+        f = open(file.name, 'r')
+        print(csv.DictReader(f).line_num)
+        rows = csv.DictReader(f)
+        for row in rows:
+            verbose_name = ['名稱', '代號']
+            field_name = ['name', 'code']
+
+            keys = {k: name for k, name in zip(field_name, verbose_name)}
+            data = {k: row[name] for k, name in zip(field_name, verbose_name)}
+
+
+            forms_obj = forms.CaryForm(data=data)
+
+            if forms_obj.is_valid():
+                data_ret.append(forms_obj)
+
+            else:
+                print(forms_obj.errors)
+                for e in forms_obj.errors:
+                    print(e, data[e], keys[e])
+                    ret['status'] = 'error'
+                    ret['msg'] = '%s"%s"錯誤' % (keys[e], data[e])
+                    data_ret = []
+                    break
+
+        # 匯入
+        if ret['status'] == 'error':
+            pass
+        else:
+            print("data_ret", data_ret)
+            for form in data_ret:
+                # print(form)
+                form.save()
+            ret['status'] = 'ok'
+            ret['msg'] = '匯入成功'
+
+        # 必須傳回JSON
+        return JsonResponse(ret)
 
 
 def category_output(request):
-    pass
+    opts = models.Catagory.objects.all().model._meta
+    response = HttpResponse(content_type='text/csv; charset=cp936')
+
+    # force download.
+    response['Content-Disposition'] = 'attachment;filename=Catagory.csv'
+    # the csv writer
+    writer = csv.writer(response)
+
+    # ['ID', '名稱', '代號']
+    row_names = [field.verbose_name for field in opts.fields]
+    print(row_names)
+
+    # ['id', 'name', 'code']
+    field_names = [field.name for field in opts.fields]
+    print(field_names)
+
+    # Write a first row with header information
+    writer.writerow(row_names)
+
+    ret = [writer.writerow([getattr(obj, field) for field in field_names]) for obj in models.Catagory.objects.all()]
+
+    return response
 
 
 # --- 用戶 ---
@@ -787,7 +900,7 @@ def user_input(request):
     ret = {'status': '', "msg": ''}
 
     if request.method == 'GET':
-        return render(request, "user/user_input.html", locals())
+        return render(request, "user/input.html", locals())
 
     if request.method == 'POST':
 
@@ -806,8 +919,8 @@ def user_input(request):
         rows = csv.DictReader(f)
         for row in rows:
 
-            verbose_name = ['用户名','姓名','員工編號','性別','部門','在職狀態','生日日期','登入']
-            field_name = ['username','name','code','sex','dent','in_service','birthday','is_staff']
+            verbose_name = ['用户名', '姓名', '員工編號', '性別', '部門', '在職狀態', '生日日期', '登入']
+            field_name = ['username', 'name', 'code', 'sex', 'dent', 'in_service', 'birthday', 'is_staff']
 
             keys = {k: name for k, name in zip(field_name, verbose_name)}
             data = {k: row[name] for k, name in zip(field_name, verbose_name)}
@@ -829,22 +942,20 @@ def user_input(request):
                 for e in forms_obj.errors:
                     print(e, data[e], keys[e])
                     ret['status'] = 'error'
-                    ret['msg'] = '%s"%s"錯誤' % (keys[e],data[e])
-                    data_ret =[]
+                    ret['msg'] = '%s"%s"錯誤' % (keys[e], data[e])
+                    data_ret = []
                     break
-
 
         # 匯入
         if ret['status'] == 'error':
             pass
         else:
-            print("data_ret",data_ret)
+            print("data_ret", data_ret)
             for form in data_ret:
                 # print(form)
                 form.save()
             ret['status'] = 'ok'
             ret['msg'] = '匯入成功'
-
 
         # 必須傳回JSON
         return JsonResponse(ret)
@@ -855,7 +966,7 @@ def user_output(request):
     response = HttpResponse(content_type='text/csv; charset=cp936')
 
     # force download.
-    response['Content-Disposition'] = 'attachment;filename=export.csv'
+    response['Content-Disposition'] = 'attachment;filename=user.csv'
     # the csv writer
     writer = csv.writer(response)
 
@@ -875,7 +986,7 @@ def user_output(request):
         ret.append(obj.id)
         ret.append(obj.user.username)
         ret.append(obj.name)
-        ret.append(str("{}{}".format(obj.dent.block_number,obj.code)))
+        ret.append(str("{}{}".format(obj.dent.block_number, obj.code)))
         ret.append(obj.sex)
         ret.append(obj.dent.name)
         ret.append(obj.in_service)

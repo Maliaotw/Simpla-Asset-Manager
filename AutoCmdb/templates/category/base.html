@@ -7,11 +7,13 @@
 
 {% block sideber_menu %}
 
+    {% url 'category' as category %}
+    {% url 'category_input' as category_input %}
 
 
     {% url 'asset' as asset %}
     {% url 'department' as department %}
-    {% url 'category' as category %}
+
 
     {% url 'host' as host %}
     {% url 'user' as user %}
@@ -21,8 +23,8 @@
 
 
         <li {% if request.path == category %}class="active"{% endif %}><a href={{ category }}>類型管理</a></li>
-        <li><a href="#">匯入</a></li>
-        <li><a href="#">匯出</a></li>
+        <li {% if request.path == category_input %}class="active"{% endif %}><a href="{{ category_input }}">匯入</a></li>
+        <li><a href="{% url 'category_output' %}" target="_blank">匯出</a></li>
 
     </ul>
 

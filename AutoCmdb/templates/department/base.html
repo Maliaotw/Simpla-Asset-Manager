@@ -8,9 +8,11 @@
 {% block sideber_menu %}
 
 
+    {% url 'department' as department %}
+    {% url 'department_input' as department_input %}
+
 
     {% url 'asset' as asset %}
-    {% url 'department' as department %}
     {% url 'category' as category %}
 
     {% url 'host' as host %}
@@ -19,10 +21,9 @@
 
     <ul class="nav nav-sidebar">
 
-
         <li {% if request.path == department %}class="active"{% endif %}><a href={{ department }}>部門管理</a></li>
-        <li><a href="#">匯入</a></li>
-        <li><a href="#">匯出</a></li>
+        <li {% if request.path == department_input %}class="active"{% endif %}><a href="{{ department_input }}">匯入</a></li>
+        <li><a href="{% url 'department_output' %}" target="_blank">匯出</a></li>
 
     </ul>
 

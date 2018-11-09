@@ -1,9 +1,11 @@
 {% extends 'user/base.html' %}
 {% load asset_tags %}
 
+{% block title %}用戶管理{% endblock %}
 
 
 {% block head %}
+
     <!-- CSS -->
     <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
 
@@ -110,7 +112,6 @@
                         <td>{{ user.sex }}</td>
                         <td>{{ user.dent }}</td>
                         <td>
-
                             <a href="{% url 'user_edit' user.id %}"><i class="fas fa-pen"></i></a>
                         </td>
                     </tr>
@@ -127,9 +128,7 @@
                             {% get_pageer user_obj search_field %}
                         </ul>
                     </nav>
-
                 </th>
-
                 </tfoot>
 
             </table>

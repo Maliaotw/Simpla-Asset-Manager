@@ -147,6 +147,8 @@ class Asset_Edit_Form(AssetForm):
         return cleaned_data
 
 
+
+
 class DentForm(ModelForm):
     '''
     部門表單
@@ -400,17 +402,21 @@ class User_Add_Form(forms.Form):
             self.add_error('username', "username error")
 
         # 員工編號不得重複
-        dent = cleaned_data.get('dent')
-        code = cleaned_data.get('code')
+        dent = cleaned_data.get('dent','')
+        code = cleaned_data.get('code','')
 
-        code_num = code[len(dent.block_number):]  # 編號
-        dent_num = code[:len(dent.block_number)]  # 部門號碼
-        u = models.UserProfile.objects.filter(dent=dent).filter(code=code_num)
+        if dent and code:
+            code_num = code[len(dent.block_number):]  # 編號
+            dent_num = code[:len(dent.block_number)]  # 部門號碼
+            u = models.UserProfile.objects.filter(dent=dent).filter(code=code_num)
 
-        if dent_num != dent.block_number or u:
-            self.add_error('code', "code error")
+            if dent_num != dent.block_number or u:
+                self.add_error('code', "code error")
+            else:
+                self.code = code_num
         else:
-            self.code = code_num
+            self.add_error('code', "code error")
+
 
         self.password1 = cleaned_data.get('password1', '')
         self.password2 = cleaned_data.get('password2', '')
