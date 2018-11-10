@@ -60,15 +60,12 @@ class AssetForm(ModelForm):
         admin_readonly_fields = ()
         user_readonly_fields = ()
 
-        # print(self.request)
-
         # 對所有字段添加Css屬性
         for k, v in self.fields.items():
 
             if self.request.user.is_anonymous:
                 if k in user_readonly_fields:
                     self.fields[k].widget.attrs['disabled'] = 'ture'
-
 
             else:
                 if k in admin_readonly_fields:

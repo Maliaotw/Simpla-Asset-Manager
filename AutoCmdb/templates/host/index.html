@@ -41,13 +41,14 @@
                     <th>運維負責人</th>
                     <th>所屬部門</th>
                     <th>關聯資產</th>
+                    <th>操作</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for host in host_obj %}
                     <tr>
                         <td>{{ host.number }}</td>
-                        <td>{{ host.get_host_type_id_display }}</td>
+                        <td>{{ host.host_type_id }}</td>
                         <td>{{ host.manufacturer }} {{ host.model }}</td>
                         <td>{{ host.manage_ip }}</td>
                         <td>{{ host.os_platform }}</td>
@@ -55,6 +56,10 @@
                         <td>{{ host.ops_owner }}</td>
                         <td>{{ host.asset.department.name | default:"None" }}</td>
                         <td>{{ host.asset }}</td>
+                        <td>
+                            <i class="fas fa-eye"></i>
+                            <i class="fas fa-pen"></i>
+                        </td>
                     </tr>
                 {% endfor %}
                 </tbody>

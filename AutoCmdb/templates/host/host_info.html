@@ -1,0 +1,211 @@
+{% extends 'host/base.html' %}
+{% load asset_tags %}
+
+
+{% block title %}主機列表{% endblock %}
+
+{% block head %}
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+
+
+    <ol class="breadcrumb">
+        <li><a href="{% url 'host' %}">主機列表 </a></li>
+        <li class="active">{{ host_obj.asset }}</li>
+
+    </ol>
+
+    <div class="panel panel-default" style="padding: 20px">
+
+        <div class="form-group">
+            <label>主機信息&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus" data-toggle="collapse" data-target="#host"></i> </label>
+        </div>
+
+        <div id="host" class="row collapse" style="padding-left: 15px">
+
+
+            <div class="col-md-6 form-group">
+                {{ host_form_obj.asset.label_tag }}
+                {{ host_form_obj.asset }}
+            </div>
+
+
+
+            <div class="col-md-6 form-group">
+                {{ host_form_obj.sn.label_tag }}
+                {{ host_form_obj.sn }}
+            </div>
+
+
+            <div class="col-md-6 form-group">
+                {{ host_form_obj.manage_ip.label_tag }}
+                {{ host_form_obj.manage_ip }}
+            </div>
+
+            <div class="col-md-6 form-group">
+                {{ host_form_obj.location.label_tag }}
+                {{ host_form_obj.location }}
+            </div>
+
+            <div class="col-md-6 form-group">
+                {{ host_form_obj.manufacturer.label_tag }}
+                {{ host_form_obj.manufacturer }}
+            </div>
+            <div class="col-md-6 form-group">
+                {{ host_form_obj.model.label_tag }}
+                {{ host_form_obj.model }}
+            </div>
+
+
+            <div class="col-md-6 form-group">
+                {{ host_form_obj.os_platform.label_tag }}
+                {{ host_form_obj.os_platform }}
+            </div>
+            <div class="col-md-6 form-group">
+                {{ host_form_obj.os_version.label_tag }}
+                {{ host_form_obj.os_version }}
+            </div>
+
+
+            <div class="col-md-4 form-group">
+                {{ host_form_obj.cpu_count.label_tag }}
+                {{ host_form_obj.cpu_count }}
+            </div>
+            <div class="col-md-4 form-group">
+                {{ host_form_obj.cpu_physical_count.label_tag }}
+                {{ host_form_obj.cpu_physical_count }}
+            </div>
+            <div class="col-md-4 form-group">
+                {{ host_form_obj.cpu_model.label_tag }}
+                {{ host_form_obj.cpu_model }}
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+            <label> 網卡信息&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus" data-toggle="collapse" data-target="#nic"></i></label>
+        </div>
+
+        <div id="nic" class="row collapse" style="padding-left: 15px">
+
+
+            {% for nicform in nic_forms_obj %}
+                <div class="col-md-3 form-group">
+                    {{ nicform.model.label_tag }}
+                    {{ nicform.model }}
+                </div>
+
+                <div class="col-md-3 form-group">
+                    {{ nicform.ipaddress.label_tag }}
+                    {{ nicform.ipaddress }}
+                </div>
+
+
+                <div class="col-md-3 form-group">
+                    {{ nicform.macaddress.label_tag }}
+                    {{ nicform.macaddress }}
+                </div>
+
+                <div class="col-md-3 form-group">
+                    {{ nicform.netmask.label_tag }}
+                    {{ nicform.netmask }}
+                </div>
+
+
+
+            {% endfor %}
+
+        </div>
+
+
+        <div class="form-group">
+            <label> 硬盤信息&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus" data-toggle="collapse" data-target="#disk"></i></label>
+        </div>
+
+        <div id="disk" class="row collapse" style="padding-left: 15px">
+
+            {% for dickform in disk_forms_obj %}
+
+                <div class="col-md-3 form-group">
+                    {{ dickform.sn.label_tag }}
+                    {{ dickform.sn }}
+                </div>
+
+                <div class="col-md-3 form-group">
+                    {{ dickform.model.label_tag }}
+                    {{ dickform.model }}
+                </div>
+
+                <div class="col-md-3 form-group">
+                    {{ dickform.capacity.label_tag }}
+                    {{ dickform.capacity }}
+                </div>
+
+                <div class="col-md-3 form-group">
+                    {{ dickform.slot.label_tag }}
+                    {{ dickform.slot }}
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        <div class="form-group">
+            <label> 內存信息&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus" data-toggle="collapse" data-target="#mem"></i></label>
+        </div>
+        <div id="mem" class="row collapse" style="padding-left: 15px">
+
+            {% for memform in mem_forms_obj %}
+
+                <div class="col-md-3 form-group">
+                    {{ memform.sn.label_tag }}
+                    {{ memform.sn }}
+                </div>
+
+                <div class="col-md-3 form-group">
+                    {{ memform.model.label_tag }}
+                    {{ memform.model }}
+                </div>
+
+                <div class="col-md-3 form-group">
+                    {{ memform.capacity.label_tag }}
+                    {{ memform.capacity }}
+                </div>
+
+                <div class="col-md-3 form-group">
+                    {{ memform.slot.label_tag }}
+                    {{ memform.slot }}
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+{% endblock %}
+
+
+{% block extra-js %}
+
+
+
+
+    <script>
+
+    var inputs = $("input");
+    $.each(inputs,function (i,obj) {
+        console.log(obj);
+        $(obj).attr('type','text');
+    })
+
+    </script>
+
+{% endblock %}

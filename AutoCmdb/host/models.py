@@ -9,19 +9,19 @@ class Host(models.Model):
     '''
 
     host_type_choice = (
-        (1, '工作站'),
-        (2, '值班電腦'),
-        (3, '培訓電腦'),
-        (4, '備用電腦'),
-        (5, '汰換機'),
-        (6, '測試機'),
+        ('工作站', '工作站'),
+        ('值班電腦', '值班電腦'),
+        ('培訓電腦', '培訓電腦'),
+        ('備用電腦', '備用電腦'),
+        ('汰換機', '汰換機'),
+        ('測試機', '測試機'),
     )
 
-    asset = models.OneToOneField('asset.Asset',null=True,blank=True)
+    asset = models.OneToOneField('asset.Asset',verbose_name="資產編號",null=True,blank=True ,related_name='Host')
     ops_owner = models.ForeignKey('asset.UserProfile',verbose_name="運維負責人",null=True, blank=True)
     location = models.ForeignKey('asset.Location', verbose_name='位置', null=True, blank=True)
 
-    host_type_id = models.IntegerField(choices=host_type_choice, default=2)
+    host_type_id = models.CharField(choices=host_type_choice, default='值班電腦',max_length=64)
 
     number = models.IntegerField(verbose_name="編號")
     sn = models.CharField('SN序號', max_length=64, db_index=True)
@@ -85,12 +85,12 @@ class Memory(models.Model):
     """
     内存信息表
     """
+
     slot = models.CharField('插槽位置', max_length=32)
     manufacturer = models.CharField('製造商', max_length=32, null=True, blank=True)
     model = models.CharField('型號', max_length=64)
     capacity = models.FloatField('內存容量', null=True, blank=True)
     sn = models.CharField('內存SN號', max_length=64, null=True, blank=True)
-
     host_obj = models.ForeignKey("Host", related_name='memory')
 
     class Meta:

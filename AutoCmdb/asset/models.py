@@ -114,7 +114,7 @@ class Asset(models.Model):
         verbose_name_plural = "資產信息表"
 
     def __str__(self):
-        return "%s %s-%s" % (self.department, self.category.code, self.sn)
+        return "%s-%s" % (self.category.code,self.sn)
 
 
 class AssetRecord(models.Model):
