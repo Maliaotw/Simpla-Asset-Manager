@@ -15,6 +15,7 @@
 
 
 
+
     <ol class="breadcrumb">
         <li><a href="#">主機列表</a></li>
 
@@ -47,17 +48,140 @@
                 <tbody>
                 {% for host in host_obj %}
                     <tr>
-                        <td>{{ host.number }}</td>
-                        <td>{{ host.host_type_id }}</td>
-                        <td>{{ host.manufacturer }} {{ host.model }}</td>
-                        <td>{{ host.manage_ip }}</td>
-                        <td>{{ host.os_platform }}</td>
-                        <td>{{ host.location }}</td>
-                        <td>{{ host.ops_owner }}</td>
-                        <td>{{ host.asset.department.name | default:"None" }}</td>
-                        <td>{{ host.asset }}</td>
+                        <td name="id" style="display: none">
+                            {{ host.id }}
+                        </td>
+
+                        <td name="number">
+                             <span class="form-control-static">
+                                {{ host.number }}
+                            </span>
+                            <input type="text" class='form-control match-content' value="{{ category.code }}"
+                                   style="display: none">
+
+                        </td>
+                        <td name="host_type_id">
+
+                            <span class="form-control-static">
+                                {{ host.host_type_id }}
+                            </span>
+
+                            <select class="form-control match-content" style="display: none">
+
+                                {% for k,v in host.host_type_choice %}
+                                    {% if host.host_type_id   ==  v %}
+                                        <option selected
+                                                value="{{ k }}">{{ v }}
+                                        </option>
+                                    {% else %}
+                                        <option value="{{ k }}">{{ v }}</option>
+                                    {% endif %}
+
+                                {% endfor %}
+                            </select>
+                        </td>
+
                         <td>
-                            <i class="fas fa-eye"></i>
+                            <span class="form-control-static">
+                                {{ host.manufacturer }} {{ host.model }}
+                            </span>
+                        </td>
+
+
+                        <td name="manufacturer" style="display: none">
+                            <span class="form-control-static">
+                               {{ host.manufacturer }}
+                            </span>
+
+                            <input type="text" class='form-control match-content' value="{{ host.manufacturer }}"
+                                   style="display: none">
+                        </td>
+
+                        <td name="model" style="display: none">
+                            <span class="form-control-static">
+                               {{ host.model }}
+                            </span>
+
+                            <input type="text" class='form-control match-content' value="{{ host.model }}"
+                                   style="display: none">
+                        </td>
+
+
+                        <td name="manage_ip">
+
+                            <span class="form-control-static">
+                               {{ host.manage_ip }}
+                            </span>
+
+                            <input type="text" class='form-control match-content' value="{{ host.manage_ip }}"
+                                   style="display: none">
+                        </td>
+
+                        <td name="os_platform">
+                            <span class="form-control-static">
+                               {{ host.os_platform }}
+                            </span>
+
+                            <input type="text" class='form-control match-content' value="{{ host.os_platform }}"
+                                   style="display: none">
+                        </td>
+
+
+                        <td name="location">
+                            <span class="form-control-static">
+                               {{ host.location }}
+                            </span>
+
+                            <input type="text" class='form-control match-content' value="{{ host.location }}"
+                                   style="display: none">
+                        </td>
+
+
+                        <td name="ops_owner">
+                            <span class="form-control-static">
+                               {{ host.ops_owner }}
+                            </span>
+
+                            <select class="form-control" style="display: none">
+                                {% for user in it_user_obj %}
+                                    {% if host.ops_owner   ==  user %}
+                                        <option selected
+                                                value="{{ user.id }}">{{ user }}
+                                        </option>
+                                    {% else %}
+                                        <option value="{{ user.id }}">{{ user }}</option>
+                                    {% endif %}
+
+                                {% endfor %}
+                            </select>
+                        </td>
+
+                        <td>
+                            {{ host.asset.department.name | default:"None" }}
+                        </td>
+
+                        <td name="asset">
+                            <span class="form-control-static">
+                               {{ host.asset }}
+                            </span>
+
+                            <select class="form-control">
+                                {% for asset in asset_host_obj %}
+                                    {% if host.asset   ==  asset %}
+                                        <option selected
+                                                value="{{ asset.id }}">{{ asset }}
+                                        </option>
+                                    {% else %}
+                                        <option value="{{ asset.id }}">{{ asset }}</option>
+                                    {% endif %}
+
+                                {% endfor %}
+                            </select>
+                        </td>
+
+
+                        <td>
+                            <a href="{% url 'host_info' host.id %}"><i class="fas fa-eye"></i></a>
                             <i class="fas fa-pen"></i>
                         </td>
                     </tr>
@@ -80,5 +204,73 @@
         </div>
     </div>
 
+    {% csrf_token %}
+
+{% endblock %}
+
+
+{% block extra-js %}
+
+    <script>
+
+
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+
+        //編輯 EditData : Change icon
+        $(".table").on('click', ".fa-pen", function (ele) {
+            console.log('edit');
+
+            $(this).attr('data-icon', 'file');
+
+            tds = $(this).parent().prevAll();
+            tr = $(this).closest("tr");
+            var obj_id = tr.find("[name='id']").text();
+
+            console.log($.trim(obj_id));
+
+            $.each(tds, function (i, ele) {
+                var span_tag = $(this).find("span");
+                var input_tag = $(this).find("input");
+
+                //user
+                select_list = ['host_type_id', 'location', 'ops_owner', 'asset'];
+                input_list = ['number'];
+
+                n = $(this).attr("name");
+                if (select_list.includes(n)) {
+                    console.log(n);
+                    span_tag.hide();
+                    $(this).find('select').show();
+                }
+
+                if (input_list.includes(n)) {
+                    span_tag.hide();
+                    //console.log(span_tag);
+                    input_tag.val($.trim(span_tag.text()));
+                    input_tag.show()
+                }
+
+
+            });
+
+
+        });
+
+
+    </script>
 
 {% endblock %}

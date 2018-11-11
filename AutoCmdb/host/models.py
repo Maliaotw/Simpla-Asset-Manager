@@ -23,7 +23,8 @@ class Host(models.Model):
 
     host_type_id = models.CharField(choices=host_type_choice, default='值班電腦',max_length=64)
 
-    number = models.IntegerField(verbose_name="編號")
+    # number = models.IntegerField(verbose_name="設備編號")
+    number = models.CharField(verbose_name="設備編號",max_length=64, null=True, blank=True)
     sn = models.CharField('SN序號', max_length=64, db_index=True)
     manufacturer = models.CharField(verbose_name='製造商', max_length=64, null=True, blank=True)
     model = models.CharField('型號', max_length=64, null=True, blank=True)
@@ -42,7 +43,7 @@ class Host(models.Model):
 
 
     def __str__(self):
-        return "PC-%03d %s" % (self.number,self.manage_ip)
+        return "%s %s" % (self.number,self.manage_ip)
 
 
 class NIC(models.Model):

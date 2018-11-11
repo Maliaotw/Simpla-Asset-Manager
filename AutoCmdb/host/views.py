@@ -1,6 +1,6 @@
 from django.shortcuts import render, HttpResponse
 from host import models
-from asset.models import Location
+from asset.models import Location,UserProfile,Asset
 from host import forms
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -11,6 +11,19 @@ def host(request):
     search_field = {}
 
     host_obj = models.Host.objects.all()
+
+    host_obj1 = models.Host.objects.filter(asset__isnull=True).all().select_related('asset')
+    host_exclude_objs = models.Host.objects.exclude(asset__isnull=True).all()
+    asset_host_obj = [i.asset for i in host_exclude_objs]
+
+    asset_pc= Asset.objects.filter(category__name="電腦").all()
+    asset_host_obj = list(filter(lambda x:x not in asset_host_obj,asset_pc))
+
+
+
+    it_user_obj = UserProfile.objects.filter(dent__name='資訊').all()
+
+
 
     # 分頁功能
 
@@ -36,17 +49,9 @@ def host_info(request,pk):
 
     host_form_obj = forms.HostForm(instance=host_obj)
 
-    print(host_form_obj)
-
-
-    print(host_obj.nic.all())
     nic_forms_obj = [forms.NICForm(instance=nic) for nic in host_obj.nic.all()]
 
-
     disk_forms_obj = [forms.DiskForm(instance=disk) for disk in host_obj.disk.all()]
-
-
-
 
     mem_forms_obj = [forms.MemoryForm(instance=memory) for memory in host_obj.memory.all()]
 
