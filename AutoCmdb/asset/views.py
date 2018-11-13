@@ -15,6 +15,10 @@ import csv
 # --- 資產 ---
 
 def asset(request):
+
+    # for asset in models.Asset.objects.all():
+    #     print(asset)
+
     search_field = {}
 
     category_obj = models.Catagory.objects.all()

@@ -157,7 +157,7 @@
                         </td>
 
                         <td>
-                            {{ host.asset.department.name | default:"None" }}
+                            {{ host.asset.department.name |default:'' }}
                         </td>
 
                         <td name="asset">
@@ -165,17 +165,13 @@
                                {{ host.asset }}
                             </span>
 
-                            <select class="form-control">
-                                {% for asset in asset_host_obj %}
-                                    {% if host.asset   ==  asset %}
-                                        <option selected
-                                                value="{{ asset.id }}">{{ asset }}
-                                        </option>
-                                    {% else %}
-                                        <option value="{{ asset.id }}">{{ asset }}</option>
-                                    {% endif %}
+                            <input type="text" class='form-control match-content'
+                                   value="{% if host.asset %}{{ host.asset.id }}{% else %} {% endif %}"
+                                   style="display: none">
 
-                                {% endfor %}
+                            <select id='asset_list' class="form-control ">
+                                <option value="">-----</option>
+
                             </select>
                         </td>
 
@@ -229,6 +225,42 @@
             }
         });
 
+        // 發送hostid 向請求API進行請求
+        function get_asset(hostid, assetid, select_obj) {
+            console.log("dd", select_obj.children('option'));
+
+            $.ajax({
+                url: "/api/host",
+                data: {'hostid': hostid, 'assetid': assetid},
+                type: 'GET',
+                async: false,
+                success: function (callback) {
+                    console.log(callback);
+                    assets = callback.data;
+                    own = callback.own;
+
+                    // 讓select只保留一個
+                    document.getElementById("asset_list").options.length = 1;
+                    $.each(assets, function (i, item) {
+                        console.log(item);
+
+                        select_obj.append($('<option>', {
+                            value: item.id,
+                            text: item.asset,
+                        }));
+
+                    });
+                    select_obj.val(own);
+
+                },
+                error: function () {
+
+
+                }
+
+            });
+        }
+
 
         //編輯 EditData : Change icon
         $(".table").on('click', ".fa-pen", function (ele) {
@@ -238,9 +270,13 @@
 
             tds = $(this).parent().prevAll();
             tr = $(this).closest("tr");
-            var obj_id = tr.find("[name='id']").text();
+            var obj_id = $.trim(tr.find("[name='id']").text());
+            var asset_id = tr.find("[name='asset'] input").val();
+            var select_obj = tr.find("[name='asset'] select");
+            console.log(asset_id);
 
-            console.log($.trim(obj_id));
+            // 請求asset
+            get_asset(obj_id, asset_id, select_obj);
 
             $.each(tds, function (i, ele) {
                 var span_tag = $(this).find("span");
@@ -248,11 +284,11 @@
 
                 //user
                 select_list = ['host_type_id', 'location', 'ops_owner', 'asset'];
-                input_list = ['number'];
+                input_list = [];
 
                 n = $(this).attr("name");
                 if (select_list.includes(n)) {
-                    console.log(n);
+                    //console.log(n);
                     span_tag.hide();
                     $(this).find('select').show();
                 }
@@ -270,6 +306,94 @@
 
         });
 
+
+        //SaveData : PUT
+        $(".table").on('click', ".fa-file", function (ele) {
+
+            console.log('save');
+            $(this).attr('data-icon', 'pen');
+
+            tr = $(this).closest('tr');
+            tds = $(this).parent().prevAll();
+            console.log(tds);
+
+            // 主機ID
+            id = $.trim(tr.find("[name='id']").text());
+
+            // 類型
+            host_type_id = $.trim(tr.find("[name='host_type_id'] select").val());
+
+            // 運維負責人
+            ops_owner = $.trim(tr.find("[name='ops_owner'] select").val());
+
+            // 關聯資產
+            asset = $.trim(tr.find("[name='asset'] select").val());
+
+            console.log(id, host_type_id, ops_owner, asset);
+
+            data = {
+                'id': id, 'host_type_id': host_type_id, 'ops_owner': ops_owner, 'asset': asset
+            };
+
+            // Ajax put請求 /host
+            $.ajax({
+                url: "{% url 'host' %}",
+                data: data,
+                type: 'PUT',
+                async: false,
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback.status == 'ok') {
+                        put_status = true
+
+                    } else {
+                        put_status = false
+                    }
+
+                },
+                error: function () {
+                    put_status = false
+
+                }
+
+            });
+
+            if (put_status) {
+                $(this).attr('data-icon', 'pen');
+                $.each(tds, function (i, ele) {
+
+                    var span_tag = $(this).find("span");
+                    var input_tag = $(this).find("input");
+                    var select_tag = $(this).find('select');
+
+                    select_list = ['host_type_id', 'location', 'ops_owner', 'asset'];
+                    input_list = [];
+
+                    n = $(this).attr("name");
+
+                    if (select_list.includes(n)) {
+
+                        //console.log(select_tag);
+                        selected_text = $.trim(select_tag.find(":selected").text());
+                        console.log(selected_text);
+                        span_tag.text(selected_text);
+                        select_tag.hide();
+                        span_tag.show();
+
+                    }
+
+                    if (input_list.includes(n)) {
+                        span_tag.show();
+                        span_tag.text($.trim(input_tag.val()));
+                        input_tag.hide()
+                    }
+
+                })
+
+            }
+
+        });
 
     </script>
 

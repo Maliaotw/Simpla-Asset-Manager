@@ -25,4 +25,8 @@ urlpatterns = [
     url(r'^add_user_number/', views.add_user_number),
     url(r'^asset/', views.asset),
 
+    url(r'^host/', views.host),
+
+
+
 ]

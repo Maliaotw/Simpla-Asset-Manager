@@ -87,6 +87,7 @@
         <table class="table" id="mytable" style="margin-top: 20px">
             <thead>
             <tr>
+                <th>排序</th>
                 <th>資產編號</th>
                 <th>類型</th>
                 <th>部門</th>
@@ -103,6 +104,10 @@
             {% for asset in asset_obj %}
 
                 <tr>
+                    <td>
+                    {{ forloop.counter  }}
+
+                    </td>
                     <td name="id" style="display: none">
                         <input type="text" class="form-control" value="{{ asset.id }}"/>
                     </td>
@@ -187,7 +192,6 @@
 
                         <input type='number' class='form-control match-content' value="" style="display: none">
                     </td>
-
 
 
                     <td name="status">
@@ -353,7 +357,7 @@
 
             $("#assetform_add").trigger('reset');
             $("#assetform_add_Modal .alert-danger").hide();
-            $("#assetform_add_Modal #user_add").attr("disabled","disabled");
+            $("#assetform_add_Modal #user_add").attr("disabled", "disabled");
 
         });
 
@@ -489,9 +493,6 @@
         };
 
 
-
-
-
         // 提交 新增資產表單
         $("#assetform_add").on("submit", function (e) {
             //console.log(e);
@@ -531,8 +532,6 @@
             $("#assetform_add").submit();
 
         });
-
-
 
 
         //SaveData : PUT
@@ -638,8 +637,6 @@
 
 
         });
-
-
 
 
     </script>

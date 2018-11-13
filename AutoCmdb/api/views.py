@@ -5,6 +5,7 @@ import json
 import hashlib
 import time
 from asset.models import Catagory, Asset, Department, UserProfile
+from host.models import Host
 
 # Create your views here.
 
@@ -49,7 +50,7 @@ def category(request):
 
     c = Catagory.objects.get(id=cate_id)
     a = Asset.objects.filter(category=c).count() + 1
-    
+
     print(a)
     data = {
         'count': a,
@@ -129,7 +130,7 @@ def add_user_number(request):
 
         num = num_format % (user_count)  # block_numer
 
-        print("block_number + num",block_number + num)
+        print("block_number + num", block_number + num)
         ret['data'] = block_number + num
         ret['status'] = 'ok'
 
@@ -138,3 +139,53 @@ def add_user_number(request):
         ret['status'] = 'error'
 
     return JsonResponse(ret)
+
+
+def host(request):
+    ret = {
+        'data': '',
+        'status': '',
+        'own': ''
+    }
+
+    if request.method == 'GET':
+
+        host_id = request.GET.get('hostid')
+        asset_id = request.GET.get('assetid')
+
+        print('host', host_id)
+        print('asset', asset_id)
+
+        # 有綁定主機的資產
+        asset_include_hosts = [i.asset for i in Host.objects.exclude(asset__isnull=True).all()]
+        print('asset_include_hosts', asset_include_hosts)
+
+        # 篩選只有主機的資產
+        asset_obj = Asset.objects.filter(category__name="電腦").all()
+
+        # 篩選出未綁定主機的資產
+        asset_exclude_hosts = list(filter(lambda x: x not in asset_include_hosts, asset_obj))
+        print('asset_exclude_hosts', asset_exclude_hosts)
+
+        # 當前主機 若有綁定資產將再加入一筆已綁定資產
+        host_obj = Host.objects.get(id=host_id)
+
+        if host_obj.asset:
+            print('有綁')
+            asset_exclude_hosts.append(host_obj.asset)
+            ret['own'] = host_obj.asset.id
+        else:
+            print('沒綁')
+
+        print(asset_exclude_hosts)
+
+        asset_list = []
+        for asset in asset_exclude_hosts:
+            asset_data = {
+                'asset': str(asset),
+                'id': asset.id
+            }
+            asset_list.append(asset_data)
+        ret['data'] = asset_list
+
+        return JsonResponse(ret)
