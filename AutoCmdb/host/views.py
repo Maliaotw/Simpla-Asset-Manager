@@ -69,6 +69,14 @@ def host_info(request, pk):
     return render(request, "host/host_info.html", locals())
 
 
+def host_input(request):
+    pass
+
+def host_output(request):
+    pass
+
+
+
 def location(requesrt):
     local_obj = Location.objects.all()
 
