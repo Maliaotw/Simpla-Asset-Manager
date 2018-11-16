@@ -62,6 +62,8 @@
 
             <div class="row" style="padding-left: 15px">
 
+                {{ forms_obj.name }}
+
                 <div class="col-md-6 form-group has-feedback">
                     {{ forms_obj.category.label_tag }}
                     {{ forms_obj.category }}
@@ -70,8 +72,8 @@
                 </div>
 
                 <div class="col-md-6 form-group has-feedback">
-                    {{ forms_obj.sn.label_tag }}
-                    {{ forms_obj.sn }}
+                    {{ forms_obj.number.label_tag }}
+                    {{ forms_obj.number }}
                     <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
                 </div>
 
@@ -95,6 +97,7 @@
             <div class="form-group">
                 <label> 使用狀態</label>
             </div>
+
 
             <div class="row" style="padding-left: 15px">
 
@@ -156,7 +159,6 @@
                 <div class="modal-footer">
                     <a href="{% url 'asset' %}" class="btn btn-primary" role="button">返回列表</a>
                     <a href="{% url 'asset_edit' pk %}" class="btn btn-success" role="button">繼續修改</a>
-                    {#                    <button type="button" class="btn btn-success" data-dismiss="modal">繼續修改</button>#}
                 </div>
 
             </div>
@@ -215,8 +217,8 @@
 
                 success: function (callback) {
                     //console.log(callback);
-                    $("input[name='sn']").removeAttr("disabled");
-                    $("input[name='sn']").val(callback.number);
+                    $("input[name='number']").removeAttr("disabled");
+                    $("input[name='number']").val(callback.number);
                 },
                 error: function () {
                 }

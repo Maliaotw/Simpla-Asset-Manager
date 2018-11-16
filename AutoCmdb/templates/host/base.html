@@ -9,6 +9,9 @@
 
 
     {% url 'host' as host %}
+    {% url 'host_input' as host_input %}
+    {% url 'host_output' as host_output %}
+
     {% url 'location' as location %}
 
     {% url 'asset' as asset %}
@@ -17,8 +20,17 @@
     <ul class="nav nav-sidebar">
 
         <li {% if request.path == host %}class="active"{% endif %}><a href={{ host }}>主機管理</a></li>
-        <li {% if request.path == location %}class="active"{% endif %}><a href={{ location }}>位置</a></li>
+        <li {% if request.path == host_input %}class="active"{% endif %}><a href={{ host_input }}>匯入</a></li>
+        <li {% if request.path == host_output %}class="active"{% endif %}><a href={{ host_output }}>匯出</a></li>
 
+
+    </ul>
+
+    <ul class="nav nav-sidebar">
+        <li {% if request.path == location %}class="active"{% endif %}><a href={{ location }}>位置</a></li>
+        <li><a href='#'>IP電話管理</a></li>
+        <li><a href='#'>交換器管理</a></li>
+        <li><a href='#'>CCTV管理</a></li>
     </ul>
 
 

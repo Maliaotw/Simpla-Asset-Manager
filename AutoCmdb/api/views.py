@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 import json
 import hashlib
 import time
-from asset.models import Catagory, Asset, Department, UserProfile
+from asset.models import Category, Asset, Department, UserProfile
 from host.models import Host
 
 # Create your views here.
@@ -48,13 +48,14 @@ def asset(request):
 def category(request):
     cate_id = request.GET.get('cate')
 
-    c = Catagory.objects.get(id=cate_id)
+    c = Category.objects.get(id=cate_id)
     a = Asset.objects.filter(category=c).count() + 1
+    number = "%03d" % a
 
-    print(a)
     data = {
         'count': a,
-        'number': "%03d" % a
+        'number': number,
+        'name':"%s-%s" % (c.code,number)
     }
     return JsonResponse(data)
 
@@ -76,15 +77,17 @@ def dent_user(request):
 
     dent = Department.objects.get(id=dent_id)
     users = UserProfile.objects.filter(dent=dent)
+
     print(dent)
     print(dent.user)
+    print(users)
 
     # 負責人
 
     if dent.user:
         ret['owner'] = {
             'user': dent.user.name,
-            'code': '%s%s' % (dent.user.dent.block_number, dent.user.code),
+            'code': '%s' % (dent.user.code),
             'id': dent.user.user.id,
         }
     # dent.user.dent.block_number
@@ -94,7 +97,7 @@ def dent_user(request):
     for u in users:
         user_data = {
             'user': u.name,
-            'code': "%s%s" % (dent.block_number, u.code),
+            'code': "%s" % u.code,
             'id': u.user.id
         }
         user_list.append(user_data)

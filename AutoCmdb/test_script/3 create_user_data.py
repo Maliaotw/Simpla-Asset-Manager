@@ -67,14 +67,22 @@ for u in ret:
     dents = Department.objects.exclude(code='OM')
     dent = choice(dents)
     as_count = UserProfile.objects.filter(dent=dent).count() + 1
-    num = "%02d" % as_count
+
+    # 部門編號
+    block_number = dent.block_number
+    # 部門長度
+    block_number_len = dent.block_number_len
+    num_format = "%0{}d".format(block_number_len - len(block_number))  # block_numer_len
+    num = num_format % (as_count)  # block_numer
+    code = "%s%s" % (block_number, num)
+
 
     user = User()
     user.username = u['username']
     user.set_password('12345678')
-    user.is_staff = True
+    user.is_staff = False
     user.save()
-    UserProfile.objects.create(user=user, name=u['name'], sex=u['sex'],code=num,dent=dent)
+    UserProfile.objects.create(user=user, name=u['name'], sex=u['sex'],code=code,dent=dent,number=num)
 
 
 

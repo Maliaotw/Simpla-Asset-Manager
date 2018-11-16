@@ -8,7 +8,7 @@ class Host(models.Model):
     主機資產表
     '''
 
-    host_type_choice = (
+    status_choice = (
         ('工作站', '工作站'),
         ('值班電腦', '值班電腦'),
         ('培訓電腦', '培訓電腦'),
@@ -21,11 +21,15 @@ class Host(models.Model):
     ops_owner = models.ForeignKey('asset.UserProfile',verbose_name="運維負責人",null=True, blank=True)
     location = models.ForeignKey('asset.Location', verbose_name='位置', null=True, blank=True)
 
-    host_type_id = models.CharField(choices=host_type_choice, default='值班電腦',max_length=64)
+    status = models.CharField(choices=status_choice, default='值班電腦',max_length=64)
 
-    # number = models.IntegerField(verbose_name="設備編號")
-    number = models.CharField(verbose_name="設備編號",max_length=64, null=True, blank=True)
-    sn = models.CharField('SN序號', max_length=64, db_index=True)
+
+    name = models.CharField(verbose_name="主機名稱",max_length=64)
+    number = models.IntegerField(verbose_name="主機號碼")
+
+    sn = models.CharField('SN序號', max_length=64, null=True, blank=True)
+    pn = models.CharField('產品序號', max_length=64, null=True, blank=True) # 保固用
+
     manufacturer = models.CharField(verbose_name='製造商', max_length=64, null=True, blank=True)
     model = models.CharField('型號', max_length=64, null=True, blank=True)
 

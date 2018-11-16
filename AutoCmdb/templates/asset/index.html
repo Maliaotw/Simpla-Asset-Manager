@@ -48,7 +48,7 @@
 
                     <div class="form-group">
                         <label for="inputsearch" class="col-form-label">搜尋</label>
-                        <input type="" class="form-control" name='name' id="search" placeholder="" value="{{ name }}">
+                        <input type="text" class="form-control" name='name' id="search" placeholder="" value="{{ name }}">
                     </div>
 
 
@@ -106,19 +106,17 @@
                 <tr>
                     <td>
                     {{ forloop.counter  }}
-
                     </td>
+
                     <td name="id" style="display: none">
                         <input type="text" class="form-control" value="{{ asset.id }}"/>
                     </td>
 
-                    <td name="sn" style="display: none">
-                        <input type="text" class="form-control" value="{{ asset.sn }}"/>
-                    </td>
 
-                    <td>
+
+                    <td name="name">
                         <span class="form-control-static">
-                            {{ asset.category.code }}-{{ asset.sn }}
+                            {{ asset.name }}
                         </span>
                     </td>
 
@@ -266,7 +264,7 @@
 
                         <div class="form-group">
                             <label for="">資產編號</label>
-                            <input type="text" name="sn" class="form-control" placeholder="">
+                            <input type="text" name="name" class="form-control" placeholder="">
                         </div>
 
                         <div class="form-group">

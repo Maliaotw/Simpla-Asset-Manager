@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
 from host import models
-from asset.models import Location, UserProfile, Asset,Catagory
+from asset.models import Location, UserProfile, Asset,Category
 from host import forms
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import QueryDict
@@ -17,6 +17,8 @@ def host(request):
         host_obj = models.Host.objects.all()
 
         it_user_obj = UserProfile.objects.filter(dent__name='資訊').all()
+
+        location_obj = Location.objects.all()
 
         # 分頁功能
 
@@ -35,12 +37,14 @@ def host(request):
         put = QueryDict(request.body)
         print(put)
         id = put.get('id')
-        host_type_id = put.get('host_type_id')
+        status = put.get('status')
         ops_owner = put.get('ops_owner')
         asset = put.get('asset')
+        location = put.get('location')
 
         host_obj = models.Host.objects.get(id=id)
-        host_obj.host_type_id = host_type_id
+        host_obj.status = status
+        host_obj.location = Location.objects.get(id=location)
         host_obj.ops_owner = UserProfile.objects.get(id=ops_owner)
         host_obj.asset = Asset.objects.get(id=asset)
         host_obj.save()
@@ -70,10 +74,14 @@ def host_info(request, pk):
 
 
 def host_input(request):
-    pass
+
+    return render(request, "host/input.html", locals())
 
 def host_output(request):
-    pass
+
+    host_obj = models.Host.objects.all()
+
+    return render(request, "host/output.html", locals())
 
 
 

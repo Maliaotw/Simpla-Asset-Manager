@@ -12,6 +12,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User,verbose_name="用户名")
     name = models.CharField(max_length=64, verbose_name="姓名")
     code = models.CharField(max_length=64, verbose_name='員工編號', blank=True, null=True)
+    number = models.CharField(max_length=64, verbose_name='員工號碼', blank=True, null=True)
 
     sex_choice = (
         ('男', '男'),
@@ -37,7 +38,7 @@ class UserProfile(models.Model):
         verbose_name_plural = "用戶"
 
     def __str__(self):
-        return "%s(%s%s)" % (self.name,self.dent.block_number,self.code)
+        return "%s(%s)" % (self.code,self.name,)
 
 
 class Location(models.Model):
@@ -71,7 +72,7 @@ class Department(models.Model):
         return "%s部(%s)" % (self.name,self.code)
 
 
-class Catagory(models.Model):
+class Category(models.Model):
     '''
     分類
     '''
@@ -82,7 +83,7 @@ class Catagory(models.Model):
         verbose_name_plural = "類型"
 
     def __str__(self):
-        return "%s(%s)" % (self.name, self.code)
+        return "%s(%s)" % (self.code, self.name)
 
 
 class Asset(models.Model):
@@ -90,9 +91,10 @@ class Asset(models.Model):
     資產信息表
     '''
 
-    sn = models.CharField(verbose_name='資產編號',max_length=255)
+    name = models.CharField(verbose_name='資產編號',max_length=255)
+    number = models.IntegerField(verbose_name='資產號碼',max_length=255)
     price = models.IntegerField(verbose_name='價格', null=True, blank=True)
-    category = models.ForeignKey("Catagory", verbose_name='類型')
+    category = models.ForeignKey("category", verbose_name='類型')
     department = models.ForeignKey('Department', verbose_name='部門', null=True, blank=True)
     manager = models.ForeignKey("UserProfile", verbose_name='負責人', null=True, blank=True)
     purchase_date = models.DateTimeField(verbose_name='購買日期', null=True, blank=True)
@@ -114,7 +116,7 @@ class Asset(models.Model):
         verbose_name_plural = "資產信息表"
 
     def __str__(self):
-        return "%s-%s" % (self.category.code,self.sn)
+        return "%s" % (self.name)
 
 
 class AssetRecord(models.Model):

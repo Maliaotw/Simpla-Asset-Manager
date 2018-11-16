@@ -33,12 +33,12 @@
             <table class="table">
                 <thead>
                 <tr>
-                    <th>主機編號</th>
+                    <th>主機名稱</th>
                     <th>類型</th>
                     <th>型號</th>
                     <th>管理IP</th>
                     <th>作業系統</th>
-                    <th>所在位置</th>
+                    <th>位置</th>
                     <th>運維負責人</th>
                     <th>所屬部門</th>
                     <th>關聯資產</th>
@@ -52,24 +52,23 @@
                             {{ host.id }}
                         </td>
 
-                        <td name="number">
+                        <td name="name" class="col-xs-1">
                              <span class="form-control-static">
-                                {{ host.number }}
+                                {{ host.name }}
                             </span>
-                            <input type="text" class='form-control match-content' value="{{ category.code }}"
-                                   style="display: none">
+
 
                         </td>
-                        <td name="host_type_id">
+                        <td name="status" class="col-xs-2">
 
                             <span class="form-control-static">
-                                {{ host.host_type_id }}
+                                {{ host.status }}
                             </span>
 
-                            <select class="form-control match-content" style="display: none">
+                            <select class="form-control" style="display: none">
 
-                                {% for k,v in host.host_type_choice %}
-                                    {% if host.host_type_id   ==  v %}
+                                {% for k,v in host.status_choice %}
+                                    {% if host.status   ==  v %}
                                         <option selected
                                                 value="{{ k }}">{{ v }}
                                         </option>
@@ -81,7 +80,7 @@
                             </select>
                         </td>
 
-                        <td>
+                        <td class="">
                             <span class="form-control-static">
                                 {{ host.manufacturer }} {{ host.model }}
                             </span>
@@ -93,7 +92,7 @@
                                {{ host.manufacturer }}
                             </span>
 
-                            <input type="text" class='form-control match-content' value="{{ host.manufacturer }}"
+                            <input type="text" class='form-control input-sm' value="{{ host.manufacturer }}"
                                    style="display: none">
                         </td>
 
@@ -102,42 +101,53 @@
                                {{ host.model }}
                             </span>
 
-                            <input type="text" class='form-control match-content' value="{{ host.model }}"
+                            <input type="text" class='form-control input-sm' value="{{ host.model }}"
                                    style="display: none">
                         </td>
 
 
-                        <td name="manage_ip">
+                        <td name="manage_ip"  class="">
 
                             <span class="form-control-static">
                                {{ host.manage_ip }}
                             </span>
 
-                            <input type="text" class='form-control match-content' value="{{ host.manage_ip }}"
+                            <input type="text" class='form-control input-sm' value="{{ host.manage_ip }}"
                                    style="display: none">
                         </td>
 
-                        <td name="os_platform">
+                        <td name="os_platform" class="">
                             <span class="form-control-static">
                                {{ host.os_platform }}
                             </span>
 
-                            <input type="text" class='form-control match-content' value="{{ host.os_platform }}"
+                            <input type="text" class='form-control input-sm' value="{{ host.os_platform }}"
                                    style="display: none">
                         </td>
 
 
-                        <td name="location">
+                        <td name="location" class="col-xs-2">
                             <span class="form-control-static">
                                {{ host.location }}
                             </span>
 
-                            <input type="text" class='form-control match-content' value="{{ host.location }}"
-                                   style="display: none">
+                             <select class="form-control" style="display: none">
+
+                                {% for location in location_obj %}
+                                    {% if host.location   ==  location %}
+                                        <option selected
+                                                value="{{ location.id }}">{{ location.name }}
+                                        </option>
+                                    {% else %}
+                                        <option value="{{ location.id }}">{{ location.name }}</option>
+                                    {% endif %}
+
+                                {% endfor %}
+                            </select>
                         </td>
 
 
-                        <td name="ops_owner">
+                        <td name="ops_owner" class="col-xs-2">
                             <span class="form-control-static">
                                {{ host.ops_owner }}
                             </span>
@@ -156,27 +166,27 @@
                             </select>
                         </td>
 
-                        <td>
+                        <td class="col-xs-1">
                             {{ host.asset.department.name |default:'' }}
                         </td>
 
-                        <td name="asset">
+                        <td name="asset" class="col-xs-2">
                             <span class="form-control-static">
                                {{ host.asset }}
                             </span>
 
-                            <input type="text" class='form-control match-content'
+                            <input type="text" class='form-control input-sm'
                                    value="{% if host.asset %}{{ host.asset.id }}{% else %} {% endif %}"
                                    style="display: none">
 
-                            <select id='asset_list' class="form-control ">
+                            <select id='asset_list' class="form-control" style="display: none">
                                 <option value="">-----</option>
 
                             </select>
                         </td>
 
 
-                        <td>
+                        <td class="col-xs-1">
                             <a href="{% url 'host_info' host.id %}"><i class="fas fa-eye"></i></a>
                             <i class="fas fa-pen"></i>
                         </td>
@@ -186,7 +196,7 @@
 
 
                 <tfoot>
-                <th colspan="7">
+                <th colspan="8">
                     <nav aria-label="Page navigation">
                         <ul class="pagination pull-right">
                             {% get_pageer host_obj search_field %}
@@ -198,6 +208,10 @@
 
             </table>
         </div>
+
+
+
+
     </div>
 
     {% csrf_token %}
@@ -241,6 +255,8 @@
 
                     // 讓select只保留一個
                     document.getElementById("asset_list").options.length = 1;
+
+                    // 遍歷 assets
                     $.each(assets, function (i, item) {
                         console.log(item);
 
@@ -283,7 +299,7 @@
                 var input_tag = $(this).find("input");
 
                 //user
-                select_list = ['host_type_id', 'location', 'ops_owner', 'asset'];
+                select_list = ['status', 'location', 'ops_owner', 'asset'];
                 input_list = [];
 
                 n = $(this).attr("name");
@@ -318,21 +334,24 @@
             console.log(tds);
 
             // 主機ID
-            id = $.trim(tr.find("[name='id']").text());
+            var id = $.trim(tr.find("[name='id']").text());
 
             // 類型
-            host_type_id = $.trim(tr.find("[name='host_type_id'] select").val());
+            var status = $.trim(tr.find("[name='status'] select").val());
 
             // 運維負責人
-            ops_owner = $.trim(tr.find("[name='ops_owner'] select").val());
+            var ops_owner = $.trim(tr.find("[name='ops_owner'] select").val());
 
             // 關聯資產
-            asset = $.trim(tr.find("[name='asset'] select").val());
+            var asset = $.trim(tr.find("[name='asset'] select").val());
 
-            console.log(id, host_type_id, ops_owner, asset);
+            // 位置
+            var location = $.trim(tr.find("[name='location'] select").val());
+
+            console.log(id, status, ops_owner, asset,location);
 
             data = {
-                'id': id, 'host_type_id': host_type_id, 'ops_owner': ops_owner, 'asset': asset
+                'id': id, 'status': status, 'ops_owner': ops_owner, 'asset': asset,'location':location
             };
 
             // Ajax put請求 /host
@@ -367,7 +386,7 @@
                     var input_tag = $(this).find("input");
                     var select_tag = $(this).find('select');
 
-                    select_list = ['host_type_id', 'location', 'ops_owner', 'asset'];
+                    select_list = ['status', 'location', 'ops_owner', 'asset'];
                     input_list = [];
 
                     n = $(this).attr("name");

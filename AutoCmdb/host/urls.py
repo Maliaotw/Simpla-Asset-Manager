@@ -24,6 +24,8 @@ urlpatterns = [
     # --- host ---
     url(r'^host$', views.host, name="host"),
     url(r'^host/(\d+)', views.host_info, name="host_info"),
+    url(r'^host/input', views.host_input, name="host_input"),
+    url(r'^host/output', views.host_output, name="host_output"),
 
     # --- network ---
 

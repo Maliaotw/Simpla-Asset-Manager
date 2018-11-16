@@ -11,21 +11,21 @@ from django.contrib.auth.models import User
 from host.models import *
 from asset.models import *
 
-Catagory.objects.all().delete()
+Category.objects.all().delete()
 UserProfile.objects.all().delete()
 User.objects.all().delete()
 Host.objects.all().delete()
 Location.objects.all().delete()
 
 # 創建分類
-cate_pc = Catagory.objects.create(name="電腦", code='PC')
-cate_m = Catagory.objects.create(name="滑鼠", code='M')
-cate_p = Catagory.objects.create(name="變壓器", code='P')
-cate_a = Catagory.objects.create(name='延長線', code='A')
+cate_pc = Category.objects.create(name="電腦", code='PC')
+cate_m = Category.objects.create(name="滑鼠", code='M')
+cate_p = Category.objects.create(name="變壓器", code='P')
+cate_a = Category.objects.create(name='延長線', code='A')
 
 # 位置
 
-location = ["辦公室", "機房"]
+location = ["北部辦公室", "機房"]
 for l in location:
     Location.objects.create(name=l)
 
@@ -341,6 +341,12 @@ for pc in pcs:
     host = Host(sn=sn, cpu_count=cpu_count, cpu_physical_count=cpu_physical_count, cpu_model=cpu_model,
                 manufacturer=manufacturer, model=model)
     host.number = Host.objects.all().count() + 1
+    num_format = "%03d" % (host.number)
+    name = "%s-%s" % ("PC", num_format)
+    host.name = name
+    print(num_format)
+    print(name)
+
     host.save()
 
     for mem in pc['mem']:

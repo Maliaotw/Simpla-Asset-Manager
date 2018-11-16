@@ -21,7 +21,7 @@ def asset(request):
 
     search_field = {}
 
-    category_obj = models.Catagory.objects.all()
+    category_obj = models.Category.objects.all()
     department_obj = models.Department.objects.all()
     user_obj = models.UserProfile.objects.all()
 
@@ -41,13 +41,13 @@ def asset(request):
         # GET 字段 篩選
 
         if cate_id and dent_id:
-            asset_obj = models.Asset.objects.filter(sn__contains=name, category_id=cate_id, department_id=dent_id)
+            asset_obj = models.Asset.objects.filter(name__contains=name, category_id=cate_id, department_id=dent_id)
         elif cate_id:
-            asset_obj = models.Asset.objects.filter(sn__contains=name, category_id=cate_id)
+            asset_obj = models.Asset.objects.filter(name__contains=name, category_id=cate_id)
         elif dent_id:
-            asset_obj = models.Asset.objects.filter(sn__contains=name, department_id=dent_id)
+            asset_obj = models.Asset.objects.filter(name__contains=name, department_id=dent_id)
         else:
-            asset_obj = models.Asset.objects.filter(sn__contains=name)
+            asset_obj = models.Asset.objects.filter(name__contains=name)
 
     else:
         asset_obj = models.Asset.objects.all()
@@ -146,7 +146,7 @@ def asset_add(request):
     elif request.method == 'POST':
 
         print(request.POST)
-        forms_obj = forms.Asset_Add_Form(request.POST, request=request)
+        forms_obj = forms.Asset_Add_Form(data=request.POST, request=request)
 
         print(forms_obj.errors)
         #
@@ -258,7 +258,7 @@ def asset_input(request):
             # 找到類型對象
             cate_name, cate_code2 = data['category'].replace(")", "").split("(")
             if cate_code1 == cate_code2:
-                data['category'] = models.Catagory.objects.filter(code=cate_code1)
+                data['category'] = models.Category.objects.filter(code=cate_code1)
 
             # 找到部門對象
             if data['department']:
@@ -512,7 +512,7 @@ def category(request):
 
     search_field = {}
 
-    category_obj = models.Catagory.objects.all()
+    category_obj = models.Category.objects.all()
 
     # 分頁功能
 
@@ -557,7 +557,7 @@ def category(request):
         name = put.get('name')
         code = put.get('code')
 
-        cary_obj = models.Catagory.objects.get(id=cary_id)
+        cary_obj = models.Category.objects.get(id=cary_id)
 
         form_obj = forms.CaryForm(data=put, instance=cary_obj)
 
@@ -581,7 +581,7 @@ def category(request):
 
         print(put)
 
-        cary_obj = models.Catagory.objects.get(id=id)
+        cary_obj = models.Category.objects.get(id=id)
         cary_obj.delete()
 
         ret['msg'] = '成功'
@@ -650,7 +650,7 @@ def category_input(request):
 
 
 def category_output(request):
-    opts = models.Catagory.objects.all().model._meta
+    opts = models.Category.objects.all().model._meta
     response = HttpResponse(content_type='text/csv; charset=cp936')
 
     # force download.
@@ -669,7 +669,7 @@ def category_output(request):
     # Write a first row with header information
     writer.writerow(row_names)
 
-    ret = [writer.writerow([getattr(obj, field) for field in field_names]) for obj in models.Catagory.objects.all()]
+    ret = [writer.writerow([getattr(obj, field) for field in field_names]) for obj in models.Category.objects.all()]
 
     return response
 
@@ -1006,13 +1006,13 @@ def test1(request):
     print("this is test1")
 
     forms_obj = forms.test1Form()
-    print(models.Catagory.objects.filter(id=2))
-    print([models.Catagory.objects.get(id=2)])
-    data = {'id': '', 'cary': models.Catagory.objects.filter(id=2), 'dent': models.Department.objects.filter(id=8)}
+    print(models.Category.objects.filter(id=2))
+    print([models.Category.objects.get(id=2)])
+    data = {'id': '', 'cary': models.Category.objects.filter(id=2), 'dent': models.Department.objects.filter(id=8)}
     print(data)
     forms_obj1 = forms.test1Form(data)
 
-    # forms_obj1.fields["cary"].queryset=models.Catagory.objects.filter(id=2)
+    # forms_obj1.fields["cary"].queryset=models.Category.objects.filter(id=2)
     # forms_obj1.fields["dent"].queryset=models.Department.objects.filter(id=8)
 
     print("forms_obj1.errors", forms_obj1.errors)

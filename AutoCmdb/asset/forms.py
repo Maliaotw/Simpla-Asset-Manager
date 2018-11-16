@@ -9,16 +9,24 @@ class AssetForm(ModelForm):
     資產表單
     '''
 
-    sn = forms.CharField(
+
+    name = forms.CharField(
         label="資產編號",
         widget=forms.TextInput(
-            attrs={}
+            attrs={"readonly": 'ture','style':'display:none;'}
+        )
+    )
+
+    number = forms.CharField(
+        label="資產號碼",
+        widget=forms.NumberInput(
+
         )
     )
 
     category = forms.ModelChoiceField(
         label="類型",
-        queryset=models.Catagory.objects.all(),
+        queryset=models.Category.objects.all(),
         widget=forms.Select(attrs={"onchange": "get_category(this)"}),
         required=True,
 
@@ -83,42 +91,50 @@ class Asset_Add_Form(AssetForm):
     資產表單
     '''
 
-    sn = forms.CharField(
-        label="資產編號",
-        widget=forms.TextInput(
-            attrs={"disabled": 'ture'}
+    number = forms.CharField(
+        label="資產號碼",
+        widget=forms.NumberInput(
+
         )
     )
+
+    name = forms.CharField(
+
+        widget=forms.TextInput(
+            attrs={"readonly": 'ture'}
+        )
+    )
+
+
+
 
     def clean(self):
         cleaned_data = super().clean()
 
         # 驗證編號是否重複
-
         # 先找類型在驗證編號
-
         category = cleaned_data.get("category")
-        sn = cleaned_data.get("sn")
+        number = cleaned_data.get("number")
 
-        sn_num = models.Asset.objects.filter(category=category).filter(sn=sn)
+        asset_number = models.Asset.objects.filter(category=category).filter(number=number)
 
-        if sn_num:
-            self.add_error('sn', "sn error")
+        if asset_number:
+            self.add_error('number', "number error")
 
         return cleaned_data
 
 
 class Asset_Edit_Form(AssetForm):
-    sn = forms.CharField(
+    number = forms.CharField(
         label="資產編號",
-        widget=forms.TextInput(
+        widget=forms.NumberInput(
             attrs={"readonly": 'ture'}
         )
     )
 
     category = forms.ModelChoiceField(
         label="類型",
-        queryset=models.Catagory.objects.all(),
+        queryset=models.Category.objects.all(),
         widget=forms.Select(attrs={"onchange": "get_category(this)", "readonly": 'ture'}),
         required=True,
 
@@ -162,7 +178,7 @@ class CaryForm(ModelForm):
     '''
 
     class Meta:
-        model = models.Catagory
+        model = models.Category
         fields = '__all__'
 
 
@@ -430,4 +446,4 @@ class User_Add_Form(forms.Form):
 class test1Form(forms.Form):
     id = forms.IntegerField(required=False, widget=forms.HiddenInput())
     dent = forms.ModelChoiceField(queryset=models.Department.objects.all())
-    cary = forms.ModelChoiceField(queryset=models.Catagory.objects.all())
+    cary = forms.ModelChoiceField(queryset=models.Category.objects.all())

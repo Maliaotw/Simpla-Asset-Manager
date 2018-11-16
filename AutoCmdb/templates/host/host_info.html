@@ -24,7 +24,8 @@
     <div class="panel panel-default" style="padding: 20px">
 
         <div class="form-group">
-            <label>主機信息&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus" data-toggle="collapse" data-target="#host"></i> </label>
+            <label>主機信息&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus" data-toggle="collapse" data-target="#host"></i>
+            </label>
         </div>
 
         <div id="host" class="row collapse" style="padding-left: 15px">
@@ -34,7 +35,6 @@
                 {{ host_form_obj.asset.label_tag }}
                 {{ host_form_obj.asset }}
             </div>
-
 
 
             <div class="col-md-6 form-group">
@@ -90,7 +90,8 @@
 
 
         <div class="form-group">
-            <label> 網卡信息&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus" data-toggle="collapse" data-target="#nic"></i></label>
+            <label> 網卡信息&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus" data-toggle="collapse"
+                                                   data-target="#nic"></i></label>
         </div>
 
         <div id="nic" class="row collapse" style="padding-left: 15px">
@@ -126,7 +127,8 @@
 
 
         <div class="form-group">
-            <label> 硬盤信息&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus" data-toggle="collapse" data-target="#disk"></i></label>
+            <label> 硬盤信息&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus" data-toggle="collapse"
+                                                   data-target="#disk"></i></label>
         </div>
 
         <div id="disk" class="row collapse" style="padding-left: 15px">
@@ -146,6 +148,7 @@
                 <div class="col-md-3 form-group">
                     {{ dickform.capacity.label_tag }}
                     {{ dickform.capacity }}
+
                 </div>
 
                 <div class="col-md-3 form-group">
@@ -159,7 +162,8 @@
 
 
         <div class="form-group">
-            <label> 內存信息&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus" data-toggle="collapse" data-target="#mem"></i></label>
+            <label> 內存信息&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus" data-toggle="collapse"
+                                                   data-target="#mem"></i></label>
         </div>
         <div id="mem" class="row collapse" style="padding-left: 15px">
 
@@ -177,7 +181,8 @@
 
                 <div class="col-md-3 form-group">
                     {{ memform.capacity.label_tag }}
-                    {{ memform.capacity }}
+                    {{ memform.capacity  }}
+
                 </div>
 
                 <div class="col-md-3 form-group">
@@ -200,11 +205,11 @@
 
     <script>
 
-    var inputs = $("input");
-    $.each(inputs,function (i,obj) {
-        console.log(obj);
-        $(obj).attr('type','text');
-    })
+        var inputs = $("input");
+        $.each(inputs, function (i, obj) {
+            console.log(obj);
+            $(obj).attr('type', 'text');
+        })
 
     </script>
 
