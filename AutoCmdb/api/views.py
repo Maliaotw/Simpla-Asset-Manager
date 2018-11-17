@@ -83,21 +83,25 @@ def dent_user(request):
     print(users)
 
     # 負責人
+    user_list = []
+
 
     if dent.user:
-        ret['owner'] = {
-            'user': dent.user.name,
-            'code': '%s' % (dent.user.code),
-            'id': dent.user.user.id,
-        }
-    # dent.user.dent.block_number
+        ret['owner'] = dent.user.user.id
+        if dent.user.dent == dent:
+            pass
+        else:
+            user_data = {
+                'name': "%s(%s)" % (dent.user.code, dent.user.name),
+                'id': dent.user.user.id
+            }
+            user_list.append(user_data)
 
     # 遍歷用戶
-    user_list = []
+
     for u in users:
         user_data = {
-            'user': u.name,
-            'code': "%s" % u.code,
+            'name': "%s(%s)" % (u.code,u.name),
             'id': u.user.id
         }
         user_list.append(user_data)

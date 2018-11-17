@@ -43,13 +43,14 @@
     <ol class="breadcrumb">
         <li><a href="{% url 'user' %}">用戶管理</a></li>
         <li class="active">
-            {{ userinfo_obj.dent.block_number }}{{ userinfo_obj.code }} {{ userinfo_obj.user.username }}</li>
+            {{ userinfo_obj.code }} {{ userinfo_obj.user.username }}
+        </li>
 
     </ol>
 
 
     <div class="panel panel-default" style="padding: 20px">
-        <form method="post" id="userform_add" onsubmit="BeforeFormSubmit()">
+        <form class="form" id="form">
             {% csrf_token %}
 
 
@@ -57,86 +58,150 @@
                 <label> 基本信息</label>
             </div>
 
-            <div class="form-group col-md-6">
-                <label class="col-form-label">編號</label>
-                <input  type="number" name="code" class="form-control" placeholder=""
-                       value="{{ userinfo_obj.dent.block_number }}{{ userinfo_obj.code }}">
+
+            <div class="form-group col-md-6 has-feedback">
+
+                {{ forms_userproinfo_obj.code.label_tag }}
+                {{ forms_userproinfo_obj.code }}
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
             </div>
 
-
-            <div class="col-md-6 form-group">
-                <label class="col-form-label">用戶名</label>
-                {{ forms_user_obj.username }}
-            </div>
-
-            <div class="col-md-6  form-group">
-                <label class="col-form-label">姓名</label>
-                {{ forms_userproinfo_obj.name }}
-            </div>
-
-            <div class="col-md-6 form-group">
-                <label class="col-form-label">性別</label>
-                {{ forms_userproinfo_obj.sex }}
-            </div>
-
-
-            <div class="col-md-6  form-group">
-                <label class="col-form-label">部門</label>
+            <div class="col-md-6  form-group has-feedback">
+                {{ forms_userproinfo_obj.dent.label_tag }}
                 {{ forms_userproinfo_obj.dent }}
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
             </div>
 
-            <div class="col-md-6  form-group">
-                <label class="col-form-label">生日</label>
+            <div class="form-group col-md-6 has-feedback" style="display: none">
+                {{ forms_userproinfo_obj.number.label_tag }}
+                {{ forms_userproinfo_obj.number }}
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+            </div>
+
+
+            <div class="col-md-6 form-group has-feedback">
+                {{ forms_user_obj.username.label_tag }}
+                {{ forms_user_obj.username }}
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+            </div>
+
+            <div class="col-md-6  form-group has-feedback">
+                {{ forms_userproinfo_obj.name.label_tag }}
+                {{ forms_userproinfo_obj.name }}
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+            </div>
+
+            <div class="col-md-6 form-group has-feedback">
+                {{ forms_userproinfo_obj.sex.label_tag }}
+                {{ forms_userproinfo_obj.sex }}
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+            </div>
+
+
+            <div class="col-md-6  form-group has-feedback">
+                {{ forms_userproinfo_obj.birthday.label_tag }}
                 {{ forms_userproinfo_obj.birthday }}
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
             </div>
 
-            <div class="form-group" style="padding-left:15px;    padding-right: 15px; ">
-                <label> 在職狀態</label>
+            <div class="col-md-12 form-group has-feedback" style="padding-left:15px ">
+                {{ forms_userproinfo_obj.in_service.label_tag }}
                 {{ forms_userproinfo_obj.in_service }}
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
             </div>
 
 
             <div class="form-group">
                 <label> 登入功能</label>
-
-                {% if forms_user_obj.is_staff.value == "True" %}
-
+                {% if forms_user_obj.instance.is_staff %}
                     <button id="change_passwd" type="button" class="btn btn-success" style="margin-left: 20px">更改密碼
                     </button>
                 {% endif %}
             </div>
 
+            <div class="row" style="padding-left: 30px">
 
-            <div class="form-inline">
-                <label class="col-md-2  col-form-label">狀態</label>
+                <div class="form-horizontal">
 
-                {{ forms_user_obj.is_staff }}
+                    <div class="form-group col-md-12 has-feedback">
+                        <label class="col-md-2 ">{{ forms_user_obj.is_staff.label }}</label>
+                        {{ forms_user_obj.is_staff }}
+                        <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+                    </div>
+
+
+                    <!-- Text input-->
+                    <div class="form-group col-md-12 has-feedback" style="display: none">
+                        <label class="col-md-2 ">{{ forms_user_obj.password1.label }}</label>
+                        {{ forms_user_obj.password1 }}
+                        <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+                    </div>
+
+
+                    <!-- Text input-->
+                    <div class="form-group col-md-12 has-feedback" style="display: none">
+                        <label class="col-md-2 ">{{ forms_user_obj.password2.label }}</label>
+                        {{ forms_user_obj.password2 }}
+                        <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+                    </div>
+
+                </div>
 
             </div>
 
 
-            <div class="form-inline" style="padding-right: 15px; display: none">
-                <label class="col-md-2  col-form-label">密碼</label>
+            <div class="row">
+                <div class="form-group">
+                    <button id="submit" type="button" class="btn btn-primary center-block">更改</button>
 
-                {{ forms_user_obj.password1 }}
+                </div>
+
             </div>
-
-
-            <div class="form-inline" style="padding-right: 15px; ; display: none">
-                <label class="col-md-2  col-form-label">確認密碼</label>
-                {{ forms_user_obj.password2 }}
-            </div>
-
-
-            <div class="form-group">
-                <button id="userform_submit" type="submit" class="btn btn-primary center-block">更改</button>
-            </div>
-
-
         </form>
 
-
     </div>
+
+
+
+
+
+    <!--- Modal -->
+    <div class="modal fade" id="Modal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title"></h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    是否還需要繼續修改資料
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <a href="{% url 'user' %}" class="btn btn-primary" role="button">返回列表</a>
+                    <a href="{% url 'user_edit' pk %}" class="btn btn-success" role="button">繼續修改</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 
 
 {% endblock %}
@@ -148,23 +213,87 @@
 {% block extra-js %}
 
     <script>
-        function BeforeFormSubmit(e) {
-            $(":disabled").removeAttr("disabled");
-        }
 
 
-        $("input[name='birthday']").datepicker(
-            {
-                language: 'zh-TW',
-                format: "yyyy-mm-dd",
-                todayHighlight: true,
+
+
+        // 更改密碼按紐
+        $("#change_passwd").bind("click", function (e) {
+            $("[name='password1']").closest(".form-group").show();
+            $("[name='password2']").closest(".form-group").show();
+        });
+
+ // 提交
+        $("#form").on("submit", function (e) {
+
+            var postData = $(this).serializeArray();
+            console.log(postData);
+
+            $.ajax({
+                url: "{% url 'user_edit' pk %}",
+                type: "POST",
+                data: postData,
+                success: function (callback) {
+                    console.log(callback);
+                    $('#Modal').modal({backdrop: 'static', keyboard: false});
+
+                    if (callback.status == 'ok') {
+                        console.log("ok");
+                        $(".alert").show();
+                        $(".alert strong").text(callback.msg);
+                        $(".alert").addClass("alert-success").removeClass("alert-danger");
+
+
+                        $.each(callback.success_fields, function (i, val) {
+
+                            input_tag = $("[name='" + val + "']");
+                            div_tag = input_tag.closest("div");
+                            div_tag.removeClass("has-error").addClass("has-success");
+                            div_tag.find("span").removeClass("glyphicon-remove").addClass("glyphicon-ok");
+
+                        });
+
+                        $("#Modal").modal('show')
+
+
+                    } else {
+                        console.log("error");
+                        $(".modal-title").text(callback.msg);
+                        $(".modal-title").css({'color': 'red'});
+
+
+                        //console.log(callback.errors_fields);
+                        //console.log(callback.success_fields);
+
+                        $.each(callback.errors_fields, function (i, val) {
+
+                            input_tag = $("[name='" + val + "']");
+                            div_tag = input_tag.closest("div");
+                            div_tag.removeClass("has-success").addClass("has-error");
+                            div_tag.find("span").removeClass("glyphicon-ok").addClass("glyphicon-remove");
+
+
+                        });
+
+                        $.each(callback.success_fields, function (i, val) {
+
+                            input_tag = $("[name='" + val + "']");
+                            div_tag = input_tag.closest("div");
+                            div_tag.removeClass("has-error").addClass("has-success");
+                            div_tag.find("span").removeClass("glyphicon-remove").addClass("glyphicon-ok");
+
+                        });
+
+
+                    }
+                }
 
             });
 
-        $("#change_passwd").bind("click", function (e) {
-            $("[name='password1']").closest(".form-inline").show();
-            $("[name='password2']").closest(".form-inline").show();
+
         });
+
+
 
     </script>
 

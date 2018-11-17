@@ -15,7 +15,6 @@ import csv
 # --- 資產 ---
 
 def asset(request):
-
     # for asset in models.Asset.objects.all():
     #     print(asset)
 
@@ -265,7 +264,6 @@ def asset_input(request):
                 dent_name, dent_code = data['department'].replace(")", "").split("(")
                 data['department'] = models.Department.objects.filter(code=dent_code)
 
-
             # 找到負責人 對象
             if data['manager']:
                 manager_name, manager_code = data['manager'].replace(")", "").split("(")
@@ -274,7 +272,7 @@ def asset_input(request):
             # 購買日期
             data['purchase_date'] = datetime.datetime.strptime(data['purchase_date'], '%Y/%m/%d')
 
-            forms_obj = forms.Asset_Add_Form(data=data,request=request)
+            forms_obj = forms.Asset_Add_Form(data=data, request=request)
 
             if forms_obj.is_valid():
                 data_ret.append(forms_obj)
@@ -450,7 +448,6 @@ def department_input(request):
                 manager_name, manager_code = data['user'].replace(")", "").split("(")
                 data['user'] = models.UserProfile.objects.filter(name=manager_name)
 
-
             forms_obj = forms.DentForm(data=data)
 
             if forms_obj.is_valid():
@@ -500,7 +497,7 @@ def department_output(request):
     # Write a first row with header information
     writer.writerow(row_names)
 
-    ret = [writer.writerow([getattr(obj,field) for field in field_names]) for obj in models.Department.objects.all()]
+    ret = [writer.writerow([getattr(obj, field) for field in field_names]) for obj in models.Department.objects.all()]
 
     return response
 
@@ -618,7 +615,6 @@ def category_input(request):
 
             keys = {k: name for k, name in zip(field_name, verbose_name)}
             data = {k: row[name] for k, name in zip(field_name, verbose_name)}
-
 
             forms_obj = forms.CaryForm(data=data)
 
@@ -797,34 +793,70 @@ def user_add(request):
     ret = {"status": "", "re_html": "", "msg": ""}
 
     if request.method == 'GET':
-        forms_obj = forms.User_Add_Form()
+        forms_user_obj = forms.User_Add_Form(request=request)
+        forms_userproinfo_obj = forms.UserProfile_Add_Form(request=request)
 
     if request.method == 'POST':
 
-        print("This is POST")
+        forms_user_obj = forms.User_Add_Form(request.POST, request=request)
+        forms_userproinfo_obj = forms.UserProfile_Add_Form(request.POST, request=request)
 
-        form_obj = forms.User_Add_Form(data=request.POST)
-        print(request.POST)
+        fields = set(list(dict(forms_user_obj.fields).keys()) + list(dict(forms_userproinfo_obj.fields).keys()))
+        errors = set(list(forms_user_obj.errors.keys()) + list(forms_userproinfo_obj.errors.keys()))
 
-        print(form_obj.errors)
-        #
-        fields = set(list(dict(form_obj.fields).keys()))
-        errors = set(list(form_obj.errors.keys()))
-        #
         errors_fields = list(fields & errors)
         success_fields = list(fields - errors)
-        print(errors_fields)
-        print(success_fields)
-        #
-        print(form_obj.errors)
-        #
-        if form_obj.is_valid():
-            print("ok")
+        print("errors_fields",errors_fields)
+        print("success_fields",success_fields)
 
-            form_obj.save()
+        # 確認表單提交無誤
+        if forms_user_obj.is_valid() and forms_userproinfo_obj.is_valid():
+            pass
+
+        else:
+            print("error")
+            # print(forms_user_obj.errors)
+            # print(forms_userproinfo_obj.errors)
+
+            ret['status'] = 'error'
+
+        return JsonResponse(ret)
+
+    return render(request, "user/user_add.html", locals())
+
+
+def user_edit(request, pk):
+    ret = {"status": "", "re_html": "", "msg": ""}
+
+    userinfo_obj = models.UserProfile.objects.get(id=pk)
+
+    print("request.method", request.method)
+
+    if request.method == 'GET':
+        forms_user_obj = forms.User_Edit_Form(instance=userinfo_obj.user, request=request)
+        forms_userproinfo_obj = forms.UserProfile_Edit_Form(instance=userinfo_obj, request=request)
+
+    elif request.method == 'POST':
+
+        print("request.POST", request.POST)
+
+        forms_user_obj = forms.User_Edit_Form(request.POST, instance=userinfo_obj.user, request=request)
+        forms_userproinfo_obj = forms.UserProfile_Edit_Form(request.POST, instance=userinfo_obj, request=request)
+
+        fields = set(list(dict(forms_user_obj.fields).keys()) + list(dict(forms_userproinfo_obj.fields).keys()))
+        errors = set(list(forms_user_obj.errors.keys()) + list(forms_userproinfo_obj.errors.keys()))
+
+        errors_fields = list(fields & errors)
+        success_fields = list(fields - errors)
+
+        # 確認表單提交無誤
+        if forms_user_obj.is_valid() and forms_userproinfo_obj.is_valid():
+            # 把判斷都交給Form表單並儲存
+            forms_user_obj.save()
+            forms_userproinfo_obj.save()
 
             ret['status'] = 'ok'
-            ret['msg'] = '新增成功'
+            ret['msg'] = '修改成功'
             ret['errors_fields'] = errors_fields
             ret['success_fields'] = success_fields
 
@@ -836,66 +868,6 @@ def user_add(request):
             ret['success_fields'] = success_fields
 
         return JsonResponse(ret)
-
-    return render(request, "user/user_add.html", locals())
-
-
-def user_edit(request, pk):
-    # pk = 804
-
-    userinfo_obj = models.UserProfile.objects.get(id=pk)
-
-    if request.method == 'GET':
-        forms_user_obj = forms.UserForm(instance=userinfo_obj.user, request=request)
-        forms_userproinfo_obj = forms.UserProfileForm(instance=userinfo_obj, request=request)
-
-    if request.method == 'POST':
-
-        print(request.POST)
-
-        forms_user_obj = forms.UserForm(request.POST, instance=userinfo_obj.user, request=request)
-        forms_userproinfo_obj = forms.UserProfileForm(request.POST, instance=userinfo_obj, request=request)
-
-        # 確認表單提交無誤
-        if forms_user_obj.is_valid() and forms_userproinfo_obj.is_valid():
-            print("ok")
-
-            # 取值
-
-            username = forms_user_obj.cleaned_data.get('username')
-            is_staff = forms_user_obj.cleaned_data.get('is_staff')
-
-            password1 = forms_user_obj.cleaned_data.get('password1')
-            password2 = forms_user_obj.cleaned_data.get('password2')
-
-            name = forms_userproinfo_obj.cleaned_data.get('name')
-            in_service = forms_userproinfo_obj.cleaned_data.get('in_service')
-            birthday = forms_userproinfo_obj.cleaned_data.get('birthday')
-            sex = forms_userproinfo_obj.cleaned_data.get('sex')
-            code = forms_userproinfo_obj.cleaned_data.get('code')
-            dent = forms_userproinfo_obj.cleaned_data.get('dent')
-
-            userinfo = forms_user_obj.save(commit=False)
-            # 修改密碼
-            if password1 and password2:
-                userinfo.user.set_password(password1)
-
-            # 修改用戶
-
-            userinfo.save()
-
-            # 修改用戶profifle
-            code = code[len(dent.block_number):]
-
-            userproinfo_obj = forms_userproinfo_obj.save(commit=False)
-            userproinfo_obj.code = code
-            userproinfo_obj.save()
-
-
-        else:
-            print("error")
-            print(forms_user_obj.errors)
-            print(forms_userproinfo_obj.errors)
 
     return render(request, "user/user_edit.html", locals())
 

@@ -25,6 +25,16 @@
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+
+        .modal-dialog {
+
+            width: 600px;
+            left: 50%;
+            top: 50%;
+            margin-top: -134.5px;
+            margin-left: -250px;
+
+        }
     </style>
 
 
@@ -139,6 +149,9 @@
 
 
 
+
+
+
     <!--- 新增完成 表單-->
     <div class="modal fade" id="Modal">
         <div class="modal-dialog modal-dialog-centered">
@@ -156,7 +169,7 @@
                 </div>
 
                 <!-- Modal footer -->
-                <div class="modal-footer">
+                <div class="modal-footer" >
                     <a href="{% url 'asset' %}" class="btn btn-primary" role="button">返回列表</a>
                     <a href="{% url 'asset_edit' pk %}" class="btn btn-success" role="button">繼續修改</a>
                 </div>
@@ -182,154 +195,16 @@
     <script>
 
 
-        $("#id_manager").find('option')
-            .remove()
-            .end()
-            .append('<option value="">--------</option>')
-            .val('')
-        ;
-
-
+        // 提交之後 將所有disabled刪除
         function BeforeFormSubmit(e) {
             $(":disabled").removeAttr("disabled");
         }
 
 
-        $('#id_purchase_date').datepicker(
-            {
-                language: 'zh-TW',
-                format: "yyyy-mm-dd",
-                todayHighlight: true,
-
-            });
-
-
-        // 選擇類型後請求該分類數量
-        function get_category(e) {
-            //console.log(e);
-            //console.log($(this));
-            //console.log(e.value);
-
-            $.ajax({
-                url: "/api/category",
-                type: "GET",
-                data: {'cate': e.value},
-
-                success: function (callback) {
-                    //console.log(callback);
-                    $("input[name='number']").removeAttr("disabled");
-                    $("input[name='number']").val(callback.number);
-                },
-                error: function () {
-                }
-            });
-
-        };
-
-
-        // 選擇部門後請求關聯使用資料
-        function get_dent_user(e) {
-            //console.log(e);
-            //console.log($(this));
-            //console.log(e.value);
-
-            $.ajax({
-                url: "/api/dent_user",
-                type: "GET",
-                data: {'dent': e.value},
-                async: false,
-
-                success: function (callback) {
-                    window.dent_user = {
-                        'status': 'ok',
-                        'data': callback
-                    };
-                    console.log(window.dent_user);
-                },
-                error: function () {
-
-                }
-            });
-        };
-
-
-        // 新增資產 關聯用戶
-        function add_assetform_user(e) {
-            get_dent_user(e);
-            dent_user = window.dent_user;
-            //console.log(dent_user);
-            if (dent_user.status == 'ok') {
-                // 解開#user_add select選項 disabled
-                $("#id_manager").removeAttr("disabled");
-
-                console.log('add_assetform_user');
-
-                $("#id_manager").find('option')
-                    .remove()
-                    .end()
-                    .append('<option value="">--------</option>')
-                    .val('')
-                ;
-
-                users = dent_user.data.users;
-                owner = dent_user.data.owner;
-
-                console.log(owner);
-                if (owner) {
-                    $("#id_manager").append($('<option>', {
-                        value: owner.id,
-                        text: owner.user + "(" + owner.code + ")",
-                        selected: true,
-                    }));
-                }
-
-
-                $.each(users, function (i, item) {
-                        //console.log(item);
-
-                        if (item.code == owner.code) {
-                            //console.log(item.code);
-                            //console.log(owner.code);
-
-                            $("#id_manager").append($('<option>', {
-                                value: item.id,
-                                text: item.user + "(" + item.code + ")",
-                                selected: true,
-                            }));
-                        }
-                        else {
-
-                            $("#id_manager").append($('<option>', {
-                                value: item.id,
-                                text: item.user + "(" + item.code + ")"
-                            }));
-                        }
-                    }
-                );
-            }
-
-        }
-
-
-        // 檢查狀態
-        function ch_status_ele(e) {
-
-            if (e.value == "使用中") {
-                $("#id_department").removeAttr("disabled").val("");
-                $("#id_manager").removeAttr("disabled").val("");
-
-
-            } else {
-                $("#id_department").attr("disabled", "disabled").val("");
-                $("#id_manager").attr("disabled", "disabled").val("");
-
-            }
-
-        }
-
 
         // bind button
         $("#submit").on("click", function (e) {
+            BeforeFormSubmit(this);
             $("#form").submit();
         });
 
@@ -345,6 +220,7 @@
                 data: postData,
                 success: function (callback) {
                     console.log(callback);
+                    $('#Modal').modal({backdrop: 'static', keyboard: false});
 
                     if (callback.status == 'ok') {
                         console.log("ok");

@@ -9,11 +9,10 @@ class AssetForm(ModelForm):
     資產表單
     '''
 
-
     name = forms.CharField(
         label="資產編號",
         widget=forms.TextInput(
-            attrs={"readonly": 'ture','style':'display:none;'}
+            attrs={"readonly": 'ture', 'style': 'display:none;'}
         )
     )
 
@@ -105,9 +104,6 @@ class Asset_Add_Form(AssetForm):
         )
     )
 
-
-
-
     def clean(self):
         cleaned_data = super().clean()
 
@@ -128,14 +124,14 @@ class Asset_Edit_Form(AssetForm):
     number = forms.CharField(
         label="資產編號",
         widget=forms.NumberInput(
-            attrs={"readonly": 'ture'}
+            attrs={"disabled": 'ture'}
         )
     )
 
     category = forms.ModelChoiceField(
         label="類型",
         queryset=models.Category.objects.all(),
-        widget=forms.Select(attrs={"onchange": "get_category(this)", "readonly": 'ture'}),
+        widget=forms.Select(attrs={"disabled": 'ture'}),
         required=True,
 
     )
@@ -143,14 +139,14 @@ class Asset_Edit_Form(AssetForm):
     department = forms.ModelChoiceField(
         label="部門",
         queryset=models.Department.objects.all(),
-        widget=forms.Select(attrs={"onchange": "add_assetform_user(this)"}),
+        widget=forms.Select(attrs={"onchange": "add_assetform_user(this)", "disabled": 'ture'}),
         required=False,
     )
 
     manager = forms.ModelChoiceField(
         label='負責人/使用者',
         queryset=models.UserProfile.objects.all(),
-        widget=forms.Select(attrs={"style": "margin-bottom: 10px"}),
+        widget=forms.Select(attrs={"style": "margin-bottom: 10px", "disabled": 'ture'}),
         required=False,
     )
 
@@ -158,8 +154,6 @@ class Asset_Edit_Form(AssetForm):
         cleaned_data = super().clean()
 
         return cleaned_data
-
-
 
 
 class DentForm(ModelForm):
@@ -196,6 +190,69 @@ class UserProfileForm(ModelForm):
 
         super(UserProfileForm, self).__init__(*args, **kwargs)
 
+        # 對所有字段添加Css屬性
+        for k, v in self.fields.items():
+            self.fields[k].widget.attrs['class'] = 'form-control'
+
+    class Meta:
+        model = models.UserProfile
+        fields = "__all__"
+        exclude = ['user']
+
+
+class UserProfile_Add_Form(UserProfileForm):
+
+
+
+    dent = forms.ModelChoiceField(
+        label="部門",
+        queryset=models.Department.objects.all(),
+        widget=forms.Select(attrs={"class": "form-control", "onchange": "get_user_number(this)"}),
+        required=True,
+
+    )
+
+    def clean_code(self):
+        '''
+        驗證code是否重複
+        :return:
+        '''
+
+        code = self.cleaned_data['code']
+        print("code", code)
+        user = models.UserProfile.objects.filter(code=code)
+        if user:
+            self.add_error('code', "code error")
+        return code
+
+    def clean(self):
+        '''
+        全局驗證
+        :return:
+        '''
+
+        # 驗證number
+        number = self.cleaned_data.get('number','')
+
+        dent = self.cleaned_data.get("dent",'')
+        user = models.UserProfile.objects.filter(dent=dent).filter(number=number)
+
+        if user:
+            self.add_error('number', "number error")
+
+
+
+
+
+
+
+class UserProfile_Edit_Form(UserProfileForm):
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+
+        super(UserProfileForm, self).__init__(*args, **kwargs)
+
         admin_readonly_fields = ("username",)
         user_readonly_fields = ("username", "dent", "code",)
 
@@ -215,11 +272,6 @@ class UserProfileForm(ModelForm):
 
             self.fields[k].widget.attrs['class'] = 'form-control'
 
-    class Meta:
-        model = models.UserProfile
-        fields = "__all__"
-        exclude = ['user']
-
 
 class UserForm(ModelForm):
     '''
@@ -228,7 +280,9 @@ class UserForm(ModelForm):
 
     username = forms.CharField(
         label='用戶名',
-        widget=forms.TextInput(attrs={"class": "form-control"})
+        widget=forms.TextInput(attrs={
+            "class": "form-control"
+        })
     )
 
     is_staff_choice = (
@@ -238,7 +292,13 @@ class UserForm(ModelForm):
 
     is_staff = forms.ChoiceField(
         label='登入',
-        widget=forms.Select(attrs={"class": "col-md-10  form-control-static", "style": "margin-bottom: 10px"}),
+        widget=forms.Select(
+            attrs={
+                "class": "col-md-10 form-control-static",
+                "style": "margin-bottom: 10px",
+                "onchange": "ch_login(this)",
+            }
+        ),
         choices=is_staff_choice,
         required=True,
     )
@@ -257,6 +317,51 @@ class UserForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
+
+        super(UserForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+
+        print('self.cleaned_data',self.cleaned_data)
+
+        is_staff = self.cleaned_data.get("is_staff")
+        print("is_staff",is_staff)
+        if is_staff == 'True':
+            passwd1 = self.cleaned_data.get('password1') if self.cleaned_data.get('password1') else '1'
+            passwd2 = self.cleaned_data.get('password2') if self.cleaned_data.get('password2') else '2'
+            if passwd1 != passwd2:
+                # 全局錯誤
+                self.add_error('password1', 'password1 error')
+                self.add_error('password2', 'password2 error')
+                raise forms.ValidationError(("密碼不一致"))
+            else:
+                self.password = self.cleaned_data.get('password1')
+        else:
+            self.password = "12345678"
+
+    def save(self, commit=True):
+        user_obj = super(UserForm, self).save(commit=False)
+        user_obj.set_password(self.password)
+        user_obj.save()
+
+
+    class Meta:
+        model = models.User
+        fields = ('username', 'is_staff',)
+
+
+class User_Add_Form(UserForm):
+
+   pass
+
+
+
+
+class User_Edit_Form(UserForm):
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+
         super(UserForm, self).__init__(*args, **kwargs)
 
         admin_readonly_fields = ("username",)
@@ -275,19 +380,14 @@ class UserForm(ModelForm):
                 if k in admin_readonly_fields:
                     self.fields[k].widget.attrs['disabled'] = 'ture'
 
-    def clean(self):
 
-        cleaned_data = super().clean()
-        if cleaned_data.get('password1') != cleaned_data.get('password2'):
-            # 全局錯誤
-            raise forms.ValidationError(("密碼不一致"))
-
-    class Meta:
-        model = models.User
-        fields = ('username', 'is_staff',)
+    def save(self, commit=True):
+        user_obj = super(UserForm, self).save(commit=False)
+        user_obj.set_password(self.password)
+        user_obj.save()
 
 
-class User_Add_Form(forms.Form):
+class Custom_User_Add_Form(forms.Form):
     '''
     User Add 表單
     '''
@@ -383,7 +483,6 @@ class User_Add_Form(forms.Form):
 
     def save(self, *args, **kwargs):
 
-
         if self.password1 and self.password2:
             passwd = self.password1
         else:
@@ -405,7 +504,6 @@ class User_Add_Form(forms.Form):
             in_service=self.cleaned_data['in_service']
         )
 
-
     def clean(self):
         cleaned_data = super().clean()
 
@@ -415,8 +513,8 @@ class User_Add_Form(forms.Form):
             self.add_error('username', "username error")
 
         # 員工編號不得重複
-        dent = cleaned_data.get('dent','')
-        code = cleaned_data.get('code','')
+        dent = cleaned_data.get('dent', '')
+        code = cleaned_data.get('code', '')
 
         if dent and code:
             code_num = code[len(dent.block_number):]  # 編號
@@ -429,7 +527,6 @@ class User_Add_Form(forms.Form):
                 self.code = code_num
         else:
             self.add_error('code', "code error")
-
 
         self.password1 = cleaned_data.get('password1', '')
         self.password2 = cleaned_data.get('password2', '')

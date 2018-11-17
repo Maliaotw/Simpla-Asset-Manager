@@ -33,8 +33,8 @@
     </ul>
     <ul class="nav nav-sidebar">
 
-    <li {% if request.path == host %}class="active"{% endif %}><a href={{ host }}>運維管理</a></li>
-
+        <li {% if request.path == host %}class="active"{% endif %}><a href={{ host }}>運維管理</a></li>
+    </ul>
 
 
 {% endblock %}
@@ -42,6 +42,71 @@
 
 {% block content %}
 
+{% endblock %}
+
+
+{% block base-js %}
+
+    <script>
+
+
+        // 提交之後 將所有disabled刪除
+        function BeforeFormSubmit(e) {
+            $(":disabled").removeAttr("disabled");
+        }
+
+        // 生日日期
+        $("input[name='birthday']").datepicker(
+            {
+                language: 'zh-TW',
+                format: "yyyy-mm-dd",
+                todayHighlight: true,
+
+            });
+
+
+        // 密碼顯示或隱藏
+        function ch_login(e) {
+
+            login_status = $(e).val();
+            console.log(login_status);
+            if (login_status == 'True') {
+                $("[name='password1']").closest(".form-group").show();
+                $("[name='password2']").closest(".form-group").show();
+            }else {
+                $("[name='password1']").closest(".form-group").hide();
+                $("[name='password2']").closest(".form-group").hide();
+                $("#change_passwd").hide()
+
+            }
+        }
+
+
+
+        // bind button
+        $("#submit").on("click", function (e) {
+            BeforeFormSubmit(this);
+            $("#form").submit();
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+
 
 
 {% endblock %}
+
+
+
+
