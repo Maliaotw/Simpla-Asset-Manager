@@ -54,6 +54,12 @@
             {% csrf_token %}
 
 
+            <!-- 錯誤提示-->
+            <div class="alert" style="display: none">
+                <strong></strong>
+            </div>
+
+
             <div class="form-group">
                 <label> 基本信息</label>
             </div>
@@ -125,6 +131,11 @@
                     <button id="change_passwd" type="button" class="btn btn-success" style="margin-left: 20px">更改密碼
                     </button>
                 {% endif %}
+
+                <div style="display: none">
+                    {{ forms_user_obj.pd_status }}
+                </div>
+
             </div>
 
             <div class="row" style="padding-left: 30px">
@@ -215,15 +226,22 @@
     <script>
 
 
-
-
         // 更改密碼按紐
         $("#change_passwd").bind("click", function (e) {
-            $("[name='password1']").closest(".form-group").show();
-            $("[name='password2']").closest(".form-group").show();
+            if ($("#id_pd_status").prop("checked")) {
+                $("#id_pd_status").prop("checked", false);
+                $("[name='password1']").closest(".form-group").hide();
+                $("[name='password2']").closest(".form-group").hide();
+
+            } else {
+                $("#id_pd_status").prop("checked", true);
+                $("[name='password1']").closest(".form-group").show();
+                $("[name='password2']").closest(".form-group").show();
+            }
+
         });
 
- // 提交
+        // 提交
         $("#form").on("submit", function (e) {
 
             var postData = $(this).serializeArray();
@@ -235,14 +253,10 @@
                 data: postData,
                 success: function (callback) {
                     console.log(callback);
-                    $('#Modal').modal({backdrop: 'static', keyboard: false});
+
 
                     if (callback.status == 'ok') {
                         console.log("ok");
-                        $(".alert").show();
-                        $(".alert strong").text(callback.msg);
-                        $(".alert").addClass("alert-success").removeClass("alert-danger");
-
 
                         $.each(callback.success_fields, function (i, val) {
 
@@ -253,17 +267,17 @@
 
                         });
 
-                        $("#Modal").modal('show')
+                        $("#Modal").modal('show');
+                        $('#Modal').modal({backdrop: 'static', keyboard: false});
 
 
                     } else {
                         console.log("error");
-                        $(".modal-title").text(callback.msg);
-                        $(".modal-title").css({'color': 'red'});
-
-
-                        //console.log(callback.errors_fields);
-                        //console.log(callback.success_fields);
+                        $(".alert").show();
+                        $(".alert strong").text(callback.msg);
+                        $(".alert").addClass("alert-danger").removeClass("alert-success");
+                        //$(".modal-title").text(callback.msg);
+                        //$(".modal-title").css({'color': 'red'});
 
                         $.each(callback.errors_fields, function (i, val) {
 
@@ -292,7 +306,6 @@
 
 
         });
-
 
 
     </script>

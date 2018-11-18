@@ -793,32 +793,54 @@ def user_add(request):
     ret = {"status": "", "re_html": "", "msg": ""}
 
     if request.method == 'GET':
-        forms_user_obj = forms.User_Add_Form(request=request)
-        forms_userproinfo_obj = forms.UserProfile_Add_Form(request=request)
+        forms_user_obj = forms.User_Add_Form()
+        forms_userproinfo_obj = forms.UserProfile_Add_Form()
 
     if request.method == 'POST':
 
-        forms_user_obj = forms.User_Add_Form(request.POST, request=request)
-        forms_userproinfo_obj = forms.UserProfile_Add_Form(request.POST, request=request)
+
+
+        forms_user_obj = forms.User_Add_Form(request.POST)
+        forms_userproinfo_obj = forms.UserProfile_Add_Form(request.POST)
 
         fields = set(list(dict(forms_user_obj.fields).keys()) + list(dict(forms_userproinfo_obj.fields).keys()))
         errors = set(list(forms_user_obj.errors.keys()) + list(forms_userproinfo_obj.errors.keys()))
 
         errors_fields = list(fields & errors)
         success_fields = list(fields - errors)
-        print("errors_fields",errors_fields)
-        print("success_fields",success_fields)
+        print("errors_fields", errors_fields)
+        print("success_fields", success_fields)
 
         # 確認表單提交無誤
+
+        print('forms_user_obj.is_valid()', forms_user_obj.is_valid())
+        print('forms_userproinfo_obj.is_valid()', forms_userproinfo_obj.is_valid())
+
         if forms_user_obj.is_valid() and forms_userproinfo_obj.is_valid():
-            pass
+
+            # 創建User
+            user_obj = forms_user_obj.save()
+            data = forms_userproinfo_obj.cleaned_data
+            data['user'] = user_obj
+            models.UserProfile.objects.create(**data)
+
+            print("ok")
+            ret['status'] = 'ok'
+            ret['msg'] = '新增成功'
+            ret['errors_fields'] = errors_fields
+            ret['success_fields'] = success_fields
+
+
 
         else:
             print("error")
-            # print(forms_user_obj.errors)
-            # print(forms_userproinfo_obj.errors)
+            print(forms_user_obj.errors)
+            print(forms_userproinfo_obj.errors)
 
             ret['status'] = 'error'
+            ret['msg'] = '用戶信息輸入不正確!'
+            ret['errors_fields'] = errors_fields
+            ret['success_fields'] = success_fields
 
         return JsonResponse(ret)
 

@@ -233,12 +233,13 @@ class UserProfile_Add_Form(UserProfileForm):
 
         # 驗證number
         number = self.cleaned_data.get('number','')
-
         dent = self.cleaned_data.get("dent",'')
-        user = models.UserProfile.objects.filter(dent=dent).filter(number=number)
-
-        if user:
-            self.add_error('number', "number error")
+        if not dent:
+            self.add_error('dent', "dent error")
+        else:
+            user = models.UserProfile.objects.filter(dent=dent).filter(number=number)
+            if user:
+                self.add_error('number', "number error")
 
 
 
@@ -263,14 +264,17 @@ class UserProfile_Edit_Form(UserProfileForm):
 
             if self.request.user.is_anonymous:
                 if k in user_readonly_fields:
-                    self.fields[k].widget.attrs['disabled'] = 'ture'
+                    self.fields[k].widget.attrs.update({'disabled': 'ture'})
+                    self.fields[k].widget.attrs.update({'readonly': 'ture'})
 
 
             else:
                 if k in admin_readonly_fields:
-                    self.fields[k].widget.attrs['disabled'] = 'ture'
+                    self.fields[k].widget.attrs.update({'disabled': 'ture'})
+                    self.fields[k].widget.attrs.update({'readonly': 'ture'})
 
             self.fields[k].widget.attrs['class'] = 'form-control'
+
 
 
 class UserForm(ModelForm):
@@ -286,8 +290,9 @@ class UserForm(ModelForm):
     )
 
     is_staff_choice = (
-        (True, '是'),
         (False, '否'),
+        (True, '是'),
+
     )
 
     is_staff = forms.ChoiceField(
@@ -315,18 +320,24 @@ class UserForm(ModelForm):
         required=False,
     )
 
-    def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop('request', None)
 
-        super(UserForm, self).__init__(*args, **kwargs)
+    class Meta:
+        model = models.User
+        fields = ('username', 'is_staff',)
+
+
+class User_Add_Form(UserForm):
+
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if User.objects.filter(username__iexact=username).exists():
+            raise forms.ValidationError('Username already exists')
+        return username
 
     def clean(self):
-
-        print('self.cleaned_data',self.cleaned_data)
-
-        is_staff = self.cleaned_data.get("is_staff")
-        print("is_staff",is_staff)
-        if is_staff == 'True':
+        is_staff = eval(self.cleaned_data.get("is_staff", False))
+        if is_staff:
             passwd1 = self.cleaned_data.get('password1') if self.cleaned_data.get('password1') else '1'
             passwd2 = self.cleaned_data.get('password2') if self.cleaned_data.get('password2') else '2'
             if passwd1 != passwd2:
@@ -339,25 +350,21 @@ class UserForm(ModelForm):
         else:
             self.password = "12345678"
 
+
     def save(self, commit=True):
         user_obj = super(UserForm, self).save(commit=False)
         user_obj.set_password(self.password)
         user_obj.save()
-
-
-    class Meta:
-        model = models.User
-        fields = ('username', 'is_staff',)
-
-
-class User_Add_Form(UserForm):
-
-   pass
-
+        return user_obj
 
 
 
 class User_Edit_Form(UserForm):
+
+    pd_status = forms.BooleanField(
+        required=False,
+
+    )
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
@@ -381,9 +388,29 @@ class User_Edit_Form(UserForm):
                     self.fields[k].widget.attrs['disabled'] = 'ture'
 
 
+    def clean(self):
+        print('self.cleaned_data', self.cleaned_data)
+
+        pd_status = self.cleaned_data.get("pd_status",False)
+        print("pd_status", pd_status)
+        if pd_status:
+            passwd1 = self.cleaned_data.get('password1') if self.cleaned_data.get('password1') else '1'
+            passwd2 = self.cleaned_data.get('password2') if self.cleaned_data.get('password2') else '2'
+            if passwd1 != passwd2:
+                # 全局錯誤
+                self.add_error('password1', 'password1 error')
+                self.add_error('password2', 'password2 error')
+                raise forms.ValidationError(("密碼不一致"))
+            else:
+                self.password = self.cleaned_data.get('password1')
+        else:
+            self.password = ""
+
+
     def save(self, commit=True):
         user_obj = super(UserForm, self).save(commit=False)
-        user_obj.set_password(self.password)
+        if self.password:
+            user_obj.set_password(self.password)
         user_obj.save()
 
 

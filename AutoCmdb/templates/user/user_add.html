@@ -220,7 +220,13 @@
                 }
             );
 
+
+
         });
+
+
+
+
 
 
         // 選擇部門後請求該用戶編號
@@ -262,14 +268,14 @@
         $("#form").on("submit", function (e) {
 
             var postData = $(this).serializeArray();
-            console.log(postData);
+            //console.log(postData);
 
             $.ajax({
                 url: "{% url 'user_add' %}",
                 type: "POST",
                 data: postData,
                 success: function (callback) {
-                    console.log(callback);
+                    //console.log(callback);
                     //$('#Modal').modal({backdrop: 'static', keyboard: false});
 
                     if (callback.status == 'ok') {
@@ -289,12 +295,13 @@
 
                     } else {
                         console.log("error");
+                        console.log(callback.msg);
                         $(".modal-title").text(callback.msg);
                         $(".modal-title").css({'color': 'red'});
 
 
-                        //console.log(callback.errors_fields);
-                        //console.log(callback.success_fields);
+                        console.log(callback.errors_fields);
+                        console.log(callback.success_fields);
 
                         $.each(callback.errors_fields, function (i, val) {
 
