@@ -55,8 +55,6 @@ class BasePlugin(object):
         return os
 
 
-
-
     def execute(self):
 
         os = self.chkos()
