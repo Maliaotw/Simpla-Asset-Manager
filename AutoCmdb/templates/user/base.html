@@ -71,9 +71,11 @@
             login_status = $(e).val();
             console.log(login_status);
             if (login_status == 'True') {
+                $("#id_pd_status").prop("checked", true);
                 $("[name='password1']").closest(".form-group").show();
                 $("[name='password2']").closest(".form-group").show();
-            }else {
+            } else {
+                 $("#id_pd_status").prop("checked", false);
                 $("[name='password1']").closest(".form-group").hide();
                 $("[name='password2']").closest(".form-group").hide();
                 $("#change_passwd").hide()
@@ -82,23 +84,11 @@
         }
 
 
-
         // bind button
         $("#submit").on("click", function (e) {
             BeforeFormSubmit(this);
             $("#form").submit();
         });
-
-
-
-
-
-
-
-
-
-
-
 
 
     </script>

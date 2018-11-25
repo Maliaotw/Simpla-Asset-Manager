@@ -171,6 +171,30 @@ class CaryForm(ModelForm):
     類型表單
     '''
 
+    def clean_code(self):
+        code = self.cleaned_data['code']
+        print("code",code)
+
+        cary_obj = models.Category.objects.filter(code=code)
+
+        if code == 'nan' and not cary_obj:
+            return code
+        else:
+            self.add_error('code', "code error")
+
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        print(name)
+
+        cary_obj = models.Category.objects.filter(name=name)
+
+        if name  == 'nan'  and not cary_obj:
+            return name
+        else:
+            self.add_error('name', "name error")
+
+
     class Meta:
         model = models.Category
         fields = '__all__'

@@ -25,6 +25,19 @@
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+
+    .modal-dialog {
+
+            width: 600px;
+            left: 50%;
+            top: 50%;
+            margin-top: -134.5px;
+            margin-left: -250px;
+
+        }
+
+
+
     </style>
 
 
@@ -257,6 +270,7 @@
 
                         });
 
+                        $('#Modal').modal({backdrop: 'static', keyboard: false});
                         $("#Modal").modal('show')
 
 

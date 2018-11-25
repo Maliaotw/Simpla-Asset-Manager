@@ -6,10 +6,20 @@ from asset import forms
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.models import User
 import pandas as pd
-import csv
 import re
 import datetime
 import csv
+from django.http import StreamingHttpResponse
+
+
+def file_iterator(file_name, chunk_size=512):
+    f = open(file_name, encoding="utf8")
+    while True:
+        c = f.read(chunk_size)
+        if c:
+            yield c
+        else:
+            break
 
 
 # --- 資產 ---
@@ -364,6 +374,7 @@ def department(request):
     if request.method == 'POST':
 
         form_obj = forms.DentForm(data=request.POST)
+        print(request.POST)
 
         if form_obj.is_valid():
 
@@ -479,12 +490,8 @@ def department_input(request):
 
 def department_output(request):
     opts = models.Department.objects.all().model._meta
-    response = HttpResponse(content_type='text/csv; charset=cp936')
 
-    # force download.
-    response['Content-Disposition'] = 'attachment;filename=department.csv'
-    # the csv writer
-    writer = csv.writer(response)
+    file_name = "%E9%83%A8%E9%96%80.xlsx"
 
     # ['ID', '部門名稱', '部門簡稱', '部門工/代號', '部門工/代號碼長度', '部門負責人']
     row_names = [field.verbose_name for field in opts.fields]
@@ -494,10 +501,16 @@ def department_output(request):
     field_names = [field.name for field in opts.fields]
     # print(field_names)
 
-    # Write a first row with header information
-    writer.writerow(row_names)
+    data = [{field.verbose_name: getattr(obj, field.name) for field in opts.fields} for obj in
+            models.Department.objects.all()]
+    # print(data)
+    df = pd.DataFrame(data)
+    df.to_excel(file_name)
 
-    ret = [writer.writerow([getattr(obj, field) for field in field_names]) for obj in models.Department.objects.all()]
+    file = open(file_name, 'rb')
+    response = StreamingHttpResponse(file)
+    response['Content-Type'] = 'application/vnd.ms-excel;charset=utf-8'
+    response['Content-Disposition'] = 'attachment;filename="%s"' % file_name
 
     return response
 
@@ -606,27 +619,36 @@ def category_input(request):
         # 分析
         data_ret = []
 
-        f = open(file.name, 'r')
-        print(csv.DictReader(f).line_num)
-        rows = csv.DictReader(f)
+        # f = open(file.name, 'r')
+        print("file.name")
+        df = pd.read_excel(file.name)
+        print(df)
+        # print(df.head())
+
+        verbose_names = ['名稱', '代號']
+        field_names = ['name', 'code']
+
+        # 要更改的 column name
+        col_name = {v: f for f, v in zip(field_names, verbose_names)}
+
+        df = df.rename(columns=col_name)
+
+        print(df.head())
+        rows = df.to_dict("record")
+
         for row in rows:
-            verbose_name = ['名稱', '代號']
-            field_name = ['name', 'code']
 
-            keys = {k: name for k, name in zip(field_name, verbose_name)}
-            data = {k: row[name] for k, name in zip(field_name, verbose_name)}
-
-            forms_obj = forms.CaryForm(data=data)
+            forms_obj = forms.CaryForm(data=row)
 
             if forms_obj.is_valid():
                 data_ret.append(forms_obj)
 
             else:
                 print(forms_obj.errors)
-                for e in forms_obj.errors:
-                    print(e, data[e], keys[e])
+                for e in forms_obj.errors: #
+                    print(e, row[e])
                     ret['status'] = 'error'
-                    ret['msg'] = '%s"%s"錯誤' % (keys[e], data[e])
+                    ret['msg'] = '%s"錯誤' % (row[e])
                     data_ret = []
                     break
 
@@ -647,25 +669,26 @@ def category_input(request):
 
 def category_output(request):
     opts = models.Category.objects.all().model._meta
-    response = HttpResponse(content_type='text/csv; charset=cp936')
+    print(request)
 
-    # force download.
-    response['Content-Disposition'] = 'attachment;filename=Catagory.csv'
-    # the csv writer
-    writer = csv.writer(response)
+    file_name = "%E9%A1%9E%E5%9E%8B.xlsx"
 
     # ['ID', '名稱', '代號']
     row_names = [field.verbose_name for field in opts.fields]
-    print(row_names)
 
     # ['id', 'name', 'code']
     field_names = [field.name for field in opts.fields]
-    print(field_names)
 
-    # Write a first row with header information
-    writer.writerow(row_names)
+    data = [{field.verbose_name: getattr(obj, field.name) for field in opts.fields} for obj in
+            models.Category.objects.all()]
+    print(data)
+    df = pd.DataFrame(data)
+    df.to_excel(file_name)
 
-    ret = [writer.writerow([getattr(obj, field) for field in field_names]) for obj in models.Category.objects.all()]
+    file = open(file_name, 'rb')
+    response = StreamingHttpResponse(file)
+    response['Content-Type'] = 'application/vnd.ms-excel;charset=utf-8'
+    response['Content-Disposition'] = 'attachment;filename="%s"' % file_name
 
     return response
 
@@ -797,8 +820,6 @@ def user_add(request):
         forms_userproinfo_obj = forms.UserProfile_Add_Form()
 
     if request.method == 'POST':
-
-
 
         forms_user_obj = forms.User_Add_Form(request.POST)
         forms_userproinfo_obj = forms.UserProfile_Add_Form(request.POST)
