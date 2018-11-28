@@ -161,9 +161,52 @@ class DentForm(ModelForm):
     部門表單
     '''
 
+    def clean_name(self):
+        name = self.cleaned_data['name']
+
+        dent_obj = models.Department.objects.filter(name=name)
+        if dent_obj:
+            self.add_error('name', 'add error')
+        else:
+            return name
+
+    def clean_user(self):
+        user = self.cleaned_data['user']
+        # print(user)
+        user_obj = models.UserProfile.objects.get(code=user)
+        # print(user_obj)
+        if user_obj:
+            return user_obj
+        else:
+            self.add_error('user', 'user error')
+
+    def clean(self):
+        '''
+        全局驗證
+        :return:
+        '''
+        block_number = self.cleaned_data.get('block_number', '')
+        block_number_len = self.cleaned_data.get("block_number_len", '')
+        if len(block_number) < block_number_len:
+            self.add_error('block_number','block_number error')
+            self.add_error('block_number_len','block_number_len error')
+
+
     class Meta:
         model = models.Department
         fields = '__all__'
+
+
+class Dent_Input_Form(DentForm):
+    '''
+    部門匯入用表單
+    '''
+
+    user = forms.CharField(
+        widget=forms.TextInput()
+    )
+
+    # <class 'list'>: ['id', 'name', 'code', 'block_number', 'block_number_len', 'user']
 
 
 class CaryForm(ModelForm):
@@ -173,27 +216,25 @@ class CaryForm(ModelForm):
 
     def clean_code(self):
         code = self.cleaned_data['code']
-        print("code",code)
+        # print("code", code)
 
         cary_obj = models.Category.objects.filter(code=code)
 
-        if code == 'nan' and not cary_obj:
+        if code != 'nan' and not cary_obj:
             return code
         else:
             self.add_error('code', "code error")
 
-
     def clean_name(self):
         name = self.cleaned_data['name']
-        print(name)
+        # print(name)
 
         cary_obj = models.Category.objects.filter(name=name)
 
-        if name  == 'nan'  and not cary_obj:
+        if name != 'nan' and not cary_obj:
             return name
         else:
             self.add_error('name', "name error")
-
 
     class Meta:
         model = models.Category
@@ -225,9 +266,6 @@ class UserProfileForm(ModelForm):
 
 
 class UserProfile_Add_Form(UserProfileForm):
-
-
-
     dent = forms.ModelChoiceField(
         label="部門",
         queryset=models.Department.objects.all(),
@@ -256,19 +294,14 @@ class UserProfile_Add_Form(UserProfileForm):
         '''
 
         # 驗證number
-        number = self.cleaned_data.get('number','')
-        dent = self.cleaned_data.get("dent",'')
+        number = self.cleaned_data.get('number', '')
+        dent = self.cleaned_data.get("dent", '')
         if not dent:
             self.add_error('dent', "dent error")
         else:
             user = models.UserProfile.objects.filter(dent=dent).filter(number=number)
             if user:
                 self.add_error('number', "number error")
-
-
-
-
-
 
 
 class UserProfile_Edit_Form(UserProfileForm):
@@ -298,7 +331,6 @@ class UserProfile_Edit_Form(UserProfileForm):
                     self.fields[k].widget.attrs.update({'readonly': 'ture'})
 
             self.fields[k].widget.attrs['class'] = 'form-control'
-
 
 
 class UserForm(ModelForm):
@@ -344,14 +376,12 @@ class UserForm(ModelForm):
         required=False,
     )
 
-
     class Meta:
         model = models.User
         fields = ('username', 'is_staff',)
 
 
 class User_Add_Form(UserForm):
-
 
     def clean_username(self):
         username = self.cleaned_data.get('username')
@@ -374,7 +404,6 @@ class User_Add_Form(UserForm):
         else:
             self.password = "12345678"
 
-
     def save(self, commit=True):
         user_obj = super(UserForm, self).save(commit=False)
         user_obj.set_password(self.password)
@@ -382,9 +411,7 @@ class User_Add_Form(UserForm):
         return user_obj
 
 
-
 class User_Edit_Form(UserForm):
-
     pd_status = forms.BooleanField(
         required=False,
 
@@ -411,11 +438,10 @@ class User_Edit_Form(UserForm):
                 if k in admin_readonly_fields:
                     self.fields[k].widget.attrs['disabled'] = 'ture'
 
-
     def clean(self):
         print('self.cleaned_data', self.cleaned_data)
 
-        pd_status = self.cleaned_data.get("pd_status",False)
+        pd_status = self.cleaned_data.get("pd_status", False)
         print("pd_status", pd_status)
         if pd_status:
             passwd1 = self.cleaned_data.get('password1') if self.cleaned_data.get('password1') else '1'
@@ -429,7 +455,6 @@ class User_Edit_Form(UserForm):
                 self.password = self.cleaned_data.get('password1')
         else:
             self.password = ""
-
 
     def save(self, commit=True):
         user_obj = super(UserForm, self).save(commit=False)

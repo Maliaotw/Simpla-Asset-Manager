@@ -435,6 +435,8 @@ def department_input(request):
 
     if request.method == 'POST':
         # 存取檔案
+        opts = models.Department.objects.all().model._meta
+
         print(request)
         file = request.FILES['file']
         with open(file.name, 'wb+') as destination:
@@ -444,47 +446,60 @@ def department_input(request):
         # 分析
         data_ret = []
 
-        f = open(file.name, 'r')
-        print(csv.DictReader(f).line_num)
-        rows = csv.DictReader(f)
+        df = pd.read_excel(file.name)
+        print(df.head())
+
+        def foo(x):
+            print(x)
+            if len(str(x)) < 3:
+                return "%03d" % x
+            else:
+                return x
+
+        df['部門負責人'] = df['部門負責人'].map(foo)
+
+
+        # <class 'list'>: ['部門名稱', '部門簡稱', '部門工/代號', '部門工/代號碼長度', '部門負責人']
+        verbose_names = [field.verbose_name for field in opts.fields]
+        verbose_names.remove('ID')
+
+        # <class 'list'>: ['id', 'name', 'code', 'block_number', 'block_number_len', 'user']
+        field_names = [field.name for field in opts.fields]
+        field_names.remove('id')
+
+        # 要更改的 column name
+        col_name = {v: f for f, v in zip(field_names, verbose_names)}
+        col_cn_name = {f: v for f, v in zip(field_names, verbose_names)}
+
+        df = df.rename(columns=col_name)
+        # print(df.head())
+        rows = df.to_dict("record")
+
         for row in rows:
-            verbose_name = ['部門名稱', '部門簡稱', '部門工/代號', '部門工/代號碼長度', '部門負責人']
-            field_name = ['name', 'code', 'block_number', 'block_number_len', 'user']
-
-            keys = {k: name for k, name in zip(field_name, verbose_name)}
-            data = {k: row[name] for k, name in zip(field_name, verbose_name)}
-
-            # 找到負責人 對象
-            if data['user']:
-                manager_name, manager_code = data['user'].replace(")", "").split("(")
-                data['user'] = models.UserProfile.objects.filter(name=manager_name)
-
-            forms_obj = forms.DentForm(data=data)
+            forms_obj = forms.Dent_Input_Form(data=row)
 
             if forms_obj.is_valid():
                 data_ret.append(forms_obj)
-
             else:
                 print(forms_obj.errors)
-                for e in forms_obj.errors:
-                    print(e, data[e], keys[e])
+                for e in forms_obj.errors:  #
+                    print(e, row[e])
                     ret['status'] = 'error'
-                    ret['msg'] = '%s"%s"錯誤' % (keys[e], data[e])
+                    ret['msg'] = '%s "%s"錯誤' % (col_cn_name[e], row[e])
                     data_ret = []
                     break
 
-            # 匯入
+        # 匯入
         if ret['status'] == 'error':
             pass
         else:
             print("data_ret", data_ret)
             for form in data_ret:
-                # print(form)
                 form.save()
             ret['status'] = 'ok'
             ret['msg'] = '匯入成功'
 
-            # 必須傳回JSON
+        # 必須傳回JSON
         return JsonResponse(ret)
 
 
@@ -619,36 +634,30 @@ def category_input(request):
         # 分析
         data_ret = []
 
-        # f = open(file.name, 'r')
-        print("file.name")
         df = pd.read_excel(file.name)
-        print(df)
-        # print(df.head())
 
         verbose_names = ['名稱', '代號']
         field_names = ['name', 'code']
 
         # 要更改的 column name
         col_name = {v: f for f, v in zip(field_names, verbose_names)}
+        col_cn_name = {f:v for f, v in zip(field_names, verbose_names)}
 
         df = df.rename(columns=col_name)
-
         print(df.head())
         rows = df.to_dict("record")
 
         for row in rows:
-
             forms_obj = forms.CaryForm(data=row)
 
             if forms_obj.is_valid():
                 data_ret.append(forms_obj)
-
             else:
-                print(forms_obj.errors)
+                # print(forms_obj.errors)
                 for e in forms_obj.errors: #
                     print(e, row[e])
                     ret['status'] = 'error'
-                    ret['msg'] = '%s"錯誤' % (row[e])
+                    ret['msg'] = '%s "%s"錯誤' % (col_cn_name[e],row[e])
                     data_ret = []
                     break
 
@@ -658,7 +667,6 @@ def category_input(request):
         else:
             print("data_ret", data_ret)
             for form in data_ret:
-                # print(form)
                 form.save()
             ret['status'] = 'ok'
             ret['msg'] = '匯入成功'
@@ -681,6 +689,7 @@ def category_output(request):
 
     data = [{field.verbose_name: getattr(obj, field.name) for field in opts.fields} for obj in
             models.Category.objects.all()]
+
     print(data)
     df = pd.DataFrame(data)
     df.to_excel(file_name)
