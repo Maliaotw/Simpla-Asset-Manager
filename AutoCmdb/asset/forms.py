@@ -170,15 +170,6 @@ class DentForm(ModelForm):
         else:
             return name
 
-    def clean_user(self):
-        user = self.cleaned_data['user']
-        # print(user)
-        user_obj = models.UserProfile.objects.get(code=user)
-        # print(user_obj)
-        if user_obj:
-            return user_obj
-        else:
-            self.add_error('user', 'user error')
 
     def clean(self):
         '''
@@ -186,8 +177,10 @@ class DentForm(ModelForm):
         :return:
         '''
         block_number = self.cleaned_data.get('block_number', '')
-        block_number_len = self.cleaned_data.get("block_number_len", '')
-        if len(block_number) < block_number_len:
+        block_number_len = self.cleaned_data.get("block_number_len", 0)
+        print("block_number",block_number)
+        print("block_number_len",block_number_len)
+        if len(str(block_number)) > block_number_len:
             self.add_error('block_number','block_number error')
             self.add_error('block_number_len','block_number_len error')
 
@@ -205,6 +198,16 @@ class Dent_Input_Form(DentForm):
     user = forms.CharField(
         widget=forms.TextInput()
     )
+
+    def clean_user(self):
+        user = self.cleaned_data['user']
+        # print(user)
+        user_obj = models.UserProfile.objects.get(code=user)
+        # print(user_obj)
+        if user_obj:
+            return user_obj
+        else:
+            self.add_error('user', 'user error')
 
     # <class 'list'>: ['id', 'name', 'code', 'block_number', 'block_number_len', 'user']
 

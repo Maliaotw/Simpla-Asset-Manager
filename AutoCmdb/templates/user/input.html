@@ -22,8 +22,18 @@
     <script src="/static/js/bootstrap-fileinput_zh-TW.js"></script>
 
 
+
     <style>
 
+        .modal-dialog {
+
+            width: 600px;
+            left: 50%;
+            top: 50%;
+            margin-top: -134.5px;
+            margin-left: -250px;
+
+        }
     </style>
 
 
@@ -97,7 +107,7 @@
 
         $("#input-b2").fileinput({
             language: "zh-TW",
-            allowedFileExtensions: ["csv"],
+            allowedFileExtensions: ["xlsx"],
             mainClass: "input-group-lg", //文件输入框为大型号
             uploadUrl: "{% url 'user_input' %}", //上传图片的服务器地址
             uploadExtraData: {
@@ -110,7 +120,7 @@
         // 上傳成功
         $("#input-b2").on('fileuploaded', function (event, data, previewId, index) {
             console.log("asset_input fileuploaded");
-
+            $('#Modal').modal({backdrop: 'static', keyboard: false});
             if (data.response.status == 'ok') {
                 console.log("response ok");
 
@@ -122,8 +132,8 @@
                 console.log("response error");
                 $("#Modal").modal("show");
                 $(".modal-title").text("匯入失敗");
-                $(".modal-title").css({'color':'red'});
-                $(".modal-body").html("你可以再次上傳或返回列表<br><i class='fa fa-exclamation-triangle'></i>錯誤訊息 : <b>"+ data.response.msg + "</b>");
+                $(".modal-title").css({'color': 'red'});
+                $(".modal-body").html("你可以再次上傳或返回列表<br><i class='fa fa-exclamation-triangle'></i>錯誤訊息 : <b>" + data.response.msg + "</b>");
             }
         });
 

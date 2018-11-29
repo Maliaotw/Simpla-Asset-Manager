@@ -22,7 +22,7 @@
     <script src="/static/js/bootstrap-fileinput_zh-TW.js"></script>
 
 
-     <style>
+    <style>
 
         .modal-dialog {
 
@@ -106,7 +106,7 @@
 
         $("#input-b2").fileinput({
             language: "zh-TW",
-            allowedFileExtensions: ["csv"],
+            allowedFileExtensions: ["xlsx"],
             mainClass: "input-group-lg", //文件输入框为大型号
             uploadUrl: "{% url 'asset_input' %}", //上传图片的服务器地址
             uploadExtraData: {
@@ -120,7 +120,7 @@
         $("#input-b2").on('fileuploaded', function (event, data, previewId, index) {
             console.log("asset_input fileuploaded");
             console.log(data);
-
+            $('#Modal').modal({backdrop: 'static', keyboard: false});
             if (data.response.status == 'ok') {
                 console.log("response ok");
 
@@ -132,8 +132,8 @@
 
                 $("#Modal").modal("show");
                 $(".modal-title").text("匯入失敗");
-                $(".modal-title").css({'color':'red'});
-                $(".modal-body").html("你可以再次上傳或返回列表<br><i class='fa fa-exclamation-triangle'></i>錯誤訊息 : <b>"+ data.response.msg + "</b>");
+                $(".modal-title").css({'color': 'red'});
+                $(".modal-body").html("你可以再次上傳或返回列表<br><i class='fa fa-exclamation-triangle'></i>錯誤訊息 : <b>" + data.response.msg + "</b>");
             }
 
         });
