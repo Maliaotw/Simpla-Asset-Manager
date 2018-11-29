@@ -147,13 +147,11 @@
 
                         <div class="form-group">
                             <label class="col-form-label">資產負責人</label>
-                            <select id='user_add' name="manager" class="form-control">
+                            <select id='user_add' name="user" class="form-control">
                                 <option value="">-------</option>
 
                                 {% for user in user_obj %}
-
-                                    <option value="{{ user.id }}">{{ user.name }}({{ user.dent.block_number }}{{ user.code }})</option>
-
+                                    <option value="{{ user.id }}">{{ user.code }}({{ user.name }})</option>
                                 {% endfor %}
                             </select>
                         </div>

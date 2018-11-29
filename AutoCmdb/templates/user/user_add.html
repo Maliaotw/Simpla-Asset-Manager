@@ -28,6 +28,15 @@
             border-radius: 4px;
         }
 
+        .modal-dialog {
+
+            width: 600px;
+            left: 50%;
+            top: 50%;
+            margin-top: -134.5px;
+            margin-left: -250px;
+
+        }
 
     </style>
 
@@ -50,6 +59,11 @@
     <div class="panel panel-default" style="padding: 20px">
         <form class="form" id="form">
             {% csrf_token %}
+
+            <!-- 錯誤提示-->
+            <div class="alert" style="display: none">
+                <strong></strong>
+            </div>
 
 
             <div class="form-group">
@@ -221,12 +235,7 @@
             );
 
 
-
         });
-
-
-
-
 
 
         // 選擇部門後請求該用戶編號
@@ -246,8 +255,7 @@
                         $("#form [name='code']").val(code);
                         $("#form [name='code']").removeAttr("disabled");
                         $("#id_number").val(code.slice(code.length - 2));
-                    }
-                    else {
+                    } else {
                         console.log("請求錯誤");
                         $("#form [name='code']").val("");
                         $("#form [name='code']").attr("disabled", "disabled");
@@ -276,10 +284,15 @@
                 data: postData,
                 success: function (callback) {
                     //console.log(callback);
-                    //$('#Modal').modal({backdrop: 'static', keyboard: false});
+
 
                     if (callback.status == 'ok') {
+                        $('#Modal').modal({backdrop: 'static', keyboard: false});
                         console.log("ok");
+                        $(".modal-title").text(callback.msg);
+                        $(".alert").show();
+                        $(".alert strong").text(callback.msg);
+                        $(".alert").addClass("alert-success").removeClass("alert-danger");
 
                         $.each(callback.success_fields, function (i, val) {
 
@@ -290,14 +303,15 @@
 
                         });
 
-                        //$("#Modal").modal('show')
+                        $("#Modal").modal('show')
 
 
                     } else {
                         console.log("error");
                         console.log(callback.msg);
-                        $(".modal-title").text(callback.msg);
-                        $(".modal-title").css({'color': 'red'});
+                        $(".alert").show();
+                        $(".alert").addClass("alert-danger");
+                        $(".alert strong").text(callback.msg);
 
 
                         console.log(callback.errors_fields);

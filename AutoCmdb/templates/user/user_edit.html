@@ -29,6 +29,16 @@
         }
 
 
+    .modal-dialog {
+
+            width: 600px;
+            left: 50%;
+            top: 50%;
+            margin-top: -134.5px;
+            margin-left: -250px;
+
+        }
+
     </style>
 
 
@@ -267,8 +277,9 @@
 
                         });
 
-                        $("#Modal").modal('show');
                         $('#Modal').modal({backdrop: 'static', keyboard: false});
+                        $("#Modal").modal('show');
+                        $(".modal-title").text(callback.msg);
 
 
                     } else {
@@ -276,8 +287,8 @@
                         $(".alert").show();
                         $(".alert strong").text(callback.msg);
                         $(".alert").addClass("alert-danger").removeClass("alert-success");
-                        //$(".modal-title").text(callback.msg);
-                        //$(".modal-title").css({'color': 'red'});
+                        $(".modal-title").text(callback.msg);
+                        $(".modal-title").css({'color': 'red'});
 
                         $.each(callback.errors_fields, function (i, val) {
 
