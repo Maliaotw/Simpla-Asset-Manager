@@ -159,17 +159,36 @@ class Asset_Edit_Form(AssetForm):
 class DentForm(ModelForm):
     '''
     部門表單
+    # <class 'list'>: ['id', 'name', 'code', 'block_number', 'block_number_len', 'user']
     '''
 
     def clean_name(self):
-        name = self.cleaned_data['name']
+        '''
+        驗證部門名稱
+        :return:
+        '''
+        name = self.cleaned_data.get('name','')
+        # print('name',name)
 
         dent_obj = models.Department.objects.filter(name=name)
         if dent_obj:
-            self.add_error('name', 'add error')
+            self.add_error('name', 'name error')
         else:
             return name
 
+    def clean_code(self):
+        '''
+        驗證部門簡稱
+        :return:
+        '''
+        code = self.cleaned_data.get('code','')
+        # print('name',name)
+
+        dent_obj = models.Department.objects.filter(code=code)
+        if dent_obj:
+            self.add_error('code', 'code error')
+        else:
+            return code
 
     def clean(self):
         '''
@@ -196,20 +215,25 @@ class Dent_Input_Form(DentForm):
     '''
 
     user = forms.CharField(
-        widget=forms.TextInput()
+        widget=forms.TextInput(),
+        required=False
     )
 
     def clean_user(self):
-        user = self.cleaned_data['user']
-        # print(user)
-        user_obj = models.UserProfile.objects.get(code=user)
-        # print(user_obj)
-        if user_obj:
-            return user_obj
-        else:
-            self.add_error('user', 'user error')
 
-    # <class 'list'>: ['id', 'name', 'code', 'block_number', 'block_number_len', 'user']
+        user = self.cleaned_data.get('user','')
+        print('user',user)
+        if user:
+            user_obj = models.UserProfile.objects.get(code=user)
+            # print(user_obj)
+            if user_obj:
+                return user_obj
+            else:
+                self.add_error('user', 'user error')
+        else:
+            return None
+
+
 
 
 class CaryForm(ModelForm):
@@ -247,6 +271,7 @@ class CaryForm(ModelForm):
 class UserProfileForm(ModelForm):
     '''
     UserProfile表單
+    ['id', 'user', 'name', 'code', 'number', 'sex', 'dent', 'in_service', 'birthday']
     '''
 
     name = forms.CharField(
@@ -307,6 +332,96 @@ class UserProfile_Add_Form(UserProfileForm):
                 self.add_error('number', "number error")
 
 
+class UserProfile_Input_Form(ModelForm):
+    '''
+    用戶匯入用表單
+    '''
+
+    dent = forms.CharField(
+        widget=forms.TextInput(),
+        required=True
+    )
+
+    user = forms.CharField(
+        widget=forms.TextInput(),
+        required=True
+    )
+
+    number = None
+
+
+    def clean_user(self):
+
+        user = self.cleaned_data.get('user','')
+        print('user',user)
+        if user:
+            user_obj = User.objects.filter(username=user).first()
+            userpro_obj = models.UserProfile.objects.filter(user=user_obj)
+            if userpro_obj:
+                self.add_error('user','用戶已存在')
+            elif user_obj:
+                pass
+            else:
+                # 創建用戶
+                user_obj = User.objects.create(username=user)
+            return user_obj
+
+
+    def clean_dent(self):
+        dent = self.cleaned_data.get('dent','')
+        # print('dent',dent)
+        if dent:
+            dent_obj = models.Department.objects.filter(code=dent)
+            # print(dent_obj)
+            if dent_obj:
+                return dent_obj.first()
+            else:
+                self.add_error('dent', 'dent error')
+        else:
+            self.add_error('dent', 'dent error')
+            raise forms.ValidationError(("部門不能為空"))
+
+    def clean_code(self):
+        code = self.cleaned_data['code']
+        print('code',code)
+        if code:
+            user_obj = models.UserProfile.objects.filter(code=code)
+            if user_obj:
+                self.add_error('code','error code')
+            elif len(code) > 1:
+                # print('code[1:]',code[1:])
+                self.number = code[1:]
+
+        else:
+            # self.number = None
+            self.add_error('code', 'error code')
+            self.add_error('number', 'error number')
+
+        return code
+
+
+
+
+    def clean(self):
+        self.cleaned_data['number'] = self.number
+        print(self.cleaned_data)
+
+        code = self.cleaned_data['code']
+        dent = self.cleaned_data['dent']
+        if code and dent:
+            if code[:len(dent.block_number)] != dent.block_number:
+                self.add_error('code','工號與部門不一致')
+                self.add_error('dent','工號與部門不一致')
+
+
+
+
+    class Meta:
+        model = models.UserProfile
+        fields = "__all__"
+
+
+
 class UserProfile_Edit_Form(UserProfileForm):
 
     def __init__(self, *args, **kwargs):
@@ -334,6 +449,10 @@ class UserProfile_Edit_Form(UserProfileForm):
                     self.fields[k].widget.attrs.update({'readonly': 'ture'})
 
             self.fields[k].widget.attrs['class'] = 'form-control'
+
+
+
+
 
 
 class UserForm(ModelForm):

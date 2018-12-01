@@ -31,7 +31,7 @@ class UserProfile(models.Model):
 
 
     in_service = models.CharField(verbose_name='在職狀態',choices=in_service_choice,max_length=16)
-    birthday = models.DateTimeField(null=True, blank=True, verbose_name='生日日期')
+    birthday = models.DateField(null=True, blank=True, verbose_name='生日日期')
 
 
     class Meta:
@@ -97,7 +97,7 @@ class Asset(models.Model):
     category = models.ForeignKey("category", verbose_name='類型')
     department = models.ForeignKey('Department', verbose_name='部門', null=True, blank=True)
     manager = models.ForeignKey("UserProfile", verbose_name='負責人', null=True, blank=True)
-    purchase_date = models.DateTimeField(verbose_name='購買日期', null=True, blank=True)
+    purchase_date = models.DateField(verbose_name='購買日期', null=True, blank=True)
 
     status_choice = (
         ('未使用', '未使用'),

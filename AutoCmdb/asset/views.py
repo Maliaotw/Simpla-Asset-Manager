@@ -6,11 +6,10 @@ from asset import forms
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.models import User
 import pandas as pd
-import re
 import datetime
 import csv
 from django.http import StreamingHttpResponse
-
+import numpy as np
 
 def file_iterator(file_name, chunk_size=512):
     f = open(file_name, encoding="utf8")
@@ -239,6 +238,7 @@ def asset_input(request):
         return render(request, "asset/input.html", locals())
 
     if request.method == 'POST':
+        opts = models.Asset.objects.all().model._meta
 
         # 存取檔案
         print(request)
@@ -250,103 +250,78 @@ def asset_input(request):
         # 分析
         data_ret = []
 
-        f = open(file.name, 'r')
-        print(csv.DictReader(f).line_num)
-        rows = csv.DictReader(f)
-        for row in rows:
+        # 讀取excel
+        df = pd.read_excel(file.name)
 
-            verbose_name = ['資產編號', '價格', '類型', '部門', '負責人', '購買日期', '狀態']
-            field_name = ['sn', 'price', 'category', 'department', 'manager', 'purchase_date', 'status']
+        # <class 'list'>:['ID', '資產編號', '資產號碼', '價格', '類型', '部門', '負責人', '購買日期', '狀態', '更新日期', '創建日期']
+        verbose_names = [field.verbose_name for field in opts.fields]
+        print(verbose_names)
+        verbose_names.remove('ID')
 
-            keys = {k: name for k, name in zip(field_name, verbose_name)}
-            data = {k: row[name] for k, name in zip(field_name, verbose_name)}
+        # <class 'list'>: ['id', 'name', 'number', 'price', 'category', 'department', 'manager', 'purchase_date', 'status', 'latest_date', 'create_date']
+        field_names = [field.name for field in opts.fields]
+        print(field_names)
+        field_names.remove('id')
 
-            # PC-066
-            cate_code1, data['sn'] = data['sn'].split("-")
-
-            # 找到類型對象
-            cate_name, cate_code2 = data['category'].replace(")", "").split("(")
-            if cate_code1 == cate_code2:
-                data['category'] = models.Category.objects.filter(code=cate_code1)
-
-            # 找到部門對象
-            if data['department']:
-                dent_name, dent_code = data['department'].replace(")", "").split("(")
-                data['department'] = models.Department.objects.filter(code=dent_code)
-
-            # 找到負責人 對象
-            if data['manager']:
-                manager_name, manager_code = data['manager'].replace(")", "").split("(")
-                data['manager'] = models.UserProfile.objects.filter(name=manager_name)
-
-            # 購買日期
-            data['purchase_date'] = datetime.datetime.strptime(data['purchase_date'], '%Y/%m/%d')
-
-            forms_obj = forms.Asset_Add_Form(data=data, request=request)
-
-            if forms_obj.is_valid():
-                data_ret.append(forms_obj)
-
+        def foo(x):
+            print('x', x)
+            if not x:
+                return x
+            elif len(str(int(x))) < 3:
+                return "%03d" % x
             else:
-                print(forms_obj.errors)
-                for e in forms_obj.errors:
-                    print(e, data[e], keys[e])
-                    ret['status'] = 'error'
-                    ret['msg'] = '%s"%s"錯誤' % (keys[e], data[e])
-                    data_ret = []
-                    break
+                return str(int(x))
 
-        # 匯入
-        if ret['status'] == 'error':
-            pass
-        else:
-            print("data_ret", data_ret)
-            for form in data_ret:
-                # print(form)
-                form.save()
-            ret['status'] = 'ok'
-            ret['msg'] = '匯入成功'
+        # 更改 column name
+        col_name = {v: f for f, v in zip(field_names, verbose_names)}
+        col_cn_name = {f: v for f, v in zip(field_names, verbose_names)}
+        df = df.rename(columns=col_name)
+        print(df.head())
 
-        # 必須傳回JSON
-        return JsonResponse(ret)
+
+
+
+        rows = df.to_dict("record")
+
+
+
+
+
 
 
 def asset_output(request):
     opts = models.Asset.objects.all().model._meta
-    response = HttpResponse(content_type='text/csv; charset=cp936')
 
-    # force download.
-    response['Content-Disposition'] = 'attachment;filename=asset.csv'
-    # the csv writer
-    writer = csv.writer(response)
+    file_name = "%E8%B3%87%E7%94%A2.xlsx"
 
-    # ['ID', '資產編號', '價格', '類型', '部門', '負責人', '購買日期', '狀態', '更新日期', '創建日期']
+    # ['ID', '資產編號', '資產號碼', '價格', '類型', '部門', '負責人', '購買日期', '狀態', '更新日期', '創建日期']
     row_names = [field.verbose_name for field in opts.fields]
     print(row_names)
 
-    # ['id', 'sn', 'price', 'category', 'department', 'manager', 'purchase_date', 'status', 'latest_date', 'create_date']
-    field_names = [field.name for field in opts.fields]
-    print(field_names)
+    # ['id', 'name', 'number', 'price', 'category', 'department', 'manager', 'purchase_date', 'status', 'latest_date', 'create_date']
+    fields = [field.name for field in opts.fields]
+    print(fields)
 
-    # Write a first row with header information
-    writer.writerow(row_names)
-    # Write data rows
-    for obj in models.Asset.objects.all():
-        ret = []
-        ret.append(obj.id)
-        sn = "%s-%s" % (obj.category.code, obj.sn)
-        ret.append(sn)
-        ret.append(obj.price)
-        ret.append(obj.category)
-        ret.append(obj.department)
-        ret.append(obj.manager)
-        ret.append(obj.purchase_date.strftime("%Y/%m/%d") if obj.purchase_date else "")
-        ret.append(obj.get_status_display())
-        ret.append(obj.latest_date.strftime("%Y/%m/%d") if obj.latest_date else "")
-        ret.append(obj.create_date.strftime("%Y/%m/%d") if obj.create_date else "")
-        writer.writerow(ret)
+    data = [{field.verbose_name: getattr(obj, field.name) for field in opts.fields} for obj in
+            models.Asset.objects.all()]
+
+    df = pd.DataFrame(data)
+
+    # 刪除欄位
+    df = df.drop('ID', axis=1)
+    df = df.drop('更新日期', axis=1)
+    df = df.drop('創建日期', axis=1)
+    df = df.drop('資產號碼', axis=1)
+
+    df.to_excel(file_name)
+
+    file = open(file_name, 'rb')
+    response = StreamingHttpResponse(file)
+    response['Content-Type'] = 'application/vnd.ms-excel;charset=utf-8'
+    response['Content-Disposition'] = 'attachment;filename="%s"' % file_name
 
     return response
+
 
 
 # --- 部門 ---
@@ -447,16 +422,16 @@ def department_input(request):
         data_ret = []
 
         df = pd.read_excel(file.name)
-        print(df.head())
+
 
         def foo(x):
-            print(x)
-            if len(str(x)) < 3:
+            print('x',x)
+            if not x:
+                return x
+            elif len(str(int(x))) < 3:
                 return "%03d" % x
             else:
-                return x
-
-        df['部門負責人'] = df['部門負責人'].map(foo)
+                return str(int(x))
 
 
         # <class 'list'>: ['部門名稱', '部門簡稱', '部門工/代號', '部門工/代號碼長度', '部門負責人']
@@ -470,8 +445,18 @@ def department_input(request):
         # 要更改的 column name
         col_name = {v: f for f, v in zip(field_names, verbose_names)}
         col_cn_name = {f: v for f, v in zip(field_names, verbose_names)}
-
         df = df.rename(columns=col_name)
+
+        # 將user由int64轉成object
+        df['user'] = df['user'].astype(object)
+        # print(df.head())
+        # print(df.info())
+
+        # 將nan 轉為 '' 字符串
+        df = df.astype(object).replace(np.nan, '')
+        # 對user欄位 加工 帶入foo函數
+        df['user'] = df['user'].map(foo)
+
         # print(df.head())
         rows = df.to_dict("record")
 
@@ -481,8 +466,8 @@ def department_input(request):
             if forms_obj.is_valid():
                 data_ret.append(forms_obj)
             else:
-                print(forms_obj.errors)
-                for e in forms_obj.errors:  #
+                # print(forms_obj.errors)
+                for e in forms_obj.errors:
                     print(e, row[e])
                     ret['status'] = 'error'
                     ret['msg'] = '%s "%s"錯誤' % (col_cn_name[e], row[e])
@@ -931,6 +916,7 @@ def user_input(request):
         return render(request, "user/input.html", locals())
 
     if request.method == 'POST':
+        opts = models.UserProfile.objects.all().model._meta
 
         # 存取檔案
         print(request)
@@ -942,35 +928,63 @@ def user_input(request):
         # 分析
         data_ret = []
 
-        f = open(file.name, 'r')
-        print(csv.DictReader(f).line_num)
-        rows = csv.DictReader(f)
+        # 讀取excel
+        df = pd.read_excel(file.name)
+
+        # <class 'list'>:['ID', '用户名', '姓名', '員工編號', '員工號碼', '性別', '部門', '在職狀態', '生日日期']
+        verbose_names = [field.verbose_name for field in opts.fields]
+        print(verbose_names)
+        verbose_names.remove('ID')
+
+        # <class 'list'>: ['id', 'user', 'name', 'code', 'number', 'sex', 'dent', 'in_service', 'birthday']
+        field_names = [field.name for field in opts.fields]
+        print(field_names)
+        field_names.remove('id')
+
+
+        def foo(x):
+            print('x', x)
+            if not x:
+                return x
+            elif len(str(int(x))) < 3:
+                return "%03d" % x
+            else:
+                return str(int(x))
+
+
+        # 更改 column name
+        col_name = {v: f for f, v in zip(field_names, verbose_names)}
+        col_cn_name = {f: v for f, v in zip(field_names, verbose_names)}
+        df = df.rename(columns=col_name)
+        print(df.head())
+
+        print(df.info())
+
+        # 將user由int64轉成object
+        df['code'] = df['code'].astype(object)
+        print(df.head())
+        print(df.info())
+
+        # 將nan 轉為 '' 字符串
+        df = df.astype(object).replace(np.nan, '')
+        rows = df.to_dict("record")
+        # 對user欄位 加工 帶入foo函數
+        # df['code'] = df['code'].map(foo)
+
+
         for row in rows:
+            print('row',row)
+            forms_obj = forms.UserProfile_Input_Form(data=row)
 
-            verbose_name = ['用户名', '姓名', '員工編號', '性別', '部門', '在職狀態', '生日日期', '登入']
-            field_name = ['username', 'name', 'code', 'sex', 'dent', 'in_service', 'birthday', 'is_staff']
-
-            keys = {k: name for k, name in zip(field_name, verbose_name)}
-            data = {k: row[name] for k, name in zip(field_name, verbose_name)}
-
-            data['dent'] = models.Department.objects.filter(name=data['dent'])
-            data['birthday'] = datetime.datetime.strptime(data['birthday'], '%Y/%m/%d')
-
-            is_staff_coice = {'是': True, '否': False}
-            if data['is_staff'] in list(is_staff_coice.keys()):
-                data['is_staff'] = is_staff_coice[data['is_staff']]
-
-            forms_obj = forms.User_Add_Form(data=data)
 
             if forms_obj.is_valid():
                 data_ret.append(forms_obj)
-
             else:
                 print(forms_obj.errors)
                 for e in forms_obj.errors:
-                    print(e, data[e], keys[e])
+                    print(e, col_cn_name[e], row[e])
                     ret['status'] = 'error'
-                    ret['msg'] = '%s"%s"錯誤' % (keys[e], data[e])
+                    ret['msg'] = '%s "%s"錯誤' % (col_cn_name[e], row[e])
                     data_ret = []
                     break
 
@@ -978,10 +992,10 @@ def user_input(request):
         if ret['status'] == 'error':
             pass
         else:
-            print("data_ret", data_ret)
+            # print("data_ret", data_ret)
             for form in data_ret:
-                # print(form)
                 form.save()
+                # pass
             ret['status'] = 'ok'
             ret['msg'] = '匯入成功'
 
@@ -991,35 +1005,30 @@ def user_input(request):
 
 def user_output(request):
     opts = models.UserProfile.objects.all().model._meta
-    response = HttpResponse(content_type='text/csv; charset=cp936')
 
-    # force download.
-    response['Content-Disposition'] = 'attachment;filename=user.csv'
-    # the csv writer
-    writer = csv.writer(response)
+    file_name = "%E7%94%A8%E6%88%B6.xlsx"
 
-    # ID user 姓名 員工編號 性別 部門 在職狀態 生日日期
+    # ['ID', '用户名', '姓名', '員工編號', '員工號碼', '性別', '部門', '在職狀態', '生日日期']
     row_names = [field.verbose_name for field in opts.fields]
-    print(row_names)
 
-    # ['id', 'sn', 'price', 'category', 'department', 'manager', 'purchase_date', 'status', 'latest_date', 'create_date']
-    field_names = [field.name for field in opts.fields]
-    print(field_names)
+    # ['id', 'user', 'name', 'code', 'number', 'sex', 'dent', 'in_service', 'birthday']
+    fields = [field.name for field in opts.fields]
 
-    # Write a first row with header information
-    writer.writerow(row_names)
-    # Write data rows
-    for obj in models.UserProfile.objects.all():
-        ret = []
-        ret.append(obj.id)
-        ret.append(obj.user.username)
-        ret.append(obj.name)
-        ret.append(str("{}{}".format(obj.dent.block_number, obj.code)))
-        ret.append(obj.sex)
-        ret.append(obj.dent.name)
-        ret.append(obj.in_service)
-        ret.append(obj.birthday.strftime("%Y/%m/%d") if obj.birthday else "")
-        writer.writerow(ret)
+    data = [{field.verbose_name: getattr(obj, field.name) for field in opts.fields} for obj in
+            models.UserProfile.objects.all()]
+
+    df = pd.DataFrame(data)
+
+    # 刪除欄位
+    df = df.drop('ID', axis=1)
+    df = df.drop('員工號碼', axis=1)
+
+    df.to_excel(file_name)
+
+    file = open(file_name, 'rb')
+    response = StreamingHttpResponse(file)
+    response['Content-Type'] = 'application/vnd.ms-excel;charset=utf-8'
+    response['Content-Disposition'] = 'attachment;filename="%s"' % file_name
 
     return response
 
