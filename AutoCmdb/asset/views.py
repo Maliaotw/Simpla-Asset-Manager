@@ -11,15 +11,6 @@ import csv
 from django.http import StreamingHttpResponse
 import numpy as np
 
-def file_iterator(file_name, chunk_size=512):
-    f = open(file_name, encoding="utf8")
-    while True:
-        c = f.read(chunk_size)
-        if c:
-            yield c
-        else:
-            break
-
 
 # --- 資產 ---
 
@@ -232,7 +223,7 @@ def asset_edit(request, pk):
 
 
 def asset_input(request):
-    ret = {'status': '', "msg": ''}
+    ret = {'status': '', "msg": '','errordict':{}}
 
     if request.method == 'GET':
         return render(request, "asset/input.html", locals())
@@ -255,38 +246,59 @@ def asset_input(request):
 
         # <class 'list'>:['ID', '資產編號', '資產號碼', '價格', '類型', '部門', '負責人', '購買日期', '狀態', '更新日期', '創建日期']
         verbose_names = [field.verbose_name for field in opts.fields]
-        print(verbose_names)
+        # print(verbose_names)
         verbose_names.remove('ID')
 
         # <class 'list'>: ['id', 'name', 'number', 'price', 'category', 'department', 'manager', 'purchase_date', 'status', 'latest_date', 'create_date']
         field_names = [field.name for field in opts.fields]
-        print(field_names)
+        # print(field_names)
         field_names.remove('id')
 
-        def foo(x):
-            print('x', x)
-            if not x:
-                return x
-            elif len(str(int(x))) < 3:
-                return "%03d" % x
-            else:
-                return str(int(x))
 
         # 更改 column name
         col_name = {v: f for f, v in zip(field_names, verbose_names)}
         col_cn_name = {f: v for f, v in zip(field_names, verbose_names)}
         df = df.rename(columns=col_name)
+
+        # 將nan 轉為 '' 字符串
+        df = df.astype(object).replace(np.nan, '')
         print(df.head())
 
-
-
-
         rows = df.to_dict("record")
+        # print(rows)
+
+        for i,row in enumerate(rows):
+            # print('row', row)
+
+            forms_obj = forms.Asset_Input_Form(data=row,request=request)
+            if forms_obj.is_valid():
+                data_ret.append(forms_obj)
+            else:
+                print(forms_obj.errors)
+                error = {i+1:[]}
+                for k,v in forms_obj.errors.items():
+                    # print(k, col_cn_name[k], row[k])
+                    # print(v)
+                    ret['status'] = 'error'
+                    data = {'name':col_cn_name[k],'message':v[0],'content':row[k]}
+                    error[i+1].append(data)
+                    # ret['msg'] += '%s "%s"錯誤' % (col_cn_name[e], row[e])
+                    # data_ret = []
+                ret['errordict'].update(error)
 
 
+        # 匯入
+        if ret['status'] == 'error':
+            pass
+        else:
+            # print("data_ret", data_ret)
+            for form in data_ret:
+                form.save()
+            ret['status'] = 'ok'
+            ret['msg'] = '匯入成功'
 
-
-
+        # 必須傳回JSON
+        return JsonResponse(ret)
 
 
 def asset_output(request):
@@ -295,12 +307,12 @@ def asset_output(request):
     file_name = "%E8%B3%87%E7%94%A2.xlsx"
 
     # ['ID', '資產編號', '資產號碼', '價格', '類型', '部門', '負責人', '購買日期', '狀態', '更新日期', '創建日期']
-    row_names = [field.verbose_name for field in opts.fields]
-    print(row_names)
+    # row_names = [field.verbose_name for field in opts.fields]
+    # print(row_names)
 
     # ['id', 'name', 'number', 'price', 'category', 'department', 'manager', 'purchase_date', 'status', 'latest_date', 'create_date']
-    fields = [field.name for field in opts.fields]
-    print(fields)
+    # fields = [field.name for field in opts.fields]
+    # print(fields)
 
     data = [{field.verbose_name: getattr(obj, field.name) for field in opts.fields} for obj in
             models.Asset.objects.all()]
@@ -377,7 +389,6 @@ def department(request):
             user_obj = models.UserProfile.objects.get(id=user_id)
             dent_obj.user = user_obj
         else:
-
             dent_obj.user = None
 
         dent_obj.save()
@@ -403,7 +414,7 @@ def department(request):
 
 
 def department_input(request):
-    ret = {'status': '', "msg": ''}
+    ret = {'status': '', "msg": '','errordict':{}}
 
     if request.method == 'GET':
         return render(request, "department/input.html", locals())
@@ -460,19 +471,25 @@ def department_input(request):
         # print(df.head())
         rows = df.to_dict("record")
 
-        for row in rows:
-            forms_obj = forms.Dent_Input_Form(data=row)
+        for i,row in enumerate(rows):
+            # print('row', row)
 
+            forms_obj = forms.Dent_Input_Form(data=row)
             if forms_obj.is_valid():
                 data_ret.append(forms_obj)
             else:
-                # print(forms_obj.errors)
-                for e in forms_obj.errors:
-                    print(e, row[e])
+                print(forms_obj.errors)
+                error = {i+1:[]}
+                for k,v in forms_obj.errors.items():
+                    # print(k, col_cn_name[k], row[k])
+                    # print(v)
                     ret['status'] = 'error'
-                    ret['msg'] = '%s "%s"錯誤' % (col_cn_name[e], row[e])
-                    data_ret = []
-                    break
+                    data = {'name':col_cn_name[k],'message':v[0],'content':row[k]}
+                    error[i+1].append(data)
+                    # ret['msg'] += '%s "%s"錯誤' % (col_cn_name[e], row[e])
+                    # data_ret = []
+                ret['errordict'].update(error)
+
 
         # 匯入
         if ret['status'] == 'error':
@@ -494,11 +511,11 @@ def department_output(request):
     file_name = "%E9%83%A8%E9%96%80.xlsx"
 
     # ['ID', '部門名稱', '部門簡稱', '部門工/代號', '部門工/代號碼長度', '部門負責人']
-    row_names = [field.verbose_name for field in opts.fields]
+    # row_names = [field.verbose_name for field in opts.fields]
     # print(row_names)
 
     # ['id', 'name', 'code', 'block_number', 'block_number_len', 'user']
-    field_names = [field.name for field in opts.fields]
+    # field_names = [field.name for field in opts.fields]
     # print(field_names)
 
     data = [{field.verbose_name: getattr(obj, field.name) for field in opts.fields} for obj in
@@ -662,15 +679,15 @@ def category_input(request):
 
 def category_output(request):
     opts = models.Category.objects.all().model._meta
-    print(request)
+    # print(request)
 
     file_name = "%E9%A1%9E%E5%9E%8B.xlsx"
 
     # ['ID', '名稱', '代號']
-    row_names = [field.verbose_name for field in opts.fields]
+    # row_names = [field.verbose_name for field in opts.fields]
 
     # ['id', 'name', 'code']
-    field_names = [field.name for field in opts.fields]
+    # field_names = [field.name for field in opts.fields]
 
     data = [{field.verbose_name: getattr(obj, field.name) for field in opts.fields} for obj in
             models.Category.objects.all()]
@@ -1009,10 +1026,10 @@ def user_output(request):
     file_name = "%E7%94%A8%E6%88%B6.xlsx"
 
     # ['ID', '用户名', '姓名', '員工編號', '員工號碼', '性別', '部門', '在職狀態', '生日日期']
-    row_names = [field.verbose_name for field in opts.fields]
+    # row_names = [field.verbose_name for field in opts.fields]
 
     # ['id', 'user', 'name', 'code', 'number', 'sex', 'dent', 'in_service', 'birthday']
-    fields = [field.name for field in opts.fields]
+    # fields = [field.name for field in opts.fields]
 
     data = [{field.verbose_name: getattr(obj, field.name) for field in opts.fields} for obj in
             models.UserProfile.objects.all()]
