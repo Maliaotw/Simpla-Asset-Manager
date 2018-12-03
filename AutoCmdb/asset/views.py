@@ -223,7 +223,7 @@ def asset_edit(request, pk):
 
 
 def asset_input(request):
-    ret = {'status': '', "msg": '','errordict':{}}
+    ret = {'status': '', "msg": '', 'errordict': {}}
 
     if request.method == 'GET':
         return render(request, "asset/input.html", locals())
@@ -254,7 +254,6 @@ def asset_input(request):
         # print(field_names)
         field_names.remove('id')
 
-
         # 更改 column name
         col_name = {v: f for f, v in zip(field_names, verbose_names)}
         col_cn_name = {f: v for f, v in zip(field_names, verbose_names)}
@@ -262,30 +261,31 @@ def asset_input(request):
 
         # 將nan 轉為 '' 字符串
         df = df.astype(object).replace(np.nan, '')
-        print(df.head())
+
 
         rows = df.to_dict("record")
         # print(rows)
 
-        for i,row in enumerate(rows):
+        for i, row in enumerate(rows):
             # print('row', row)
 
-            forms_obj = forms.Asset_Input_Form(data=row,request=request)
+            forms_obj = forms.Asset_Input_Form(data=row, request=request)
             if forms_obj.is_valid():
                 data_ret.append(forms_obj)
             else:
-                print(forms_obj.errors)
-                error = {i+1:[]}
-                for k,v in forms_obj.errors.items():
+                # print(forms_obj.errors)
+                # print(dir(forms_obj.errors))
+                print(forms_obj.errors.as_json())
+                error = {i + 1: []}
+                for k, v in forms_obj.errors.items():
                     # print(k, col_cn_name[k], row[k])
                     # print(v)
                     ret['status'] = 'error'
-                    data = {'name':col_cn_name[k],'message':v[0],'content':row[k]}
-                    error[i+1].append(data)
+                    data = {'name': col_cn_name[k], 'message': v[0], 'content': row[k]}
+                    error[i + 1].append(data)
                     # ret['msg'] += '%s "%s"錯誤' % (col_cn_name[e], row[e])
                     # data_ret = []
                 ret['errordict'].update(error)
-
 
         # 匯入
         if ret['status'] == 'error':
@@ -333,7 +333,6 @@ def asset_output(request):
     response['Content-Disposition'] = 'attachment;filename="%s"' % file_name
 
     return response
-
 
 
 # --- 部門 ---
@@ -414,7 +413,7 @@ def department(request):
 
 
 def department_input(request):
-    ret = {'status': '', "msg": '','errordict':{}}
+    ret = {'status': '', "msg": '', 'errordict': {}}
 
     if request.method == 'GET':
         return render(request, "department/input.html", locals())
@@ -434,16 +433,14 @@ def department_input(request):
 
         df = pd.read_excel(file.name)
 
-
         def foo(x):
-            print('x',x)
+            print('x', x)
             if not x:
                 return x
             elif len(str(int(x))) < 3:
                 return "%03d" % x
             else:
                 return str(int(x))
-
 
         # <class 'list'>: ['部門名稱', '部門簡稱', '部門工/代號', '部門工/代號碼長度', '部門負責人']
         verbose_names = [field.verbose_name for field in opts.fields]
@@ -471,7 +468,7 @@ def department_input(request):
         # print(df.head())
         rows = df.to_dict("record")
 
-        for i,row in enumerate(rows):
+        for i, row in enumerate(rows):
             # print('row', row)
 
             forms_obj = forms.Dent_Input_Form(data=row)
@@ -479,17 +476,16 @@ def department_input(request):
                 data_ret.append(forms_obj)
             else:
                 print(forms_obj.errors)
-                error = {i+1:[]}
-                for k,v in forms_obj.errors.items():
+                error = {i + 1: []}
+                for k, v in forms_obj.errors.items():
                     # print(k, col_cn_name[k], row[k])
                     # print(v)
                     ret['status'] = 'error'
-                    data = {'name':col_cn_name[k],'message':v[0],'content':row[k]}
-                    error[i+1].append(data)
+                    data = {'name': col_cn_name[k], 'message': v[0], 'content': row[k]}
+                    error[i + 1].append(data)
                     # ret['msg'] += '%s "%s"錯誤' % (col_cn_name[e], row[e])
                     # data_ret = []
                 ret['errordict'].update(error)
-
 
         # 匯入
         if ret['status'] == 'error':
@@ -620,12 +616,14 @@ def category(request):
 
 
 def category_input(request):
-    ret = {'status': '', "msg": ''}
+    ret = {'status': '', "msg": '','errordict':{}}
 
     if request.method == 'GET':
         return render(request, "category/input.html", locals())
 
     if request.method == 'POST':
+        opts = models.Category.objects.all().model._meta
+
         # 存取檔案
         print(request)
         file = request.FILES['file']
@@ -633,41 +631,54 @@ def category_input(request):
             for chunk in file.chunks():
                 destination.write(chunk)
 
-        # 分析
         data_ret = []
 
         df = pd.read_excel(file.name)
 
-        verbose_names = ['名稱', '代號']
-        field_names = ['name', 'code']
+        # ['ID','名稱', '代號']
+        verbose_names = [field.verbose_name for field in opts.fields]
+        verbose_names.remove('ID')
 
-        # 要更改的 column name
+        # ['id','name', 'code']
+        field_names = [field.name for field in opts.fields]
+        field_names.remove('id')
+
+        # 更改 column name
         col_name = {v: f for f, v in zip(field_names, verbose_names)}
-        col_cn_name = {f:v for f, v in zip(field_names, verbose_names)}
-
+        col_cn_name = {f: v for f, v in zip(field_names, verbose_names)}
         df = df.rename(columns=col_name)
+
+        # 將nan 轉為 '' 字符串
+        df = df.astype(object).replace(np.nan, '')
         print(df.head())
+
         rows = df.to_dict("record")
+        # print(rows)
 
-        for row in rows:
+        for i, row in enumerate(rows):
+            # print('row', row)
+
             forms_obj = forms.CaryForm(data=row)
-
             if forms_obj.is_valid():
                 data_ret.append(forms_obj)
             else:
-                # print(forms_obj.errors)
-                for e in forms_obj.errors: #
-                    print(e, row[e])
+                print(forms_obj.errors)
+                error = {i + 1: []}
+                for k, v in forms_obj.errors.items():
+                    # print(k, col_cn_name[k], row[k])
+                    # print(v)
                     ret['status'] = 'error'
-                    ret['msg'] = '%s "%s"錯誤' % (col_cn_name[e],row[e])
-                    data_ret = []
-                    break
+                    data = {'name': col_cn_name[k], 'message': v[0], 'content': row[k]}
+                    error[i + 1].append(data)
+                    # ret['msg'] += '%s "%s"錯誤' % (col_cn_name[e], row[e])
+                    # data_ret = []
+                ret['errordict'].update(error)
 
         # 匯入
         if ret['status'] == 'error':
             pass
         else:
-            print("data_ret", data_ret)
+            # print("data_ret", data_ret)
             for form in data_ret:
                 form.save()
             ret['status'] = 'ok'
@@ -927,7 +938,7 @@ def user_edit(request, pk):
 
 
 def user_input(request):
-    ret = {'status': '', "msg": ''}
+    ret = {'status': '', "msg": '','errordict':{}}
 
     if request.method == 'GET':
         return render(request, "user/input.html", locals())
@@ -959,51 +970,37 @@ def user_input(request):
         field_names.remove('id')
 
 
-        def foo(x):
-            print('x', x)
-            if not x:
-                return x
-            elif len(str(int(x))) < 3:
-                return "%03d" % x
-            else:
-                return str(int(x))
-
 
         # 更改 column name
         col_name = {v: f for f, v in zip(field_names, verbose_names)}
         col_cn_name = {f: v for f, v in zip(field_names, verbose_names)}
         df = df.rename(columns=col_name)
-        print(df.head())
-
-        print(df.info())
 
         # 將user由int64轉成object
         df['code'] = df['code'].astype(object)
-        print(df.head())
-        print(df.info())
-
         # 將nan 轉為 '' 字符串
         df = df.astype(object).replace(np.nan, '')
         rows = df.to_dict("record")
-        # 對user欄位 加工 帶入foo函數
-        # df['code'] = df['code'].map(foo)
 
 
-        for row in rows:
-            print('row',row)
+        for i, row in enumerate(rows):
+            # print('row', row)
+
             forms_obj = forms.UserProfile_Input_Form(data=row)
-
-
             if forms_obj.is_valid():
                 data_ret.append(forms_obj)
             else:
                 print(forms_obj.errors)
-                for e in forms_obj.errors:
-                    print(e, col_cn_name[e], row[e])
+                error = {i + 1: []}
+                for k, v in forms_obj.errors.items():
+                    # print(k, col_cn_name[k], row[k])
+                    # print(v)
                     ret['status'] = 'error'
-                    ret['msg'] = '%s "%s"錯誤' % (col_cn_name[e], row[e])
-                    data_ret = []
-                    break
+                    data = {'name': col_cn_name[k], 'message': v[0], 'content': row[k]}
+                    error[i + 1].append(data)
+                    # ret['msg'] += '%s "%s"錯誤' % (col_cn_name[e], row[e])
+                    # data_ret = []
+                ret['errordict'].update(error)
 
         # 匯入
         if ret['status'] == 'error':
@@ -1012,7 +1009,6 @@ def user_input(request):
             # print("data_ret", data_ret)
             for form in data_ret:
                 form.save()
-                # pass
             ret['status'] = 'ok'
             ret['msg'] = '匯入成功'
 

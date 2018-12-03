@@ -29,11 +29,19 @@
 
             width: 600px;
             left: 50%;
-            top: 50%;
+            top: 40%;
             margin-top: -134.5px;
             margin-left: -250px;
 
         }
+
+        .modal-body {
+            position: relative;
+            padding: 15px;
+            max-height: 350px;
+            overflow: auto;
+        }
+
     </style>
 
 
@@ -71,7 +79,7 @@
                 <!-- Modal Header -->
                 <div class="modal-header">
                     <h4 class="modal-title"></h4>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+
                 </div>
 
                 <!-- Modal body -->
@@ -119,7 +127,8 @@
 
         // 上傳成功
         $("#input-b2").on('fileuploaded', function (event, data, previewId, index) {
-            console.log("asset_input fileuploaded");
+            //console.log("asset_input fileuploaded");
+            //console.log(data);
             $('#Modal').modal({backdrop: 'static', keyboard: false});
             if (data.response.status == 'ok') {
                 console.log("response ok");
@@ -127,15 +136,29 @@
                 $("#Modal").modal("show");
                 $(".modal-title").text("匯入成功");
                 $(".modal-body").text("你可以繼續上傳或返回列表。");
-
             } else {
-                console.log("response error");
+
                 $("#Modal").modal("show");
-                $(".modal-title").text("匯入失敗");
+                $(".modal-title").html("<i class='fa fa-exclamation-triangle'></i>匯入失敗");
                 $(".modal-title").css({'color': 'red'});
-                $(".modal-body").html("你可以再次上傳或返回列表<br><i class='fa fa-exclamation-triangle'></i>錯誤訊息 : <b>" + data.response.msg + "</b>");
+
+                msg = "<p>請再次嘗試上傳或返回列表</p>";
+                msg += "<p><b>錯誤訊息 : </b></p>";
+
+                $.each(data.response.errordict, function (key, data) {
+                    msg += "第 " + key + "筆 錯誤 : ";
+                    msg += "<ul>";
+                    $.each(data, function (key, val) {
+                        msg += "<li>" + val.name + " " + val.content + " " + val.message + "</li>";
+                    });
+                    msg += "</ul>"
+                });
+
+                $(".modal-body").html(msg);
             }
-        });
+
+        })
+        ;
 
     </script>
 

@@ -17,14 +17,19 @@ class AssetForm(ModelForm):
         label="資產編號",
         widget=forms.TextInput(
             attrs={"readonly": 'ture', 'style': 'display:none;'}
-        )
+        ),
+        error_messages={
+            'required': _("該欄位必填"),
+        },
     )
 
     number = forms.CharField(
         label="資產號碼",
-        widget=forms.NumberInput(
-
-        )
+        widget=forms.NumberInput(),
+        error_messages={
+            'invalid': _("格式錯誤，請輸入數字"),
+            'required': _("該欄位必填"),
+        },
     )
 
     category = forms.ModelChoiceField(
@@ -47,6 +52,7 @@ class AssetForm(ModelForm):
         queryset=models.UserProfile.objects.all(),
         widget=forms.Select(attrs={"style": "margin-bottom: 10px", "disabled": 'ture'}),
         required=False,
+
     )
 
     status_choice = (
@@ -61,6 +67,10 @@ class AssetForm(ModelForm):
         widget=forms.Select(attrs={"onchange": "ch_status_ele(this)"}),
         choices=status_choice,
         required=True,
+        error_messages={
+            'required': _("該欄位必填"),
+            'invalid_choice': _("輸入不正確"),
+        }
     )
 
     def __init__(self, *args, **kwargs):
@@ -125,19 +135,17 @@ class Asset_Add_Form(AssetForm):
 
 
 class Asset_Input_Form(AssetForm):
-
     name = forms.CharField(required=False)
     category = forms.CharField(required=False)
     department = forms.CharField(required=False)
     manager = forms.CharField(required=False)
-
 
     def clean_category(self):
         '''
         驗證類型
         :return:
         '''
-        category = self.cleaned_data.get('category','')
+        category = self.cleaned_data.get('category', '')
         category_obj = models.Category.objects.filter(code=category)
         if category_obj:
             # print('category',category)
@@ -146,8 +154,7 @@ class Asset_Input_Form(AssetForm):
             return category_obj
         else:
             self.code = category
-            self.add_error('category','類型代號輸入不正確')
-
+            self.add_error('category', '代號輸入不正確')
 
     def clean_department(self):
         '''
@@ -163,19 +170,23 @@ class Asset_Input_Form(AssetForm):
                 # print('department',department)
                 return dent_obj.first()
             else:
-                self.add_error('department', '部門代號輸入不正確')
+                self.add_error('department', '代號輸入不正確')
 
+    def valid_num(self, val, num_len=0):
+        # print('val', val)
+        # print(type(val))
+        if self.is_int(val):
+            val = str(int(float(val)))
+            if len(val) < num_len:
+                val = "%0{}d".format(num_len) % int(val)
+        return val
 
-
-    def valid_num(self,val,num_len=0):
-        print('val', val)
-        print(type(val))
-        val = str(int(float(val)))
-        if len(val) < num_len:
-            return "%0{}d".format(num_len) % int(val)
-        else:
-            return val
-
+    def is_int(self, val):
+        try:
+            float(val)
+            return True
+        except:
+            return False
 
     def clean_manager(self):
         '''
@@ -183,23 +194,22 @@ class Asset_Input_Form(AssetForm):
         :return:
         '''
 
-        print('manager')
+        # print('manager')
         status = self.data.get('status')
-        print('status',status)
+        # print('status', status)
         if '未使用' not in status:
             manager = self.cleaned_data.get('manager')
             if manager:
-                manager = self.valid_num(manager,num_len=3)
+                manager = self.valid_num(manager, num_len=3)
                 user_obj = models.UserProfile.objects.filter(code=manager)
                 if user_obj:
                     # print('manager',manager)
                     return user_obj.first()
                 else:
                     # print('None manager')
-                    self.add_error('manager', '使用者輸入不正確')
+                    self.add_error('manager', '輸入不正確')
             else:
-                self.add_error('manager', '使用者未輸入')
-
+                self.add_error('manager', '該欄位必填')
 
     def clean_name(self):
         '''
@@ -208,16 +218,16 @@ class Asset_Input_Form(AssetForm):
         '''
 
         number = self.data.get('number')
-        print('number',number)
-        if isinstance(number,(int,float)):
-            number = self.valid_num(val=number,num_len=3)
+        # print('number', number)
+        if isinstance(number, (int, float)):
+            number = self.valid_num(val=number, num_len=3)
             cary = self.data.get('category')
             name = "%s-%s" % (cary, number)
 
             asset_obj = models.Asset.objects.filter(name=name)
             if asset_obj:
-                self.add_error('number','資產編號不能重複')
-                self.add_error('category','資產編號不能重複')
+                self.add_error('number', '資產編號不能重複')
+                self.add_error('category', '資產編號不能重複')
 
             return name
 
@@ -271,7 +281,7 @@ class DentForm(ModelForm):
         驗證部門名稱
         :return:
         '''
-        name = self.cleaned_data.get('name','')
+        name = self.cleaned_data.get('name', '')
         # print('name',name)
 
         dent_obj = models.Department.objects.filter(name=name)
@@ -285,7 +295,7 @@ class DentForm(ModelForm):
         驗證部門簡稱
         :return:
         '''
-        code = self.cleaned_data.get('code','')
+        code = self.cleaned_data.get('code', '')
         # print('name',name)
 
         dent_obj = models.Department.objects.filter(code=code)
@@ -301,12 +311,11 @@ class DentForm(ModelForm):
         '''
         block_number = self.cleaned_data.get('block_number', '')
         block_number_len = self.cleaned_data.get("block_number_len", 0)
-        print("block_number",block_number)
-        print("block_number_len",block_number_len)
+        print("block_number", block_number)
+        print("block_number_len", block_number_len)
         if len(str(block_number)) > block_number_len:
-            self.add_error('block_number','工/代號長度不得小於工/代號')
-            self.add_error('block_number_len','工/代號長度不得小於工/代號')
-
+            self.add_error('block_number', '工/代號長度不得小於工/代號')
+            self.add_error('block_number_len', '工/代號長度不得小於工/代號')
 
     class Meta:
         model = models.Department
@@ -335,7 +344,7 @@ class Dent_Input_Form(DentForm):
         required=False
     )
 
-    def valid_num(self,val,num_len=0):
+    def valid_num(self, val, num_len=0):
         print('val', val)
         print(type(val))
         val = str(int(float(val)))
@@ -354,7 +363,7 @@ class Dent_Input_Form(DentForm):
 
         user = self.cleaned_data.get('user')
         if user:
-            user = self.valid_num(user,num_len=3)
+            user = self.valid_num(user, num_len=3)
             user_obj = models.UserProfile.objects.filter(code=user)
             if user_obj:
                 # print('manager',manager)
@@ -366,8 +375,6 @@ class Dent_Input_Form(DentForm):
             self.add_error('user', '使用者未輸入')
 
 
-
-
 # --- 類型 ---
 
 class CaryForm(ModelForm):
@@ -376,30 +383,38 @@ class CaryForm(ModelForm):
     '''
 
     def clean_code(self):
-        code = self.cleaned_data['code']
-        # print("code", code)
+        code = self.cleaned_data.get('code')
 
-        cary_obj = models.Category.objects.filter(code=code)
-
-        if code != 'nan' and not cary_obj:
-            return code
-        else:
-            self.add_error('code', "code error")
+        if code:
+            cary_obj = models.Category.objects.filter(code=code)
+            if cary_obj:
+                self.add_error('code', "不能重複")
+            else:
+                return code
 
     def clean_name(self):
-        name = self.cleaned_data['name']
-        # print(name)
 
-        cary_obj = models.Category.objects.filter(name=name)
+        name = self.cleaned_data.get('name')
 
-        if name != 'nan' and not cary_obj:
-            return name
-        else:
-            self.add_error('name', "name error")
+        if name:
+            cary_obj = models.Category.objects.filter(name=name)
+            if cary_obj:
+                self.add_error('name', "不能重複")
+            else:
+                return name
 
     class Meta:
         model = models.Category
         fields = '__all__'
+
+        error_messages = {
+            'code': {
+                'required': _("該欄位必填"),
+            },
+            'name': {
+                'required': _("該欄位必填"),
+            },
+        }
 
 
 # --- 用戶 ---
@@ -475,26 +490,27 @@ class UserProfile_Input_Form(ModelForm):
 
     dent = forms.CharField(
         widget=forms.TextInput(),
-        required=True
+        required=True,
+        error_messages={'required': '該欄位必填'},
     )
 
     user = forms.CharField(
         widget=forms.TextInput(),
-        required=True
+        required=True,
+        error_messages={'required': '該欄位必填'},
     )
 
     number = None
 
-
     def clean_user(self):
 
-        user = self.cleaned_data.get('user','')
-        print('user',user)
+        user = self.cleaned_data.get('user', '')
+        print('user', user)
         if user:
             user_obj = User.objects.filter(username=user).first()
             userpro_obj = models.UserProfile.objects.filter(user=user_obj)
             if userpro_obj:
-                self.add_error('user','用戶已存在')
+                self.add_error('user', '用戶已存在')
             elif user_obj:
                 pass
             else:
@@ -502,9 +518,8 @@ class UserProfile_Input_Form(ModelForm):
                 user_obj = User.objects.create(username=user)
             return user_obj
 
-
     def clean_dent(self):
-        dent = self.cleaned_data.get('dent','')
+        dent = self.cleaned_data.get('dent')
         # print('dent',dent)
         if dent:
             dent_obj = models.Department.objects.filter(code=dent)
@@ -512,49 +527,48 @@ class UserProfile_Input_Form(ModelForm):
             if dent_obj:
                 return dent_obj.first()
             else:
-                self.add_error('dent', 'dent error')
-        else:
-            self.add_error('dent', 'dent error')
-            raise forms.ValidationError(("部門不能為空"))
+                self.add_error('dent', '代號不正確')
 
     def clean_code(self):
-        code = self.cleaned_data['code']
-        print('code',code)
+        code = self.cleaned_data.get("code")
+        print('code', code)
         if code:
             user_obj = models.UserProfile.objects.filter(code=code)
             if user_obj:
-                self.add_error('code','error code')
+                self.add_error('code', '不能重複')
             elif len(code) > 1:
                 # print('code[1:]',code[1:])
                 self.number = code[1:]
 
-        else:
-            # self.number = None
-            self.add_error('code', 'error code')
-            self.add_error('number', 'error number')
-
         return code
-
-
-
 
     def clean(self):
         self.cleaned_data['number'] = self.number
         print(self.cleaned_data)
 
-        code = self.cleaned_data['code']
-        dent = self.cleaned_data['dent']
+        code = self.cleaned_data.get("code")
+        dent = self.cleaned_data.get('dent')
         if code and dent:
             if code[:len(dent.block_number)] != dent.block_number:
-                self.add_error('code','工號與部門不一致')
-                self.add_error('dent','工號與部門不一致')
-
-
-
+                self.add_error('code', '編號與所屬部門不一致')
+                self.add_error('dent', '編號與所屬部門不一致')
 
     class Meta:
         model = models.UserProfile
         fields = "__all__"
+        error_messages = {
+
+            'name': {
+                'required': _("該欄位必填"),
+            },
+            'sex': {
+                'required': _("該欄位必填"),
+            },
+            'in_service': {
+                'required': _("該欄位必填"),
+            },
+
+        }
 
 
 class UserProfile_Edit_Form(UserProfileForm):
@@ -584,7 +598,6 @@ class UserProfile_Edit_Form(UserProfileForm):
                     self.fields[k].widget.attrs.update({'readonly': 'ture'})
 
             self.fields[k].widget.attrs['class'] = 'form-control'
-
 
 
 # --- User ---
