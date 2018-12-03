@@ -79,8 +79,8 @@ class AutoAgent(AutoBase):
         :return:
         """
         server_info = plugins.get_server_info()
-        print(server_info)
-        # self.post_asset(server_info)
+        print(type(server_info))
+        self.post_asset(server_info)
 
 
 

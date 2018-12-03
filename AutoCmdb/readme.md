@@ -42,3 +42,13 @@ python manage.py migrate
 m12345678
 ```
 
+
+
+# Module
+
+- Windows
+
+```
+pip install pywin32
+pip install wmi
+```

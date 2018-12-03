@@ -15,9 +15,16 @@ auth_list = []
 
 @csrf_exempt
 def asset(request):
-    if request.method == 'POST':
-
+    if request.method == 'GET':
         print(request.META)
+
+        print(request.META['REMOTE_ADDR'])
+        return HttpResponse("GET")
+
+
+    elif request.method == 'POST':
+
+        # print(request.META)
         auth_key_time = request.META["HTTP_AUTH_KEY"]
 
         auth_key_client, client_ctime = auth_key_time.split("|")
@@ -30,7 +37,6 @@ def asset(request):
             return HttpResponse("你來晚了")
 
         # 開始驗證
-
         key_time = "%s|%s" % (ck, client_ctime)
         m = hashlib.md5()
         m.update(bytes(key_time, encoding='utf-8'))
@@ -40,7 +46,31 @@ def asset(request):
             return HttpResponse("授權失敗")
         auth_list.append(auth_key_time)
 
-        print("auth_list", auth_list)
+        # print("auth_list", auth_list)
+
+        remote_ip = request.META['REMOTE_ADDR']
+        # print('remote_ip',remote_ip)
+
+        # 獲取主機JSON
+        # print(request.body)
+        # data = json.loads(request.body)
+
+
+        data = eval(json.loads(request.body))
+
+        for nic in data['nic']:
+            ipaddress = nic.get('ipaddress')
+            macaddress = nic.get('macaddress')
+            # print('ipaddress',ipaddress)
+            if ipaddress == remote_ip:
+                print(ipaddress)
+                print(macaddress)
+
+
+
+        # 找出網卡IP與來源IP一致的MAC位址
+
+
 
         return HttpResponse("成功")
 
