@@ -15,7 +15,7 @@ class MemPlugin(BasePlugin):
                 "slot": item.DeviceLocator.strip(),
                 "capacity": ram_size,
                 "model": item.Caption,
-                "manufactory": item.Manufacturer,
+                "manufacturer": item.Manufacturer,
                 "sn": item.SerialNumber,
             }
             data.append(item_data)
@@ -57,7 +57,7 @@ class MemPlugin(BasePlugin):
                     if key == 'Type':
                         ram_item_to_dic['model'] = v.strip()
                     if key == 'Manufacturer':
-                        ram_item_to_dic['manufactory'] = v.strip()
+                        ram_item_to_dic['manufacturer'] = v.strip()
                     if key == 'Serial Number':
                         ram_item_to_dic['sn'] = v.strip()
                     if key == 'Asset Tag':

@@ -29,13 +29,13 @@ class BasicPlugin(BasePlugin):
         computer_info = wmi_obj.Win32_ComputerSystem()[0]
         system_info = wmi_obj.Win32_OperatingSystem()[0]
         data = {}
-        data['manufactory'] = computer_info.Manufacturer
+        data['manufacturer'] = computer_info.Manufacturer
         data['model'] = computer_info.Model
-        data['wake_up_type'] = computer_info.WakeUpType
+        # data['wake_up_type'] = computer_info.WakeUpType
         data['sn'] = system_info.SerialNumber
 
-        data['os_type'] = platform.system(),
-        data['os_release'] = "%s %s  %s " % (platform.release(), platform.architecture()[0], platform.version()),
+        data['os_platform'] = platform.system()
+        data['os_version'] = "%s %s %s %s" % (platform.system(),platform.release(), platform.architecture()[0], platform.version())
         data['os_distribution'] = 'Microsoft'
 
         return data
@@ -61,18 +61,18 @@ class BasicPlugin(BasePlugin):
                 raw_data[key] = -2  # means cmd went wrong
 
         data = {"asset_type": 'host'}
-        data['manufactory'] = raw_data['Manufacturer']
+        data['manufacturer'] = raw_data['Manufacturer']
         data['sn'] = raw_data['Serial Number']
         data['model'] = raw_data['Product Name']
         data['uuid'] = raw_data['UUID']
-        data['wake_up_type'] = raw_data['Wake-up Type']
+        # data['wake_up_type'] = raw_data['Wake-up Type']
 
         distributor = self.exec_shell_cmd("lsb_release -a|grep 'Distributor ID'").split("\t")[1]
         # release  = subprocess.check_output(" lsb_release -a|grep Description",shell=True).split(":")
         release = self.exec_shell_cmd("lsb_release -a|grep Description").split("\t")[1]
         data['os_distribution'] = distributor
-        data['os_release'] = release
-        data['os_type'] = platform.system()
+        data['os_version'] = release
+        data['os_platform'] = platform.system()
         data['node'] = platform.node()
 
         return data

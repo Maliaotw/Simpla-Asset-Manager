@@ -23,7 +23,6 @@ class Host(models.Model):
 
     status = models.CharField(choices=status_choice, default='值班電腦',max_length=64)
 
-
     name = models.CharField(verbose_name="主機名稱",max_length=64)
     number = models.IntegerField(verbose_name="主機號碼")
 
@@ -35,6 +34,7 @@ class Host(models.Model):
 
     manage_ip = models.GenericIPAddressField('IP', null=True, blank=True)
 
+    os_distribution = models.CharField('發行版本', max_length=64, blank=True, null=True)
     os_platform = models.CharField('系統', max_length=16, null=True, blank=True)
     os_version = models.CharField('系統版本', max_length=16, null=True, blank=True)
 
@@ -44,7 +44,6 @@ class Host(models.Model):
 
     class Meta:
         verbose_name_plural = "主機資產表"
-
 
     def __str__(self):
         return "%s %s" % (self.number,self.manage_ip)
@@ -78,6 +77,7 @@ class Disk(models.Model):
     host_obj = models.ForeignKey("Host", related_name='disk')
     sn = models.CharField("硬碟序號",max_length=128,null=True, blank=True)
     manufacturer = models.CharField('製造商', max_length=32, null=True, blank=True)
+    iface_type = models.CharField('接口類型', max_length=64)
 
     class Meta:
         verbose_name_plural = "硬盤表"

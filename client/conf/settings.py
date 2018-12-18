@@ -2,7 +2,8 @@
 MODE = 'agent'
 
 
-API_URL = "http://192.168.8.15:8000/api/asset/"
+# API_URL = "http://192.168.8.15:8000/api/asset_no_hostname/"
+API_URL = "http://192.168.8.15:8000/api/asset_by_hostname/"
 
 KEY = "mdfmsijfiosdjoidfjdf"
 

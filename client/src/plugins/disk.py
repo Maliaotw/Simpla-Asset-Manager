@@ -20,7 +20,7 @@ class DiskPlugin(BasePlugin):
             item_data['slot'] = disk.Index
             item_data['sn'] = disk.SerialNumber.strip()
             item_data['model'] = disk.Model
-            item_data['manufactory'] = disk.Manufacturer
+            item_data['manufacturer'] = disk.Manufacturer
             item_data['capacity'] = int(disk.Size) / (1024 * 1024 * 1024)
             data.append(item_data)
         return data

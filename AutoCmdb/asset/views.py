@@ -873,9 +873,8 @@ def user_add(request):
             ret['errors_fields'] = errors_fields
             ret['success_fields'] = success_fields
 
-
-
         else:
+
             print("error")
             print(forms_user_obj.errors)
             print(forms_userproinfo_obj.errors)

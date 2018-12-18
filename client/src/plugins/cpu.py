@@ -15,7 +15,7 @@ class CpuPlugin(BasePlugin):
             cpu_model = cpu.Name
         data["cpu_count"] = len(cpu_lists)
         data["cpu_model"] = cpu_model
-        data["cpu_core_count"] = cpu_core_count
+        data["cpu_physical_count"] = cpu_core_count
         return data
 
     def linux(self):
@@ -39,7 +39,7 @@ class CpuPlugin(BasePlugin):
 
         data = {
             "cpu_count": raw_data["cpu_count"],
-            "cpu_core_count": raw_data["cpu_core_count"]
+            "cpu_physical_count": raw_data["cpu_physical_count"]
         }
         cpu_model = raw_data["cpu_model"].split(":")
         if len(cpu_model) > 1:

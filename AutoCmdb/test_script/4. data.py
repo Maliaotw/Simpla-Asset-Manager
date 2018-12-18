@@ -335,7 +335,7 @@ for pc in pcs:
     cpu_physical_count = pc['cpu']['cpu_core_count']
     cpu_model = pc['cpu']['cpu_model']
     model = pc['basic']['model']
-    manufacturer = pc['basic']['manufactory']
+    manufacturer = pc['basic']['manufacturer']
 
 
     host = Host(sn=sn, cpu_count=cpu_count, cpu_physical_count=cpu_physical_count, cpu_model=cpu_model,
