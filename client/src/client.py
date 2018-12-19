@@ -19,8 +19,8 @@ import subprocess
 
 
 class AutoBase(object):
-    def __init__(self):
-        pass
+    def __init__(self,url=settings.API_URL):
+        self.api_url = url
 
     def auth_key(self):
         current_time = time.time()
@@ -47,7 +47,7 @@ class AutoBase(object):
         authkey = self.auth_key()
 
         r = requests.post(
-            url=settings.API_URL,
+            url=self.api_url,
             json=json.dumps(msg),
             headers={settings.AUTH_KEY_NAME: authkey}
         )

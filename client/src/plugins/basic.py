@@ -1,6 +1,6 @@
 from .base import BasePlugin
 import platform
-
+import socket
 
 class BasicPlugin(BasePlugin):
 
@@ -16,8 +16,8 @@ class BasicPlugin(BasePlugin):
         獲取電腦名稱
         :return:
         """
-
-        pass
+        hostname = socket.gethostname()
+        return hostname
 
     def windows(self):
         import win32com
@@ -33,7 +33,7 @@ class BasicPlugin(BasePlugin):
         data['model'] = computer_info.Model
         # data['wake_up_type'] = computer_info.WakeUpType
         data['sn'] = system_info.SerialNumber
-
+        data['hostname'] = socket.gethostname()
         data['os_platform'] = platform.system()
         data['os_version'] = "%s %s %s %s" % (platform.system(),platform.release(), platform.architecture()[0], platform.version())
         data['os_distribution'] = 'Microsoft'
@@ -65,6 +65,8 @@ class BasicPlugin(BasePlugin):
         data['sn'] = raw_data['Serial Number']
         data['model'] = raw_data['Product Name']
         data['uuid'] = raw_data['UUID']
+        data['hostname'] = socket.gethostname()
+
         # data['wake_up_type'] = raw_data['Wake-up Type']
 
         distributor = self.exec_shell_cmd("lsb_release -a|grep 'Distributor ID'").split("\t")[1]
