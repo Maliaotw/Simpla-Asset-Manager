@@ -2,7 +2,7 @@
 # Custom
 .idea
 .DS_Store
-db.sqlite3
+AutoCmdb/db.sqlite3
 
 
 # Byte-compiled / optimized / DLL files

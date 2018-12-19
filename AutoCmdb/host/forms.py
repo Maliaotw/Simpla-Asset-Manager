@@ -79,7 +79,7 @@ class MemoryForm(ModelForm):
             self.fields[k].widget.attrs['readonly'] = 'ture'
 
     class Meta:
-        model = models.Disk
+        model = models.Memory
         fields = '__all__'
 
 
