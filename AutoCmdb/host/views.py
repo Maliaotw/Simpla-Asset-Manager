@@ -1,27 +1,52 @@
 from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
 from host import models
-from asset.models import Location, UserProfile, Asset,Category
+from asset.models import Location, UserProfile, Asset, Category, Department
 from host import forms
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import QueryDict
+
 
 # Create your views here.
 def host(request):
     ret = {"status": "", "re_html": "", "msg": ""}
 
-
     if request.method == 'GET':
         search_field = {}
 
-        host_obj = models.Host.objects.all()
-
+        # host_obj = models.Host.objects.all()
         it_user_obj = UserProfile.objects.filter(dent__name='資訊').all()
-
         location_obj = Location.objects.all()
 
-        # 分頁功能
+        status_field = models.Host.status_choice
+        department_obj = Department.objects.all()
 
+        # GET 字段
+        name = request.GET.get("name", '')
+        status = request.GET.get("status", '')
+        dent_id = request.GET.get("dent_id", '')
+
+        search_field['name'] = name
+        search_field['status'] = status
+        search_field['dent_id'] = dent_id
+
+        # GET 字段 篩選
+        print('search_field', search_field)
+
+        if status and dent_id:
+            host_obj = models.Host.objects.filter(name__contains=name,status__contains=status,asset__department_id=dent_id)
+        elif status:
+            host_obj = models.Host.objects.filter(name__contains=name,status__contains=status)
+        elif dent_id:
+            host_obj = models.Host.objects.filter(name__contains=name,asset__department_id=dent_id)
+        elif name:
+            host_obj = models.Host.objects.filter(name__contains=name)
+        else:
+            host_obj = models.Host.objects.all()
+
+
+
+        # 分頁功能
         paginator = Paginator(host_obj, 10)  # Show 10 contacts per page
 
         page = request.GET.get('page')
@@ -33,7 +58,6 @@ def host(request):
             host_obj = paginator.page(paginator.num_pages)
 
     if request.method == 'PUT':
-
         put = QueryDict(request.body)
         print(put)
         id = put.get('id')
@@ -53,43 +77,31 @@ def host(request):
 
         return JsonResponse(ret)
 
-
-
-
     return render(request, "host/index.html", locals())
 
 
 def host_info(request, pk):
     host_obj = models.Host.objects.get(id=pk)
-
     host_form_obj = forms.HostForm(instance=host_obj)
-
     nic_forms_obj = [forms.NICForm(instance=nic) for nic in host_obj.nic.all()]
-
     disk_forms_obj = [forms.DiskForm(instance=disk) for disk in host_obj.disk.all()]
-
     mem_forms_obj = [forms.MemoryForm(instance=memory) for memory in host_obj.memory.all()]
 
     return render(request, "host/host_info.html", locals())
 
 
 def host_input(request):
-
     return render(request, "host/input.html", locals())
 
+
 def host_output(request):
-
     host_obj = models.Host.objects.all()
-
     return render(request, "host/output.html", locals())
-
 
 
 def location(requesrt):
     local_obj = Location.objects.all()
-
     data = {'local_obj': local_obj}
-
     return render(requesrt, "host/location.html", data)
 
 

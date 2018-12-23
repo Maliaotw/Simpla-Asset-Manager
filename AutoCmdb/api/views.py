@@ -52,6 +52,7 @@ def asset_no_hostname(request):
         # print('remote_ip',remote_ip)
 
         # 獲取主機JSON
+        print(request.body)
         data = eval(json.loads(request.body))
 
         #  Mem Nic Disk Basic Cpu

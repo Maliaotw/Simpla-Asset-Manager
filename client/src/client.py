@@ -12,7 +12,7 @@ import hashlib
 import requests
 from src import plugins
 # from lib.serialize import Json
-from lib.log import Logger
+# from lib.log import Logger
 from conf import settings
 from concurrent.futures import ThreadPoolExecutor
 import subprocess

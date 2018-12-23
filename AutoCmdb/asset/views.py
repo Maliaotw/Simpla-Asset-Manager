@@ -15,8 +15,6 @@ import numpy as np
 # --- 資產 ---
 
 def asset(request):
-    # for asset in models.Asset.objects.all():
-    #     print(asset)
 
     search_field = {}
 
@@ -304,7 +302,8 @@ def asset_input(request):
 def asset_output(request):
     opts = models.Asset.objects.all().model._meta
 
-    file_name = "%E8%B3%87%E7%94%A2.xlsx"
+    file_name = r'demo_files/資產/DEMO_資產.xlsx'
+    output_name = "%E8%B3%87%E7%94%A2.xlsx"
 
     # ['ID', '資產編號', '資產號碼', '價格', '類型', '部門', '負責人', '購買日期', '狀態', '更新日期', '創建日期']
     # row_names = [field.verbose_name for field in opts.fields]
@@ -330,7 +329,7 @@ def asset_output(request):
     file = open(file_name, 'rb')
     response = StreamingHttpResponse(file)
     response['Content-Type'] = 'application/vnd.ms-excel;charset=utf-8'
-    response['Content-Disposition'] = 'attachment;filename="%s"' % file_name
+    response['Content-Disposition'] = 'attachment;filename="%s"' % output_name
 
     return response
 
@@ -504,7 +503,8 @@ def department_input(request):
 def department_output(request):
     opts = models.Department.objects.all().model._meta
 
-    file_name = "%E9%83%A8%E9%96%80.xlsx"
+    file_name = r"demo_files/部門/DEMO_部門.xlsx"
+    output_name = '%E9%83%A8%E9%96%80.xlsx'
 
     # ['ID', '部門名稱', '部門簡稱', '部門工/代號', '部門工/代號碼長度', '部門負責人']
     # row_names = [field.verbose_name for field in opts.fields]
@@ -523,7 +523,7 @@ def department_output(request):
     file = open(file_name, 'rb')
     response = StreamingHttpResponse(file)
     response['Content-Type'] = 'application/vnd.ms-excel;charset=utf-8'
-    response['Content-Disposition'] = 'attachment;filename="%s"' % file_name
+    response['Content-Disposition'] = 'attachment;filename="%s"' % output_name
 
     return response
 
@@ -692,7 +692,8 @@ def category_output(request):
     opts = models.Category.objects.all().model._meta
     # print(request)
 
-    file_name = "%E9%A1%9E%E5%9E%8B.xlsx"
+    file_name = r'demo_files/類型/DEMO_類型.xlsx'
+    output_name = "%E9%A1%9E%E5%9E%8B.xlsx"
 
     # ['ID', '名稱', '代號']
     # row_names = [field.verbose_name for field in opts.fields]
@@ -710,7 +711,7 @@ def category_output(request):
     file = open(file_name, 'rb')
     response = StreamingHttpResponse(file)
     response['Content-Type'] = 'application/vnd.ms-excel;charset=utf-8'
-    response['Content-Disposition'] = 'attachment;filename="%s"' % file_name
+    response['Content-Disposition'] = 'attachment;filename="%s"' % output_name
 
     return response
 
@@ -1018,7 +1019,8 @@ def user_input(request):
 def user_output(request):
     opts = models.UserProfile.objects.all().model._meta
 
-    file_name = "%E7%94%A8%E6%88%B6.xlsx"
+    file_name = r'demo_files/用戶/DEMO_用戶.xlsx'
+    output_name = "%E7%94%A8%E6%88%B6.xlsx"
 
     # ['ID', '用户名', '姓名', '員工編號', '員工號碼', '性別', '部門', '在職狀態', '生日日期']
     # row_names = [field.verbose_name for field in opts.fields]
@@ -1040,7 +1042,7 @@ def user_output(request):
     file = open(file_name, 'rb')
     response = StreamingHttpResponse(file)
     response['Content-Type'] = 'application/vnd.ms-excel;charset=utf-8'
-    response['Content-Disposition'] = 'attachment;filename="%s"' % file_name
+    response['Content-Disposition'] = 'attachment;filename="%s"' % output_name
 
     return response
 

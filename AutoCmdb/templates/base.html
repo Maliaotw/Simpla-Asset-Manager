@@ -46,9 +46,17 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="#"><i class="far fa-bell"></i></a>
-                <li><a href="#"><i class="far fa-envelope"></i></a>
-                <li><a href="#"><i class="far fa-user"></i></a>
+                <!--<li><a href="#"><i class="far fa-bell"></i></a>-->
+                <!--<li><a href="#"><i class="far fa-envelope"></i></a>-->
+                <li>
+                    {% if request.user == 'AnonymousUser' %}
+                        <a href="#"><span style="color: #ffffff">{{ request.user }}</span>
+                    {% else %}
+                        <a href="#">登入
+                    {% endif %}
+
+                    <i class="far fa-user"></i></a>
+                </li>
 
             </ul>
 
@@ -125,8 +133,6 @@
 
 
 {% endblock %}
-
-
 
 
 </body>

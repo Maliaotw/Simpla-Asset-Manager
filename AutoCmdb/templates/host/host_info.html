@@ -127,7 +127,7 @@
 
 
         <div class="form-group">
-            <label> 硬盤信息&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus" data-toggle="collapse"
+            <label> 硬盤信息&nbsp;&nbsp;&nbsp;&nbsp;<i id='i_disk' class="fa fa-plus" data-toggle="collapse"
                                                    data-target="#disk"></i></label>
         </div>
 
@@ -181,7 +181,7 @@
 
                 <div class="col-md-3 form-group">
                     {{ memform.capacity.label_tag }}
-                    {{ memform.capacity  }}
+                    {{ memform.capacity }}
 
                 </div>
 
@@ -209,7 +209,31 @@
         $.each(inputs, function (i, obj) {
             console.log(obj);
             $(obj).attr('type', 'text');
-        })
+        });
+
+
+        function icon_minus() {
+            $(this).prev().find('svg').attr('data-icon', 'minus')
+        }
+
+        function icon_plus() {
+            $(this).prev().find('svg').attr('data-icon', 'plus')
+        }
+
+        $('#host').on('shown.bs.collapse', icon_minus);
+        $('#host').on('hidden.bs.collapse', icon_plus);
+        $('#mem').on('shown.bs.collapse', icon_minus);
+        $('#mem').on('hidden.bs.collapse', icon_plus);
+        $('#disk').on('shown.bs.collapse', icon_minus);
+        $('#disk').on('hidden.bs.collapse', icon_plus);
+        $('#nic').on('shown.bs.collapse', icon_minus);
+        $('#nic').on('hidden.bs.collapse', icon_plus);
+
+
+        $(document).ready(function () {
+            $('#host').collapse();
+        });
+
 
     </script>
 

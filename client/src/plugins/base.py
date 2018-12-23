@@ -58,7 +58,7 @@ class BasePlugin(object):
     def execute(self):
 
         os = self.chkos()
-        # print("os",os)
+        print("os",os)
 
         if os == "Windows":
             import win32com
@@ -73,6 +73,9 @@ class BasePlugin(object):
             # print("Linux")
             return self.linux()
 
+        elif os == 'Darwin':
+            return self.mac()
+
 
     def windows(self):
         pass
@@ -82,4 +85,6 @@ class BasePlugin(object):
         pass
 
 
+    def mac(self):
+        return '暫不支持'
 

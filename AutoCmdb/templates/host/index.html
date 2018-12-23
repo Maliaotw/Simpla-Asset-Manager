@@ -5,6 +5,18 @@
 {% block title %}主機列表{% endblock %}
 
 {% block head %}
+    <!-- CSS -->
+    <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/css/bootstrap-select.css">
+
+    <!--  JavaScript -->
+    <script src="/static/js/bootstrap-datepicker.js"></script>
+    <script src="/static/js/bootstrap-datepicker.zh-TW.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="/static/js/bootstrap-select.js"></script>
+
 
 
 {% endblock %}
@@ -26,13 +38,52 @@
 
         <div class="row">
 
+            <div class="col-md-12" style="text-align: right">
 
+                <form class="form-inline" method="get">
+
+                    <div class="form-group">
+                        <label for="inputsearch" class="col-form-label">搜尋</label>
+                        <input type="text" class="form-control" name='name' id="search" placeholder=""
+                               value="{{ name }}">
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-form-label">類型</label>
+                        <select class="selectpicker" name='status' data-width="fit">
+                            <option value="">-------</option>
+                            {% for k,v in status_field %}
+                                <option value="{{ k }}">{{ v }}</option>
+                            {% endfor %}
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-form-label">部門</label>
+                        <select class="selectpicker" name="dent_id" data-width="fit">
+                            <option value="">-------</option>
+                            {% for department in department_obj %}
+                                <option value="{{ department.id }}">{{ department.name }}部({{ department.code }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success" style="margin-left: 20px">Submit</button>
+                    </div>
+
+                </form>
+            </div>
         </div>
 
         <div class="table-responsive">
             <table class="table">
                 <thead>
                 <tr>
+                    <th>排序</th>
                     <th>主機名稱</th>
                     <th>類型</th>
                     <th>型號</th>
@@ -51,6 +102,11 @@
                         <td name="id" style="display: none">
                             {{ host.id }}
                         </td>
+
+
+                    <td>
+                    {{ forloop.counter  }}
+                    </td>
 
                         <td name="name" class="col-xs-1">
                              <span class="form-control-static">
@@ -82,7 +138,7 @@
 
                         <td class="">
                             <span class="form-control-static">
-                                {{ host.manufacturer }} {{ host.model }}
+                                {{ host.manufacturer|default:'' }} {{ host.model|default:'' }}
                             </span>
                         </td>
 
@@ -106,7 +162,7 @@
                         </td>
 
 
-                        <td name="manage_ip"  class="">
+                        <td name="manage_ip" class="">
 
                             <span class="form-control-static">
                                {{ host.manage_ip }}
@@ -131,7 +187,7 @@
                                {{ host.location }}
                             </span>
 
-                             <select class="form-control" style="display: none">
+                            <select class="form-control" style="display: none">
 
                                 {% for location in location_obj %}
                                     {% if host.location   ==  location %}
@@ -167,7 +223,7 @@
                         </td>
 
                         <td class="col-xs-1">
-                            {{ host.asset.department.name |default:'' }}
+                            {{ host.asset.department.name | default:'' }}
                         </td>
 
                         <td name="asset" class="col-xs-2">
@@ -187,7 +243,7 @@
 
 
                         <td class="col-xs-1">
-                            <a href="{% url 'host_info' host.id %}"><i class="fas fa-eye"></i></a>
+                            <a style="color:black; text-decoration:none" href="{% url 'host_info' host.id %}"><i class="fas fa-eye"></i></a>
                             <i class="fas fa-pen"></i>
                         </td>
                     </tr>
@@ -196,7 +252,16 @@
 
 
                 <tfoot>
-                <th colspan="8">
+                <th colspan="2">
+                    <nav aria-label="Page navigation">
+
+                        <ul class="pagination pull-left">
+                            共{{ paginator.count }}筆
+                        </ul>
+
+                    </nav>
+                </th>
+                <th colspan="10">
                     <nav aria-label="Page navigation">
                         <ul class="pagination pull-right">
                             {% get_pageer host_obj search_field %}
@@ -208,8 +273,6 @@
 
             </table>
         </div>
-
-
 
 
     </div>
@@ -238,6 +301,15 @@
                 }
             }
         });
+
+        $(document).ready(function () {
+            $('.dropdown-toggle').dropdown();
+
+            $(".selectpicker[name='status']").selectpicker('val', '{{ status }}');
+            $(".selectpicker[name='dent_id']").selectpicker('val', {{ dent_id }});
+
+        })
+        ;
 
         // 發送hostid 向請求API進行請求
         function get_asset(hostid, assetid, select_obj) {
@@ -348,10 +420,10 @@
             // 位置
             var location = $.trim(tr.find("[name='location'] select").val());
 
-            console.log(id, status, ops_owner, asset,location);
+            console.log(id, status, ops_owner, asset, location);
 
             data = {
-                'id': id, 'status': status, 'ops_owner': ops_owner, 'asset': asset,'location':location
+                'id': id, 'status': status, 'ops_owner': ops_owner, 'asset': asset, 'location': location
             };
 
             // Ajax put請求 /host

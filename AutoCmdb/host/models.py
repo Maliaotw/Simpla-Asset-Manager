@@ -46,7 +46,7 @@ class Host(models.Model):
         verbose_name_plural = "主機資產表"
 
     def __str__(self):
-        return "%s %s" % (self.number,self.manage_ip)
+        return "%s %s" % (self.name,self.manage_ip)
 
 
 class NIC(models.Model):
