@@ -107,31 +107,87 @@ class Memory(models.Model):
 
 
 class NetworkDevice(models.Model):
-
     '''網絡設備'''
 
     asset = models.OneToOneField('asset.Asset')
-    sub_assset_type_choices = (
+    type_choices = (
         ('路由器', '路由器'),
         ('交換器', '交換器'),
         ('AP', 'AP'),
         ('防火牆', '防火牆'),
     )
-    sub_asset_type = models.SmallIntegerField(choices=sub_assset_type_choices, verbose_name="設備類型", default=0)
+    sub_asset_type = models.SmallIntegerField(choices=type_choices, verbose_name="設備類型", default=0)
+    name = models.CharField(verbose_name='設備名稱', max_length=64)
     management_ip = models.CharField('管理IP', max_length=64, blank=True, null=True)
-    vlan_ip = models.GenericIPAddressField('VlanIP', blank=True, null=True)
     intranet_ip = models.GenericIPAddressField('內網IP', blank=True, null=True)
     sn = models.CharField('SN號', max_length=128, unique=True)
     manufactory = models.CharField(verbose_name='製造商', max_length=128, null=True, blank=True)
     model = models.CharField('型號', max_length=128, null=True, blank=True)
     port_num = models.SmallIntegerField('端口個數', null=True, blank=True)
-    device_detail = models.TextField('設置詳細配置', null=True, blank=True)
+    detail = models.TextField('備註', null=True, blank=True)
     latest_date = models.DateTimeField(verbose_name='更新日期', auto_now=True)
     create_date = models.DateTimeField(verbose_name='創建日期', auto_now_add=True)
-    warranty_date = models.DateField(verbose_name='保固日期',blank=True,null=True)
+    warranty_date = models.DateField(verbose_name='保固日期', blank=True, null=True)
 
     class Meta:
         verbose_name = '網絡設備'
+
+
+class CCTV(models.Model):
+    '''
+    CCTV
+    '''
+
+    asset = models.OneToOneField('asset.Asset')
+
+    type_choice = (
+        ('NVR', 'NVR'),
+        ('DVR', 'DVR'),
+        ('IPCAM', 'IPCAM')
+    )
+
+    name = models.CharField(verbose_name='設備名稱', max_length=64)
+    cctv_type = models.CharField(choices=type_choice, verbose_name='設備類型', default=2)
+    management_ip = models.CharField('管理IP', max_length=64, blank=True, null=True)
+    intranet_ip = models.GenericIPAddressField('內網IP', blank=True, null=True)
+    sn = models.CharField('SN號', max_length=128, unique=True)
+    manufactory = models.CharField(verbose_name='製造商', max_length=128, null=True, blank=True)
+    model = models.CharField('型號', max_length=128, null=True, blank=True)
+    latest_date = models.DateTimeField(verbose_name='更新日期', auto_now=True)
+    create_date = models.DateTimeField(verbose_name='創建日期', auto_now_add=True)
+    warranty_date = models.DateField(verbose_name='保固日期', blank=True, null=True)
+    remark = models.TextField(verbose_name='備註', blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'CCTV'
+
+
+class IPPhone(models.Model):
+    '''
+    IP電話
+    '''
+    asset = models.OneToOneField('asset.Asset')
+
+    type_choice = (
+        ('NVR', 'NVR'),
+        ('DVR', 'DVR'),
+        ('IPCAM', 'IPCAM')
+    )
+
+    name = models.CharField(verbose_name='設備名稱', max_length=64)
+    cctv_type = models.CharField(choices=type_choice, verbose_name='設備類型', default=2)
+    management_ip = models.CharField('管理IP', max_length=64, blank=True, null=True)
+    intranet_ip = models.GenericIPAddressField('內網IP', blank=True, null=True)
+    sn = models.CharField('SN號', max_length=128, unique=True)
+    manufactory = models.CharField(verbose_name='製造商', max_length=128, null=True, blank=True)
+    model = models.CharField('型號', max_length=128, null=True, blank=True)
+    latest_date = models.DateTimeField(verbose_name='更新日期', auto_now=True)
+    create_date = models.DateTimeField(verbose_name='創建日期', auto_now_add=True)
+    warranty_date = models.DateField(verbose_name='保固日期', blank=True, null=True)
+    remark = models.TextField(verbose_name='備註', blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'IP電話'
 
 
 
