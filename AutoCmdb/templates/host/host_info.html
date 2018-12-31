@@ -21,178 +21,245 @@
 
     </ol>
 
-    <div class="panel panel-default" style="padding: 20px">
+    <ul id="myTab" class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_host" data-toggle="tab">
+                硬件信息
+            </a>
+        </li>
 
-        <div class="form-group">
-            <label>主機信息&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus" data-toggle="collapse" data-target="#host"></i>
-            </label>
+        <li>
+            <a href="#tab_record" data-toggle="tab">
+                變更紀錄
+            </a>
+        </li>
+
+        <li>
+            <a href="#tab_repair" data-toggle="tab">
+                維修紀錄
+            </a>
+        </li>
+
+
+    </ul>
+
+
+
+    <div class="" style="padding: 20px">
+
+
+        <div id="myTabContent" class="tab-content">
+
+
+            <div class="tab-pane fade in active" id="tab_host">
+
+                <div class="form-group">
+                    <label>主機信息&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus" data-toggle="collapse"
+                                                          data-target="#host"></i>
+                    </label>
+                </div>
+
+                <div id="host" class="row collapse" style="padding-left: 15px">
+
+
+                    <div class="col-md-6 form-group">
+                        {{ host_form_obj.asset.label_tag }}
+                        {{ host_form_obj.asset }}
+                    </div>
+
+
+                    <div class="col-md-6 form-group">
+                        {{ host_form_obj.sn.label_tag }}
+                        {{ host_form_obj.sn }}
+                    </div>
+
+
+                    <div class="col-md-6 form-group">
+                        {{ host_form_obj.manage_ip.label_tag }}
+                        {{ host_form_obj.manage_ip }}
+                    </div>
+
+                    <div class="col-md-6 form-group">
+                        {{ host_form_obj.location.label_tag }}
+                        {{ host_form_obj.location }}
+                    </div>
+
+                    <div class="col-md-6 form-group">
+                        {{ host_form_obj.manufacturer.label_tag }}
+                        {{ host_form_obj.manufacturer }}
+                    </div>
+                    <div class="col-md-6 form-group">
+                        {{ host_form_obj.model.label_tag }}
+                        {{ host_form_obj.model }}
+                    </div>
+
+
+                    <div class="col-md-6 form-group">
+                        {{ host_form_obj.os_platform.label_tag }}
+                        {{ host_form_obj.os_platform }}
+                    </div>
+                    <div class="col-md-6 form-group">
+                        {{ host_form_obj.os_version.label_tag }}
+                        {{ host_form_obj.os_version }}
+                    </div>
+
+
+                    <div class="col-md-4 form-group">
+                        {{ host_form_obj.cpu_count.label_tag }}
+                        {{ host_form_obj.cpu_count }}
+                    </div>
+                    <div class="col-md-4 form-group">
+                        {{ host_form_obj.cpu_physical_count.label_tag }}
+                        {{ host_form_obj.cpu_physical_count }}
+                    </div>
+                    <div class="col-md-4 form-group">
+                        {{ host_form_obj.cpu_model.label_tag }}
+                        {{ host_form_obj.cpu_model }}
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+                    <label> 網卡信息&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus" data-toggle="collapse"
+                                                           data-target="#nic"></i></label>
+                </div>
+
+                <div id="nic" class="row collapse" style="padding-left: 15px">
+
+
+                    {% for nicform in nic_forms_obj %}
+                        <div class="col-md-3 form-group">
+                            {{ nicform.model.label_tag }}
+                            {{ nicform.model }}
+                        </div>
+
+                        <div class="col-md-3 form-group">
+                            {{ nicform.ipaddress.label_tag }}
+                            {{ nicform.ipaddress }}
+                        </div>
+
+
+                        <div class="col-md-3 form-group">
+                            {{ nicform.macaddress.label_tag }}
+                            {{ nicform.macaddress }}
+                        </div>
+
+                        <div class="col-md-3 form-group">
+                            {{ nicform.netmask.label_tag }}
+                            {{ nicform.netmask }}
+                        </div>
+
+
+
+                    {% endfor %}
+
+                </div>
+
+
+                <div class="form-group">
+                    <label> 硬盤信息&nbsp;&nbsp;&nbsp;&nbsp;<i id='i_disk' class="fa fa-plus" data-toggle="collapse"
+                                                           data-target="#disk"></i></label>
+                </div>
+
+                <div id="disk" class="row collapse" style="padding-left: 15px">
+
+                    {% for dickform in disk_forms_obj %}
+
+                        <div class="col-md-3 form-group">
+                            {{ dickform.sn.label_tag }}
+                            {{ dickform.sn }}
+                        </div>
+
+                        <div class="col-md-3 form-group">
+                            {{ dickform.model.label_tag }}
+                            {{ dickform.model }}
+                        </div>
+
+                        <div class="col-md-3 form-group">
+                            {{ dickform.capacity.label_tag }}
+                            {{ dickform.capacity }}
+
+                        </div>
+
+                        <div class="col-md-3 form-group">
+                            {{ dickform.slot.label_tag }}
+                            {{ dickform.slot }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <div class="form-group">
+                    <label> 內存信息&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus" data-toggle="collapse"
+                                                           data-target="#mem"></i></label>
+                </div>
+                <div id="mem" class="row collapse" style="padding-left: 15px">
+
+                    {% for memform in mem_forms_obj %}
+
+                        <div class="col-md-3 form-group">
+                            {{ memform.sn.label_tag }}
+                            {{ memform.sn }}
+                        </div>
+
+                        <div class="col-md-3 form-group">
+                            {{ memform.model.label_tag }}
+                            {{ memform.model }}
+                        </div>
+
+                        <div class="col-md-3 form-group">
+                            {{ memform.capacity.label_tag }}
+                            {{ memform.capacity }}
+
+                        </div>
+
+                        <div class="col-md-3 form-group">
+                            {{ memform.slot.label_tag }}
+                            {{ memform.slot }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+            </div>
+
+
+            <div class="tab-pane" id="tab_record">
+
+                <div class="panel panel-default " style="background-color: #f5f5f5;">
+                    123
+
+
+                </div>
+
+
+
+                <div class="card h-100">
+                    <a href="#"><img class="card-img-top" src="http://placehold.it/700x400" alt=""></a>
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            <a href="#">Item One</a>
+                        </h4>
+                        <h5>$24.99</h5>
+                        <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam
+                            aspernatur!</p>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">★ ★ ★ ★ ☆</small>
+                    </div>
+                </div>
+
+            </div>
+            <div class="tab-panel" id="tab_repair">
+
+            </div>
+
+
         </div>
 
-        <div id="host" class="row collapse" style="padding-left: 15px">
-
-
-            <div class="col-md-6 form-group">
-                {{ host_form_obj.asset.label_tag }}
-                {{ host_form_obj.asset }}
-            </div>
-
-
-            <div class="col-md-6 form-group">
-                {{ host_form_obj.sn.label_tag }}
-                {{ host_form_obj.sn }}
-            </div>
-
-
-            <div class="col-md-6 form-group">
-                {{ host_form_obj.manage_ip.label_tag }}
-                {{ host_form_obj.manage_ip }}
-            </div>
-
-            <div class="col-md-6 form-group">
-                {{ host_form_obj.location.label_tag }}
-                {{ host_form_obj.location }}
-            </div>
-
-            <div class="col-md-6 form-group">
-                {{ host_form_obj.manufacturer.label_tag }}
-                {{ host_form_obj.manufacturer }}
-            </div>
-            <div class="col-md-6 form-group">
-                {{ host_form_obj.model.label_tag }}
-                {{ host_form_obj.model }}
-            </div>
-
-
-            <div class="col-md-6 form-group">
-                {{ host_form_obj.os_platform.label_tag }}
-                {{ host_form_obj.os_platform }}
-            </div>
-            <div class="col-md-6 form-group">
-                {{ host_form_obj.os_version.label_tag }}
-                {{ host_form_obj.os_version }}
-            </div>
-
-
-            <div class="col-md-4 form-group">
-                {{ host_form_obj.cpu_count.label_tag }}
-                {{ host_form_obj.cpu_count }}
-            </div>
-            <div class="col-md-4 form-group">
-                {{ host_form_obj.cpu_physical_count.label_tag }}
-                {{ host_form_obj.cpu_physical_count }}
-            </div>
-            <div class="col-md-4 form-group">
-                {{ host_form_obj.cpu_model.label_tag }}
-                {{ host_form_obj.cpu_model }}
-            </div>
-
-        </div>
-
-
-        <div class="form-group">
-            <label> 網卡信息&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus" data-toggle="collapse"
-                                                   data-target="#nic"></i></label>
-        </div>
-
-        <div id="nic" class="row collapse" style="padding-left: 15px">
-
-
-            {% for nicform in nic_forms_obj %}
-                <div class="col-md-3 form-group">
-                    {{ nicform.model.label_tag }}
-                    {{ nicform.model }}
-                </div>
-
-                <div class="col-md-3 form-group">
-                    {{ nicform.ipaddress.label_tag }}
-                    {{ nicform.ipaddress }}
-                </div>
-
-
-                <div class="col-md-3 form-group">
-                    {{ nicform.macaddress.label_tag }}
-                    {{ nicform.macaddress }}
-                </div>
-
-                <div class="col-md-3 form-group">
-                    {{ nicform.netmask.label_tag }}
-                    {{ nicform.netmask }}
-                </div>
-
-
-
-            {% endfor %}
-
-        </div>
-
-
-        <div class="form-group">
-            <label> 硬盤信息&nbsp;&nbsp;&nbsp;&nbsp;<i id='i_disk' class="fa fa-plus" data-toggle="collapse"
-                                                   data-target="#disk"></i></label>
-        </div>
-
-        <div id="disk" class="row collapse" style="padding-left: 15px">
-
-            {% for dickform in disk_forms_obj %}
-
-                <div class="col-md-3 form-group">
-                    {{ dickform.sn.label_tag }}
-                    {{ dickform.sn }}
-                </div>
-
-                <div class="col-md-3 form-group">
-                    {{ dickform.model.label_tag }}
-                    {{ dickform.model }}
-                </div>
-
-                <div class="col-md-3 form-group">
-                    {{ dickform.capacity.label_tag }}
-                    {{ dickform.capacity }}
-
-                </div>
-
-                <div class="col-md-3 form-group">
-                    {{ dickform.slot.label_tag }}
-                    {{ dickform.slot }}
-                </div>
-
-            {% endfor %}
-
-        </div>
-
-
-        <div class="form-group">
-            <label> 內存信息&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus" data-toggle="collapse"
-                                                   data-target="#mem"></i></label>
-        </div>
-        <div id="mem" class="row collapse" style="padding-left: 15px">
-
-            {% for memform in mem_forms_obj %}
-
-                <div class="col-md-3 form-group">
-                    {{ memform.sn.label_tag }}
-                    {{ memform.sn }}
-                </div>
-
-                <div class="col-md-3 form-group">
-                    {{ memform.model.label_tag }}
-                    {{ memform.model }}
-                </div>
-
-                <div class="col-md-3 form-group">
-                    {{ memform.capacity.label_tag }}
-                    {{ memform.capacity }}
-
-                </div>
-
-                <div class="col-md-3 form-group">
-                    {{ memform.slot.label_tag }}
-                    {{ memform.slot }}
-                </div>
-
-            {% endfor %}
-
-        </div>
 
     </div>
 {% endblock %}

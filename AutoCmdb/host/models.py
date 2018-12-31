@@ -147,7 +147,7 @@ class CCTV(models.Model):
     )
 
     name = models.CharField(verbose_name='設備名稱', max_length=64)
-    cctv_type = models.CharField(choices=type_choice, verbose_name='設備類型', default=2)
+    cctv_type = models.CharField(choices=type_choice, verbose_name='設備類型',max_length=64, default=2)
     management_ip = models.CharField('管理IP', max_length=64, blank=True, null=True)
     intranet_ip = models.GenericIPAddressField('內網IP', blank=True, null=True)
     sn = models.CharField('SN號', max_length=128, unique=True)
@@ -175,7 +175,7 @@ class IPPhone(models.Model):
     )
 
     name = models.CharField(verbose_name='設備名稱', max_length=64)
-    cctv_type = models.CharField(choices=type_choice, verbose_name='設備類型', default=2)
+    cctv_type = models.CharField(choices=type_choice, verbose_name='設備類型',max_length=64, default=2)
     management_ip = models.CharField('管理IP', max_length=64, blank=True, null=True)
     intranet_ip = models.GenericIPAddressField('內網IP', blank=True, null=True)
     sn = models.CharField('SN號', max_length=128, unique=True)

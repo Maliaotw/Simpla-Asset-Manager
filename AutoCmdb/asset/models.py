@@ -138,7 +138,7 @@ class AssetRecord(models.Model):
         (3, '故障報修'),
     )
 
-    assetrecord_type_id = models.IntegerField(choices=assetrecord_type_choice, default=2)
+    assetrecord_type_id = models.IntegerField(choices=assetrecord_type_choice, default=1)
 
     # 檔案: 圖片 多對多
     photo = models.ManyToManyField('AssetRecordImage', null=True, blank=True)
