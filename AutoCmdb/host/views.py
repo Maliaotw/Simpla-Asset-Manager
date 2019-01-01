@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
 from host import models
-from asset.models import Location, UserProfile, Asset, Category, Department
+from asset.models import Location, UserProfile, Asset, Category, Department,AssetRecord,AssetRepair,AssetRepairDetail
 from host import forms
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import QueryDict
@@ -86,6 +86,14 @@ def host_info(request, pk):
     nic_forms_obj = [forms.NICForm(instance=nic) for nic in host_obj.nic.all()]
     disk_forms_obj = [forms.DiskForm(instance=disk) for disk in host_obj.disk.all()]
     mem_forms_obj = [forms.MemoryForm(instance=memory) for memory in host_obj.memory.all()]
+
+
+    asset_record_obj = AssetRecord.objects.filter(asset_obj__Host=host_obj)
+    # print(asset_record_obj)
+    asset_repair_obj = AssetRepair.objects.filter(asset_obj__Host=host_obj)
+
+    asset_repair_detail = AssetRepairDetail.objects.filter(record=asset_repair_obj)
+
 
     return render(request, "host/host_info.html", locals())
 

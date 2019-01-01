@@ -24,12 +24,12 @@ user = models.ForeignKey('UserProfile',verbose_name='部門負責人',blank=True
 
 # 部門
 department = [
-    {'code': 'HR', 'name': '人資','block_number':'1','block_number_len':3},
-    {'code': 'IT', 'name': '資訊','block_number':'2','block_number_len':3},
-    {'code': 'RD', 'name': '研發','block_number':'3','block_number_len':3},
-    {'code': 'PR', 'name': '公關','block_number':'4','block_number_len':3},
-    {'code': 'CS', 'name': '客服','block_number':'5','block_number_len':3},
-    {'code': 'OM', 'name': '運營','block_number':'0','block_number_len':3},
+    {'code': 'HR', 'name': '人資', 'block_number': '1', 'block_number_len': 3},
+    {'code': 'IT', 'name': '資訊', 'block_number': '2', 'block_number_len': 3},
+    {'code': 'RD', 'name': '研發', 'block_number': '3', 'block_number_len': 3},
+    {'code': 'PR', 'name': '公關', 'block_number': '4', 'block_number_len': 3},
+    {'code': 'CS', 'name': '客服', 'block_number': '5', 'block_number_len': 3},
+    {'code': 'OM', 'name': '運營', 'block_number': '0', 'block_number_len': 3},
 
 ]
 
