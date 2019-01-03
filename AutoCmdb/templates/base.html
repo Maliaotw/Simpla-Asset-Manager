@@ -50,9 +50,10 @@
                 <!--<li><a href="#"><i class="far fa-envelope"></i></a>-->
                 <li>
                     {% if request.user == 'AnonymousUser' %}
-                        <a href="#"><span style="color: #ffffff">{{ request.user }}</span>
+                       <a href="#">
                     {% else %}
-                        <a href="#">登入
+
+                         <a href="#"><span style="color: #ffffff">{{ request.user }}</span>
                     {% endif %}
 
                     <i class="far fa-user"></i></a>
@@ -66,7 +67,7 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-sm-3 col-md-2 sidebar">
+        <div class="col-sm-3 col-md-2 sidebar bg-info">
             {% block sideber_menu %}
 
                 <ul class="nav nav-sidebar">

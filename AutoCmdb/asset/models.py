@@ -150,7 +150,8 @@ class AssetRepair(models.Model):
     asset_obj = models.ForeignKey('Asset')
     title = models.CharField(max_length=255)
     summary = models.TextField(null=True, blank=True)
-    creator = models.ForeignKey('UserProfile', verbose_name='創建者', null=True, blank=True, related_name='+'),
+
+    creator = models.ForeignKey('UserProfile', verbose_name='創建者', null=True, blank=True, related_name='+')
 
     # 狀態: 處理完成 或 需跟進
     status = models.BooleanField(default=False)
@@ -178,15 +179,15 @@ class AssetRepairDetail(models.Model):
 
     content = models.TextField()
     user = models.ForeignKey('UserProfile')
-    record = models.ForeignKey('AssetRepair')
+    repair = models.ForeignKey('AssetRepair')
     create_date = models.DateTimeField(auto_now_add=True)
     photo = models.ManyToManyField('AssetRepairImage', null=True, blank=True)
 
     class Meta:
-        verbose_name_plural = "資產變更詳細紀錄表"
+        verbose_name_plural = "資產維修詳細紀錄表"
 
     def __str__(self):
-        return "%s %s" % (self.record, self.user)
+        return "%s %s %s" % (self.repair, self.user.code, self.content)
 
 
 class AssetRepairImage(models.Model):

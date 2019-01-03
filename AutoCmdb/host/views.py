@@ -87,13 +87,11 @@ def host_info(request, pk):
     disk_forms_obj = [forms.DiskForm(instance=disk) for disk in host_obj.disk.all()]
     mem_forms_obj = [forms.MemoryForm(instance=memory) for memory in host_obj.memory.all()]
 
-
     asset_record_obj = AssetRecord.objects.filter(asset_obj__Host=host_obj)
     # print(asset_record_obj)
     asset_repair_obj = AssetRepair.objects.filter(asset_obj__Host=host_obj)
 
-    asset_repair_detail = AssetRepairDetail.objects.filter(record=asset_repair_obj)
-
+    asset_repair_detail = AssetRepairDetail.objects.filter(repair=asset_repair_obj)
 
     return render(request, "host/host_info.html", locals())
 
@@ -102,9 +100,21 @@ def host_input(request):
     return render(request, "host/input.html", locals())
 
 
+
+
+
+
+
 def host_output(request):
     host_obj = models.Host.objects.all()
     return render(request, "host/output.html", locals())
+
+
+
+
+
+
+
 
 
 def location(requesrt):

@@ -15,7 +15,6 @@ import numpy as np
 # --- 資產 ---
 
 def asset(request):
-
     search_field = {}
 
     category_obj = models.Category.objects.all()
@@ -260,7 +259,6 @@ def asset_input(request):
         # 將nan 轉為 '' 字符串
         df = df.astype(object).replace(np.nan, '')
 
-
         rows = df.to_dict("record")
         # print(rows)
 
@@ -332,6 +330,61 @@ def asset_output(request):
     response['Content-Disposition'] = 'attachment;filename="%s"' % output_name
 
     return response
+
+
+# --- 資產維修紀錄
+
+def asset_repair_detail(request):
+    if request.method == 'GET':
+        print('Get')
+
+    elif request.method == 'POST':
+        print('Post')
+        # data = dict()
+        # print(data)
+        #
+        # request.POST.pop('csrfmiddlewaretoken')
+        # a = models.AssetRepairDetail(**data)
+        # print(a)
+
+        print(request.POST)
+        froms_obj = forms.AssetRepairDetailForm(request.POST)
+        print(froms_obj.is_valid())
+        print(froms_obj.errors)
+
+        if froms_obj.is_valid():
+            ARD_obj = froms_obj.save()
+            # print(froms_obj.cleaned_data)
+            content = froms_obj.cleaned_data.get('content')
+            user = froms_obj.cleaned_data.get('user')
+            date = ARD_obj.create_date
+            # print(date)
+            # print(date.strftime("%Y/%m/%d %H:%M"))
+
+            datetime.datetime.now()
+            data = {
+                'status': 'ok',
+                'data':
+                    {
+                        'content': content,
+                        'user': user.code,
+                        'date': date.strftime("%Y/%m/%d %H:%M")
+                    },
+
+            }
+
+            return JsonResponse(data)
+
+        # forms_obj = forms.AssetRepairDetailForm()
+        # print(forms_obj)
+
+        # froms_obj.save()
+
+
+    else:
+        print('else')
+
+    return HttpResponse("ppppp")
 
 
 # --- 部門 ---
@@ -616,7 +669,7 @@ def category(request):
 
 
 def category_input(request):
-    ret = {'status': '', "msg": '','errordict':{}}
+    ret = {'status': '', "msg": '', 'errordict': {}}
 
     if request.method == 'GET':
         return render(request, "category/input.html", locals())
@@ -938,7 +991,7 @@ def user_edit(request, pk):
 
 
 def user_input(request):
-    ret = {'status': '', "msg": '','errordict':{}}
+    ret = {'status': '', "msg": '', 'errordict': {}}
 
     if request.method == 'GET':
         return render(request, "user/input.html", locals())
@@ -969,8 +1022,6 @@ def user_input(request):
         print(field_names)
         field_names.remove('id')
 
-
-
         # 更改 column name
         col_name = {v: f for f, v in zip(field_names, verbose_names)}
         col_cn_name = {f: v for f, v in zip(field_names, verbose_names)}
@@ -981,7 +1032,6 @@ def user_input(request):
         # 將nan 轉為 '' 字符串
         df = df.astype(object).replace(np.nan, '')
         rows = df.to_dict("record")
-
 
         for i, row in enumerate(rows):
             # print('row', row)

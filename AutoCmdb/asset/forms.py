@@ -892,3 +892,16 @@ class test1Form(forms.Form):
     id = forms.IntegerField(required=False, widget=forms.HiddenInput())
     dent = forms.ModelChoiceField(queryset=models.Department.objects.all())
     cary = forms.ModelChoiceField(queryset=models.Category.objects.all())
+
+
+# --- 資產維修詳細記錄表 ---
+
+class AssetRepairDetailForm(ModelForm):
+    '''
+    AssetRepairDetailForm
+
+    '''
+
+    class Meta:
+        model = models.AssetRepairDetail
+        fields = '__all__'
