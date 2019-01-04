@@ -5,6 +5,7 @@
 {% endblock %}
 
 
+
 {% block sideber_menu %}
 
 
@@ -18,6 +19,25 @@
 
 
     <ul class="nav nav-sidebar">
+
+        <li >
+            <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false"
+               class="dropdown-toggle collapsed">
+                <span>Home</span>
+                <span style="float:right"><i class="fa fa-angle-right"></i></span></a>
+
+            <ul class="list-unstyled collapse" id="homeSubmenu" style="">
+                <li>
+                    <a href="#">Home 1</a>
+                </li>
+                <li>
+                    <a href="#">Home 2</a>
+                </li>
+                <li>
+                    <a href="#">Home 3</a>
+                </li>
+            </ul>
+        </li>
 
         <li {% if request.path == host %}class="active"{% endif %}><a href={{ host }}>主機管理</a></li>
         <li {% if request.path == host_input %}class="active"{% endif %}><a href={{ host_input }}>匯入</a></li>
@@ -49,4 +69,16 @@
 
 
 
+{% endblock %}
+
+
+
+{% block base-js %}
+
+<script>
+
+
+
+
+</script>
 {% endblock %}
