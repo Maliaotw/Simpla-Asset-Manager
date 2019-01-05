@@ -31,6 +31,7 @@
     <ol class="breadcrumb">
         <li><a href="#">主機列表</a></li>
 
+
     </ol>
 
     <div class="panel panel-default" style="padding: 20px">
@@ -104,9 +105,9 @@
                         </td>
 
 
-                    <td>
-                    {{ forloop.counter  }}
-                    </td>
+                        <td>
+                            {{ forloop.counter }}
+                        </td>
 
                         <td name="name" class="col-xs-1">
                              <span class="form-control-static">
@@ -170,6 +171,7 @@
 
                             <input type="text" class='form-control input-sm' value="{{ host.manage_ip }}"
                                    style="display: none">
+
                         </td>
 
                         <td name="os_platform" class="">
@@ -243,10 +245,13 @@
 
 
                         <td class="col-xs-1">
-                            <a style="color:black; text-decoration:none" href="{% url 'host_info' host.id %}"><i class="fas fa-eye"></i></a>
+                            <a style="color:black; text-decoration:none" href="{% url 'host_info' host.id %}"><i
+                                    class="fas fa-eye"></i></a>
                             <i class="fas fa-pen"></i>
                         </td>
+
                     </tr>
+
                 {% endfor %}
                 </tbody>
 
@@ -282,6 +287,8 @@
 {% endblock %}
 
 
+
+
 {% block extra-js %}
 
     <script>
@@ -303,16 +310,154 @@
         });
 
         $(document).ready(function () {
-            $('.dropdown-toggle').dropdown();
+            //$('.dropdown-toggle').dropdown();
 
             $(".selectpicker[name='status']").selectpicker('val', '{{ status }}');
-            $(".selectpicker[name='dent_id']").selectpicker('val', {{ dent_id }});
+            $(".selectpicker[name='dent_id']").selectpicker('val', '{{ dent_id }}');
 
-        })
-        ;
+
+            //編輯 EditData : Change icon
+            $(".table").on('click', ".fa-pen", function (ele) {
+                console.log('edit');
+
+                $(this).attr('data-icon', 'file');
+
+                tds = $(this).parent().prevAll();
+                tr = $(this).closest("tr");
+                var obj_id = $.trim(tr.find("[name='id']").text());
+                var asset_id = tr.find("[name='asset'] input").val();
+                var select_obj = tr.find("[name='asset'] select");
+                console.log(asset_id);
+
+                // 請求asset
+                get_asset(obj_id, asset_id, select_obj);
+
+                $.each(tds, function (i, ele) {
+                    var span_tag = $(this).find("span");
+                    var input_tag = $(this).find("input");
+
+                    //user
+                    select_list = ['status', 'location', 'ops_owner', 'asset'];
+                    input_list = [];
+
+                    n = $(this).attr("name");
+                    if (select_list.includes(n)) {
+                        //console.log(n);
+                        span_tag.hide();
+                        $(this).find('select').show();
+                    }
+
+                    if (input_list.includes(n)) {
+                        span_tag.hide();
+                        //console.log(span_tag);
+                        input_tag.val($.trim(span_tag.text()));
+                        input_tag.show()
+                    }
+
+
+                });
+
+
+            });
+
+
+            //SaveData : PUT
+            $(".table").on('click', ".fa-file", function (ele) {
+
+                console.log('save');
+                $(this).attr('data-icon', 'pen');
+
+                tr = $(this).closest('tr');
+                tds = $(this).parent().prevAll();
+                console.log(tds);
+
+                // 主機ID
+                var id = $.trim(tr.find("[name='id']").text());
+
+                // 類型
+                var status = $.trim(tr.find("[name='status'] select").val());
+
+                // 運維負責人
+                var ops_owner = $.trim(tr.find("[name='ops_owner'] select").val());
+
+                // 關聯資產
+                var asset = $.trim(tr.find("[name='asset'] select").val());
+
+                // 位置
+                var location = $.trim(tr.find("[name='location'] select").val());
+
+                console.log(id, status, ops_owner, asset, location);
+
+                data = {
+                    'id': id, 'status': status, 'ops_owner': ops_owner, 'asset': asset, 'location': location
+                };
+
+                // Ajax put請求 /host
+                $.ajax({
+                    url: "{% url 'host' %}",
+                    data: data,
+                    type: 'PUT',
+                    async: false,
+                    success: function (callback) {
+                        console.log(callback);
+
+                        if (callback.status == 'ok') {
+                            put_status = true
+
+                        } else {
+                            put_status = false
+                        }
+
+                    },
+                    error: function () {
+                        put_status = false
+
+                    }
+
+                });
+
+                if (put_status) {
+                    $(this).attr('data-icon', 'pen');
+                    $.each(tds, function (i, ele) {
+
+                        var span_tag = $(this).find("span");
+                        var input_tag = $(this).find("input");
+                        var select_tag = $(this).find('select');
+
+                        select_list = ['status', 'location', 'ops_owner', 'asset'];
+                        input_list = [];
+
+                        n = $(this).attr("name");
+
+                        if (select_list.includes(n)) {
+
+                            //console.log(select_tag);
+                            selected_text = $.trim(select_tag.find(":selected").text());
+                            console.log(selected_text);
+                            span_tag.text(selected_text);
+                            select_tag.hide();
+                            span_tag.show();
+
+                        }
+
+                        if (input_list.includes(n)) {
+                            span_tag.show();
+                            span_tag.text($.trim(input_tag.val()));
+                            input_tag.hide()
+                        }
+
+                    })
+
+                }
+
+            });
+
+        });
+
 
         // 發送hostid 向請求API進行請求
         function get_asset(hostid, assetid, select_obj) {
+
             console.log("dd", select_obj.children('option'));
 
             $.ajax({
@@ -347,145 +492,10 @@
                 }
 
             });
-        }
+        };
 
-
-        //編輯 EditData : Change icon
-        $(".table").on('click', ".fa-pen", function (ele) {
-            console.log('edit');
-
-            $(this).attr('data-icon', 'file');
-
-            tds = $(this).parent().prevAll();
-            tr = $(this).closest("tr");
-            var obj_id = $.trim(tr.find("[name='id']").text());
-            var asset_id = tr.find("[name='asset'] input").val();
-            var select_obj = tr.find("[name='asset'] select");
-            console.log(asset_id);
-
-            // 請求asset
-            get_asset(obj_id, asset_id, select_obj);
-
-            $.each(tds, function (i, ele) {
-                var span_tag = $(this).find("span");
-                var input_tag = $(this).find("input");
-
-                //user
-                select_list = ['status', 'location', 'ops_owner', 'asset'];
-                input_list = [];
-
-                n = $(this).attr("name");
-                if (select_list.includes(n)) {
-                    //console.log(n);
-                    span_tag.hide();
-                    $(this).find('select').show();
-                }
-
-                if (input_list.includes(n)) {
-                    span_tag.hide();
-                    //console.log(span_tag);
-                    input_tag.val($.trim(span_tag.text()));
-                    input_tag.show()
-                }
-
-
-            });
-
-
-        });
-
-
-        //SaveData : PUT
-        $(".table").on('click', ".fa-file", function (ele) {
-
-            console.log('save');
-            $(this).attr('data-icon', 'pen');
-
-            tr = $(this).closest('tr');
-            tds = $(this).parent().prevAll();
-            console.log(tds);
-
-            // 主機ID
-            var id = $.trim(tr.find("[name='id']").text());
-
-            // 類型
-            var status = $.trim(tr.find("[name='status'] select").val());
-
-            // 運維負責人
-            var ops_owner = $.trim(tr.find("[name='ops_owner'] select").val());
-
-            // 關聯資產
-            var asset = $.trim(tr.find("[name='asset'] select").val());
-
-            // 位置
-            var location = $.trim(tr.find("[name='location'] select").val());
-
-            console.log(id, status, ops_owner, asset, location);
-
-            data = {
-                'id': id, 'status': status, 'ops_owner': ops_owner, 'asset': asset, 'location': location
-            };
-
-            // Ajax put請求 /host
-            $.ajax({
-                url: "{% url 'host' %}",
-                data: data,
-                type: 'PUT',
-                async: false,
-                success: function (callback) {
-                    console.log(callback);
-
-                    if (callback.status == 'ok') {
-                        put_status = true
-
-                    } else {
-                        put_status = false
-                    }
-
-                },
-                error: function () {
-                    put_status = false
-
-                }
-
-            });
-
-            if (put_status) {
-                $(this).attr('data-icon', 'pen');
-                $.each(tds, function (i, ele) {
-
-                    var span_tag = $(this).find("span");
-                    var input_tag = $(this).find("input");
-                    var select_tag = $(this).find('select');
-
-                    select_list = ['status', 'location', 'ops_owner', 'asset'];
-                    input_list = [];
-
-                    n = $(this).attr("name");
-
-                    if (select_list.includes(n)) {
-
-                        //console.log(select_tag);
-                        selected_text = $.trim(select_tag.find(":selected").text());
-                        console.log(selected_text);
-                        span_tag.text(selected_text);
-                        select_tag.hide();
-                        span_tag.show();
-
-                    }
-
-                    if (input_list.includes(n)) {
-                        span_tag.show();
-                        span_tag.text($.trim(input_tag.val()));
-                        input_tag.hide()
-                    }
-
-                })
-
-            }
-
-        });
 
     </script>
 
 {% endblock %}
+

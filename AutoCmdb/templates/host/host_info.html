@@ -288,10 +288,12 @@
 
                                     <ul class="list-inline list-unstyled">
 
-                                        <li><span><i
-                                                class="glyphicon glyphicon-calendar"></i> {{ asset_repair.create_date |date:"Y/m/d" }} </span>
+                                        <li>
+                                            <span><i class="glyphicon glyphicon-calendar"></i> {{ asset_repair.create_date |date:"Y/m/d" }} </span>
                                         </li>
+
                                         <li>|</li>
+
                                         <li><span><i class="glyphicon glyphicon-wrench"></i>
                                         <!--- TODO 只篩選資訊部 User Code -->
                                             {% for re in asset_repair_detail %}
@@ -320,8 +322,6 @@
                                             <p class="text-right">{{ ass_re.create_date|date:'Y/m/d H:i' }}</p>
                                         </div><!-- /panel-body -->
                                     </div><!-- /panel panel-default -->
-
-
 
                                 {% endfor %}
 
@@ -361,7 +361,12 @@
 
         </div>
     </div>
+
+
 {% endblock %}
+
+
+
 
 
 {% block extra-js %}
@@ -388,7 +393,7 @@
 
         var inputs = $("input");
         $.each(inputs, function (i, obj) {
-            console.log(obj);
+            //console.log(obj);
             $(obj).attr('type', 'text');
         });
 
@@ -472,3 +477,6 @@
     </script>
 
 {% endblock %}
+
+
+

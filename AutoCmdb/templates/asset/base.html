@@ -10,28 +10,110 @@
 
 
     {% url 'asset' as asset %}
-    {% url 'department' as department %}
-    {% url 'category' as category %}
     {% url 'asset_input' as asset_input %}
 
     {% url 'host' as host %}
+
+
     {% url 'user' as user %}
+    {% url 'user_input' as user_input %}
+
+    {% url 'category' as category %}
+    {% url 'category_input' as category_input %}
+
+    {% url 'department' as department %}
+    {% url 'department_input' as department_input %}
+
+
+
+
 
 
     <ul class="nav nav-sidebar">
 
-        <li {% if request.path == asset %}class="active"{% endif %}><a href={{ asset }}>資產管理</a></li>
-        <li {% if request.path == asset_input %}class="active"{% endif %}><a href="{{ asset_input }}">匯入</a></li>
-        <li><a href="{% url 'asset_output' %}" target="_blank">匯出</a></li>
+        <li><a href="#">資產首頁</a></li>
 
     </ul>
 
 
+    <!--- nav-sidebar -->
     <ul class="nav nav-sidebar">
-        <li {% if request.path == user %}class="active"{% endif %}><a href={{ user }}>用戶管理</a></li>
-        <li {% if request.path == department %}class="active"{% endif %}><a href={{ department }}>部門管理</a></li>
-        <li {% if request.path == category %}class="active"{% endif %}><a href={{ category }}>類型管理</a></li>
+
+        <!-- 資產管理 -->
+        <li>
+            <a href="#assetSubmenu" data-toggle="collapse" aria-expanded="false"
+               class="dropdown-toggle collapsed">
+                <span>資產管理</span>
+                <span style="float:right"><i class="fa fa-angle-right"></i></span></a>
+
+            <ul class="list-unstyled collapse" id="assetSubmenu" style="">
+                <li {% if request.path == asset %}class="active"{% endif %}><a href={{ asset }}>資產列表</a></li>
+                <li {% if request.path == asset_input %}class="active"{% endif %}><a href="{{ asset_input }}">匯入</a>
+                </li>
+                <li><a href="{% url 'asset_output' %}" target="_blank">匯出</a></li>
+            </ul>
+        </li>
+
+
+        <!--- 用戶管理 -->
+        <li>
+            <a href="#userSubmenu" data-toggle="collapse" aria-expanded="false"
+               class="dropdown-toggle collapsed">
+                <span>用戶管理</span>
+                <span style="float:right"><i class="fa fa-angle-right"></i></span></a>
+
+            <ul class="list-unstyled collapse" id="userSubmenu" style="">
+                <li {% if request.path == user %}class="active"{% endif %}><a href={{ user }}>用戶管理</a></li>
+                <li {% if request.path == user_input %}class="active"{% endif %}><a href="{{ user_input }}">匯入</a></li>
+                <li><a href="{% url 'user_output' %}" target="_blank">匯出</a></li>
+
+            </ul>
+        </li>
+
+
+        <!--- 部門管理 -->
+        <li>
+            <a href="#dentSubmenu" data-toggle="collapse" aria-expanded="false"
+               class="dropdown-toggle collapsed">
+                <span>部門管理</span>
+                <span style="float:right"><i class="fa fa-angle-right"></i></span></a>
+
+            <ul class="list-unstyled collapse" id="dentSubmenu" style="">
+                <li {% if request.path == department %}class="active"{% endif %}><a href={{ department }}>部門列表</a></li>
+
+                <li {% if request.path == category_input %}class="active"{% endif %}><a
+                        href="{{ category_input }}">匯入</a></li>
+                <li><a href="{% url 'category_output' %}" target="_blank">匯出</a></li>
+
+            </ul>
+        </li>
+
+
+        <!--- 類型管理 -->
+        <li>
+            <a href="#categorySubmenu" data-toggle="collapse" aria-expanded="false"
+               class="dropdown-toggle collapsed">
+                <span>類型管理</span>
+                <span style="float:right"><i class="fa fa-angle-right"></i></span></a>
+
+            <ul class="list-unstyled collapse" id="categorySubmenu" style="">
+                <li {% if request.path == category %}class="active"{% endif %}><a href={{ category }}>類型列表</a></li>
+
+                <li {% if request.path == category_input %}class="active"{% endif %}><a
+                        href="{{ category_input }}">匯入</a></li>
+                <li><a href="{% url 'category_output' %}" target="_blank">匯出</a></li>
+
+            </ul>
+        </li>
+
+
     </ul>
+
+
+
+
+
+    <!--- 運維管理 -->
     <ul class="nav nav-sidebar">
 
         <li {% if request.path == host %}class="active"{% endif %}><a href={{ host }}>運維管理</a></li>
@@ -57,99 +139,99 @@
     <script>
 
 
-    // 日期
-    $('#id_purchase_date').datepicker(
-        {
-            language: 'zh-TW',
-            format: "yyyy-mm-dd",
-            todayHighlight: true,
+        // 日期
+        $('#id_purchase_date').datepicker(
+            {
+                language: 'zh-TW',
+                format: "yyyy-mm-dd",
+                todayHighlight: true,
 
-        });
+            });
 
 
-    // 選擇部門後請求關聯使用資料
-    function get_dent_user(e) {
-        //console.log(e);
-        //console.log($(this));
-        //console.log(e.value);
+        // 選擇部門後請求關聯使用資料
+        function get_dent_user(e) {
+            //console.log(e);
+            //console.log($(this));
+            //console.log(e.value);
 
-        $.ajax({
-            url: "/api/dent_user",
-            type: "GET",
-            data: {'dent': e.value},
-            async: false,
+            $.ajax({
+                url: "/api/dent_user",
+                type: "GET",
+                data: {'dent': e.value},
+                async: false,
 
-            success: function (callback) {
-                window.dent_user = {
-                    'status': 'ok',
-                    'data': callback
-                };
-                console.log(window.dent_user);
-            },
-            error: function () {
+                success: function (callback) {
+                    window.dent_user = {
+                        'status': 'ok',
+                        'data': callback
+                    };
+                    console.log(window.dent_user);
+                },
+                error: function () {
+
+                }
+            });
+        };
+
+
+        // 新增資產 關聯用戶
+        function add_assetform_user(e) {
+            get_dent_user(e);
+            dent_user = window.dent_user;
+            //console.log(dent_user);
+            if (dent_user.status == 'ok') {
+                // 解開#user_add select選項 disabled
+                $("#id_manager").removeAttr("disabled");
+
+                console.log('add_assetform_user');
+
+                $("#id_manager").find('option')
+                    .remove()
+                    .end()
+                    .append('<option value="">--------</option>')
+                    .val('')
+                ;
+
+                var users = dent_user.data.users;
+                var owner = dent_user.data.owner;
+
+
+                $.each(users, function (i, item) {
+                    console.log(item);
+
+                    $("#id_manager").append($('<option>', {
+                            value: item.id,
+                            text: item.name
+                        }
+                    ));
+
+                    if (owner) {
+                        $("#id_manager").val(owner)
+                    }
+
+                })
+            }
+        };
+
+
+        // 檢查狀態
+        function ch_status_ele(e) {
+
+            if (e.value == "使用中") {
+                $("#id_department").removeAttr("disabled").val("");
+                $("#id_manager").removeAttr("disabled").val("");
+
+
+            } else {
+                $("#id_department").attr("disabled", "disabled").val("");
+                $("#id_manager").attr("disabled", "disabled").val("");
 
             }
-        });
-    };
-
-
-    // 新增資產 關聯用戶
-    function add_assetform_user(e) {
-        get_dent_user(e);
-        dent_user = window.dent_user;
-        //console.log(dent_user);
-        if (dent_user.status == 'ok') {
-            // 解開#user_add select選項 disabled
-            $("#id_manager").removeAttr("disabled");
-
-            console.log('add_assetform_user');
-
-            $("#id_manager").find('option')
-                .remove()
-                .end()
-                .append('<option value="">--------</option>')
-                .val('')
-            ;
-
-            var users = dent_user.data.users;
-            var owner = dent_user.data.owner;
-
-
-            $.each(users, function (i, item) {
-                console.log(item);
-
-                $("#id_manager").append($('<option>', {
-                        value: item.id,
-                        text: item.name
-                    }
-                ));
-
-                if (owner) {
-                    $("#id_manager").val(owner)
-                }
-
-            })
-        }
-    };
-
-
-    // 檢查狀態
-    function ch_status_ele(e) {
-
-        if (e.value == "使用中") {
-            $("#id_department").removeAttr("disabled").val("");
-            $("#id_manager").removeAttr("disabled").val("");
-
-
-        } else {
-            $("#id_department").attr("disabled", "disabled").val("");
-            $("#id_manager").attr("disabled", "disabled").val("");
 
         }
 
-    }
-
-</script>
+    </script>
 
 
 {% endblock %}
