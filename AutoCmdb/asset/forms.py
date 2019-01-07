@@ -43,14 +43,14 @@ class AssetForm(ModelForm):
     department = forms.ModelChoiceField(
         label="部門",
         queryset=models.Department.objects.all(),
-        widget=forms.Select(attrs={"onchange": "add_assetform_user(this)", "disabled": 'ture'}),
+        widget=forms.Select(attrs={"onchange": "add_assetform_user(this)"}),
         required=False,
     )
 
     manager = forms.ModelChoiceField(
         label='負責人/使用者',
         queryset=models.UserProfile.objects.all(),
-        widget=forms.Select(attrs={"style": "margin-bottom: 10px", "disabled": 'ture'}),
+        widget=forms.Select(attrs={"style": "margin-bottom: 10px"}),
         required=False,
 
     )
@@ -74,25 +74,43 @@ class AssetForm(ModelForm):
     )
 
     def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop('request', None)
+        request = kwargs.pop('request', None)
 
         super(AssetForm, self).__init__(*args, **kwargs)
 
         admin_readonly_fields = ()
-        user_readonly_fields = ()
+        user_readonly_fields = ('status','department')
 
         # 對所有字段添加Css屬性
         for k, v in self.fields.items():
 
-            if self.request.user.is_anonymous:
-                if k in user_readonly_fields:
-                    self.fields[k].widget.attrs['disabled'] = 'ture'
-
-            else:
+            # 判斷是否為管理部門
+            if self.verify_permissions(request):
                 if k in admin_readonly_fields:
                     self.fields[k].widget.attrs['disabled'] = 'ture'
 
+            else:
+                self.fields['manager'].queryset = models.UserProfile.objects.filter(dent=request.user.userprofile.dent)
+                if k in user_readonly_fields:
+                    self.fields[k].widget.attrs['disabled'] = 'ture'
+                    # self.fields[k].widget.attrs['type'] = 'password'
+
             self.fields[k].widget.attrs['class'] = 'form-control'
+
+    def verify_permissions(self,request):
+        print('verify_permissions')
+        # print(request)
+
+        # 驗證用戶
+        admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
+        # print('admindent', admindent)
+
+        if request.user.userprofile.dent in admindent:
+            # print('管理用戶')
+            return True
+        else:
+            # print('一般用戶')
+            return False
 
     class Meta:
         model = models.Asset
@@ -251,14 +269,14 @@ class Asset_Edit_Form(AssetForm):
     department = forms.ModelChoiceField(
         label="部門",
         queryset=models.Department.objects.all(),
-        widget=forms.Select(attrs={"onchange": "add_assetform_user(this)", "disabled": 'ture'}),
+        widget=forms.Select(attrs={"onchange": "add_assetform_user(this)"}),
         required=False,
     )
 
     manager = forms.ModelChoiceField(
         label='負責人/使用者',
         queryset=models.UserProfile.objects.all(),
-        widget=forms.Select(attrs={"style": "margin-bottom: 10px", "disabled": 'ture'}),
+        widget=forms.Select(attrs={"style": "margin-bottom: 10px"}),
         required=False,
     )
 

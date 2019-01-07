@@ -12,10 +12,10 @@ from host.models import *
 from asset.models import *
 
 Category.objects.all().delete()
-UserProfile.objects.all().delete()
-User.objects.all().delete()
-Host.objects.all().delete()
-Location.objects.all().delete()
+# UserProfile.objects.all().delete()
+# User.objects.all().delete()
+# Host.objects.all().delete()
+# Location.objects.all().delete()
 
 # 創建分類
 cate_pc = Category.objects.create(name="電腦", code='PC')

@@ -15,50 +15,77 @@ import numpy as np
 # --- 資產 ---
 
 def asset(request):
-    search_field = {}
 
-    category_obj = models.Category.objects.all()
-    department_obj = models.Department.objects.all()
-    user_obj = models.UserProfile.objects.all()
+    print('Assset')
 
-    if request.GET:
+
+    return render(request, "asset/home.html", locals())
+
+def asset_index(request):
+    print('Asset_index')
+
+    if request.method == "GET":
+
+        search_field = {}
 
         # GET 字段
         name = request.GET.get("name", '')
         cate_id = request.GET.get("cate_id", '')
         dent_id = request.GET.get("dent_id", '')
 
-        search_field['name'] = name
-        search_field['cate_id'] = cate_id
-        search_field['dent_id'] = dent_id
+        # print(request.user)
+        category_obj = models.Category.objects.all()
 
-        print(search_field)
+        # 驗證用戶
+        admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
+        if request.user.userprofile.dent in admindent:
+            print('管理用戶')
+            # category_obj = models.Category.objects.all()
+            department_obj = models.Department.objects.all()
+            # user_obj = models.UserProfile.objects.all()
+            search_field['name'] = name
+            search_field['cate_id'] = cate_id
+            search_field['dent_id'] = dent_id
+        else:
+            print('一般用戶')
+            search_field['name'] = name
+            search_field['cate_id'] = cate_id
+            # search_field['dent_id'] = dent_id
+            dent_id = request.user.userprofile.dent_id
+            search_field['dent_id'] = dent_id
+
+
+        # print(search_field)
 
         # GET 字段 篩選
-
         if cate_id and dent_id:
             asset_obj = models.Asset.objects.filter(name__contains=name, category_id=cate_id, department_id=dent_id)
         elif cate_id:
             asset_obj = models.Asset.objects.filter(name__contains=name, category_id=cate_id)
         elif dent_id:
             asset_obj = models.Asset.objects.filter(name__contains=name, department_id=dent_id)
-        else:
+        elif name:
             asset_obj = models.Asset.objects.filter(name__contains=name)
+        else:
+            asset_obj = models.Asset.objects.all()
 
-    else:
-        asset_obj = models.Asset.objects.all()
+        # print('asset_obj', asset_obj)
+        # 分頁功能
 
-    # 分頁功能
+        paginator = Paginator(asset_obj, 10)  # Show 10 contacts per page
 
-    paginator = Paginator(asset_obj, 10)  # Show 10 contacts per page
+        page = request.GET.get('page')
+        try:
+            asset_obj = paginator.page(page)
+        except PageNotAnInteger:
+            asset_obj = paginator.page(1)
+        except EmptyPage:
+            asset_obj = paginator.page(paginator.num_pages)
 
-    page = request.GET.get('page')
-    try:
-        asset_obj = paginator.page(page)
-    except PageNotAnInteger:
-        asset_obj = paginator.page(1)
-    except EmptyPage:
-        asset_obj = paginator.page(paginator.num_pages)
+        # print('asset_obj',asset_obj)
+
+        return render(request, "asset/index.html", locals())
+
 
     if request.method == 'POST':
 
@@ -129,7 +156,7 @@ def asset(request):
 
         return JsonResponse(ret)
 
-    return render(request, "asset/index.html", locals())
+
 
 
 def asset_add(request):

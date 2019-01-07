@@ -1,5 +1,9 @@
 {% extends 'asset/base.html' %}
 {% load asset_tags %}
+<!-- 驗證用戶部門  -->
+
+
+
 
 {% block title %}更改資產{% endblock %}
 
@@ -50,104 +54,129 @@
         <li class="active">{{ asset_obj.name }}</li>
     </ol>
 
+    <ul id="myTab" class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_asset" data-toggle="tab">
+                資產信息
+            </a>
+        </li>
+
+        <li>
+            <a href="#tab_repair" data-toggle="tab">
+                維修紀錄
+            </a>
+        </li>
 
 
-
-    <div class="panel panel-default" style="padding: 20px">
-        <form role="form" method="post" id="form">
-            {% csrf_token %}
+    </ul>
 
 
-            <!-- 錯誤提示-->
-            <div class="alert" style="display: none">
-                <strong></strong>
-            </div>
+    <div class="" style="padding: 0px">
 
 
-            <div class="form-group">
-                <label> 基本信息</label>
+    <div id="myTabContent" class="tab-content">
+
+    <div class="tab-pane fade in active" id="tab_asset">
+
+        <div class="panel panel-default" style="padding: 20px">
+            <form role="form" method="post" id="form">
+                {% csrf_token %}
 
 
-            </div>
-
-            <div class="row" style="padding-left: 15px">
-
-                {{ forms_obj.name }}
-
-                <div class="col-md-6 form-group has-feedback">
-                    {{ forms_obj.category.label_tag }}
-                    {{ forms_obj.category }}
-                    <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
-
+                <!-- 錯誤提示-->
+                <div class="alert" style="display: none">
+                    <strong></strong>
                 </div>
 
-                <div class="col-md-6 form-group has-feedback">
-                    {{ forms_obj.number.label_tag }}
-                    {{ forms_obj.number }}
-                    <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
-                </div>
-
-
-                <div class="col-md-6 form-group has-feedback">
-                    {{ forms_obj.purchase_date.label_tag }}
-                    {{ forms_obj.purchase_date }}
-                    <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
-                </div>
-
-                <div class="col-md-6 form-group has-feedback">
-                    {{ forms_obj.price.label_tag }}
-                    {{ forms_obj.price }}
-                    <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
-                </div>
-
-
-            </div>
-
-
-            <div class="form-group">
-                <label> 使用狀態</label>
-            </div>
-
-
-            <div class="row" style="padding-left: 15px">
-
-
-                <div class="col-md-12 form-group has-feedback">
-                    {{ forms_obj.status.label_tag }}
-                    {{ forms_obj.status }}
-                    <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
-                </div>
-
-                <div class="col-md-6 form-group has-feedback">
-                    {{ forms_obj.department.label_tag }}
-                    {{ forms_obj.department }}
-                    <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
-                </div>
-
-
-                <div class="col-md-6 form-group has-feedback">
-                    {{ forms_obj.manager.label_tag }}
-                    {{ forms_obj.manager }}
-                    <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
-                </div>
-
-
-            </div>
-
-            <div class="row">
 
                 <div class="form-group">
-                    <button id="submit" type="button" class="btn btn-primary center-block">更改</button>
+                    <label> 基本信息</label>
+
+
                 </div>
-            </div>
 
-        </form>
+                <div class="row" style="padding-left: 15px">
 
+                    {{ forms_obj.name }}
+
+                    <div class="col-md-6 form-group has-feedback">
+                        {{ forms_obj.category.label_tag }}
+                        {{ forms_obj.category }}
+                        <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+                    </div>
+
+                    <div class="col-md-6 form-group has-feedback">
+                        {{ forms_obj.number.label_tag }}
+                        {{ forms_obj.number }}
+                        <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                    </div>
+
+                    <!-- 管理部門 -->
+                    {% verify_permissions request as admin_dent %}
+                    {% if admin_dent %}
+                        <div class="col-md-6 form-group has-feedback">
+                            {{ forms_obj.purchase_date.label_tag }}
+                            {{ forms_obj.purchase_date }}
+                            <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                        </div>
+
+                        <div class="col-md-6 form-group has-feedback">
+                            {{ forms_obj.price.label_tag }}
+                            {{ forms_obj.price }}
+                            <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <div class="form-group">
+                    <label> 使用狀態</label>
+                </div>
+
+
+                <div class="row" style="padding-left: 15px">
+
+
+                    <div class="col-md-12 form-group has-feedback">
+                        {{ forms_obj.status.label_tag }}
+                        {{ forms_obj.status }}
+                        <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                    </div>
+
+                    <div class="col-md-6 form-group has-feedback">
+                        {{ forms_obj.department.label_tag }}
+                        {{ forms_obj.department }}
+                        <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                    </div>
+
+
+                    <div class="col-md-6 form-group has-feedback">
+                        {{ forms_obj.manager.label_tag }}
+                        {{ forms_obj.manager }}
+                        <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                    </div>
+
+
+                </div>
+
+                <div class="row">
+
+                    <div class="form-group">
+                        <button id="submit" type="button" class="btn btn-primary center-block">更改</button>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
     </div>
 
 
+    <div class="tab-pane fade in active" id="tab_repair">
 
-
+    </div>
 
 
 
@@ -160,7 +189,7 @@
                 <!-- Modal Header -->
                 <div class="modal-header">
                     <h4 class="modal-title">修改成功</h4>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+
                 </div>
 
                 <!-- Modal body -->
@@ -169,7 +198,7 @@
                 </div>
 
                 <!-- Modal footer -->
-                <div class="modal-footer" >
+                <div class="modal-footer">
                     <a href="{% url 'asset' %}" class="btn btn-primary" role="button">返回列表</a>
                     <a href="{% url 'asset_edit' pk %}" class="btn btn-success" role="button">繼續修改</a>
                 </div>
@@ -199,7 +228,6 @@
         function BeforeFormSubmit(e) {
             $(":disabled").removeAttr("disabled");
         }
-
 
 
         // bind button
@@ -278,6 +306,10 @@
 
         });
 
+        $(document).ready(function () {
+
+
+        });
 
     </script>
 

@@ -22,7 +22,8 @@ urlpatterns = [
     # url(r'^admin/', admin.site.urls),
 
     # --- asset ---
-    url(r'^asset/$', views.asset, name="asset"),
+    url(r'^asset$', views.asset, name="asset"),
+    url(r'^asset/index$', views.asset_index, name="asset_index"),
     url(r'^asset/add', views.asset_add, name="asset_add"),
     url(r'^asset/edit/(?P<pk>\d+)', views.asset_edit, name="asset_edit"),
     url(r'^asset/input', views.asset_input, name="asset_input"),

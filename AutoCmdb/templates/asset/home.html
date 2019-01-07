@@ -1,0 +1,353 @@
+{% extends 'asset/base.html' %}
+{% load asset_tags %}
+
+<!-- 驗證用戶部門  -->
+{% verify_permissions request as admin_dent %}
+
+
+
+{% block title %}資產首頁{% endblock %}
+
+{% block head %}
+
+    <!-- CSS -->
+    <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/css/bootstrap-select.css">
+
+    <!--  JavaScript -->
+    <script src="/static/js/bootstrap-datepicker.js"></script>
+    <script src="/static/js/bootstrap-datepicker.zh-TW.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="/static/js/bootstrap-select.js"></script>
+
+
+
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Dashboard</h1>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-comments fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge">26</div>
+                            <div>New Comments!</div>
+                        </div>
+                    </div>
+                </div>
+                <a href="#">
+                    <div class="panel-footer">
+                        <span class="pull-left">View Details</span>
+                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-green">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-tasks fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge">12</div>
+                            <div>New Tasks!</div>
+                        </div>
+                    </div>
+                </div>
+                <a href="#">
+                    <div class="panel-footer">
+                        <span class="pull-left">View Details</span>
+                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-yellow">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-shopping-cart fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge">124</div>
+                            <div>New Orders!</div>
+                        </div>
+                    </div>
+                </div>
+                <a href="#">
+                    <div class="panel-footer">
+                        <span class="pull-left">View Details</span>
+                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-red">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-support fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge">13</div>
+                            <div>Support Tickets!</div>
+                        </div>
+                    </div>
+                </div>
+                <a href="#">
+                    <div class="panel-footer">
+                        <span class="pull-left">View Details</span>
+                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <i class="fa fa-bar-chart-o fa-fw"></i> Area Chart Example
+                    <div class="pull-right">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                Actions
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu pull-right" role="menu">
+                                <li><a href="#">Action</a>
+                                </li>
+                                <li><a href="#">Another action</a>
+                                </li>
+                                <li><a href="#">Something else here</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li><a href="#">Separated link</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div id="morris-area-chart"
+                         style="position: relative; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
+                        <svg height="347" version="1.1" width="782" xmlns="http://www.w3.org/2000/svg"
+                             xmlns:xlink="http://www.w3.org/1999/xlink" style="overflow: hidden; position: relative;">
+                            <desc style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Created with Raphaël 2.2.0
+                            </desc>
+                            <defs style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></defs>
+                            <text x="51.65625" y="310.5" text-anchor="end" font-family="sans-serif" font-size="12px"
+                                  stroke="none" fill="#888888"
+                                  style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;"
+                                  font-weight="normal">
+                                <tspan dy="4.25" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">0</tspan>
+                            </text>
+                            <path fill="none" stroke="#aaaaaa" d="M64.15625,310.5H757" stroke-width="0.5"
+                                  style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
+                            <text x="51.65625" y="239.125" text-anchor="end" font-family="sans-serif" font-size="12px"
+                                  stroke="none" fill="#888888"
+                                  style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;"
+                                  font-weight="normal">
+                                <tspan dy="4.25" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">7,500</tspan>
+                            </text>
+                            <path fill="none" stroke="#aaaaaa" d="M64.15625,239.125H757" stroke-width="0.5"
+                                  style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
+                            <text x="51.65625" y="167.75" text-anchor="end" font-family="sans-serif" font-size="12px"
+                                  stroke="none" fill="#888888"
+                                  style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;"
+                                  font-weight="normal">
+                                <tspan dy="4.25" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">15,000</tspan>
+                            </text>
+                            <path fill="none" stroke="#aaaaaa" d="M64.15625,167.75H757" stroke-width="0.5"
+                                  style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
+                            <text x="51.65625" y="96.375" text-anchor="end" font-family="sans-serif" font-size="12px"
+                                  stroke="none" fill="#888888"
+                                  style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;"
+                                  font-weight="normal">
+                                <tspan dy="4.25" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">22,500</tspan>
+                            </text>
+                            <path fill="none" stroke="#aaaaaa" d="M64.15625,96.375H757" stroke-width="0.5"
+                                  style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
+                            <text x="51.65625" y="25" text-anchor="end" font-family="sans-serif" font-size="12px"
+                                  stroke="none"
+                                  fill="#888888"
+                                  style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;"
+                                  font-weight="normal">
+                                <tspan dy="4.25" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">30,000</tspan>
+                            </text>
+                            <path fill="none" stroke="#aaaaaa" d="M64.15625,25H757" stroke-width="0.5"
+                                  style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
+                            <text x="629.0385783718104" y="323" text-anchor="middle" font-family="sans-serif"
+                                  font-size="12px"
+                                  stroke="none" fill="#888888"
+                                  style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: sans-serif; font-size: 12px; font-weight: normal;"
+                                  font-weight="normal" transform="matrix(1,0,0,1,0,8.25)">
+                                <tspan dy="4.25" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">2012</tspan>
+                            </text>
+                            <text x="321.7627961725395" y="323" text-anchor="middle" font-family="sans-serif"
+                                  font-size="12px"
+                                  stroke="none" fill="#888888"
+                                  style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: sans-serif; font-size: 12px; font-weight: normal;"
+                                  font-weight="normal" transform="matrix(1,0,0,1,0,8.25)">
+                                <tspan dy="4.25" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">2011</tspan>
+                            </text>
+                            <path fill="#7cb57c" stroke="none"
+                                  d="M64.15625,259.93795C83.51883353584446,254.70378333333335,122.24400060753342,243.84169791666667,141.6065841433779,239.00128333333333C160.96916767922235,234.16086875,199.6943347509113,227.84093752276866,219.05691828675577,221.21463333333332C238.2090389580802,214.66035418943534,276.51328030072904,188.23466443370168,295.6654009720535,186.27895C314.60705877885783,184.34472693370168,352.4903743924666,204.23248154761902,371.43203219927096,205.65488333333332C390.7946157351154,207.10889404761903,429.51978280680436,196.81627916666667,448.8823663426488,197.7846C468.2449498784933,198.75292083333335,506.9701169501823,230.59037012750457,526.3327004860267,213.40145C545.4848211573511,196.3993659608379,583.7890625,69.31435833333335,602.9411831713244,61.02058333333335C622.0933038426488,52.726808333333345,660.3975451852978,134.89034109744992,679.5496658566221,147.05125C698.9122493924666,159.3457952641166,737.6374164641555,155.8946125,757,158.8424L757,310.5L64.15625,310.5Z"
+                                  fill-opacity="1"
+                                  style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></path>
+                            <path fill="none" stroke="#4da74d"
+                                  d="M64.15625,259.93795C83.51883353584446,254.70378333333335,122.24400060753342,243.84169791666667,141.6065841433779,239.00128333333333C160.96916767922235,234.16086875,199.6943347509113,227.84093752276866,219.05691828675577,221.21463333333332C238.2090389580802,214.66035418943534,276.51328030072904,188.23466443370168,295.6654009720535,186.27895C314.60705877885783,184.34472693370168,352.4903743924666,204.23248154761902,371.43203219927096,205.65488333333332C390.7946157351154,207.10889404761903,429.51978280680436,196.81627916666667,448.8823663426488,197.7846C468.2449498784933,198.75292083333335,506.9701169501823,230.59037012750457,526.3327004860267,213.40145C545.4848211573511,196.3993659608379,583.7890625,69.31435833333335,602.9411831713244,61.02058333333335C622.0933038426488,52.726808333333345,660.3975451852978,134.89034109744992,679.5496658566221,147.05125C698.9122493924666,159.3457952641166,737.6374164641555,155.8946125,757,158.8424"
+                                  stroke-width="3" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
+                            <circle cx="64.15625" cy="259.93795" r="2" fill="#4da74d" stroke="#ffffff" stroke-width="1"
+                                    style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="141.6065841433779" cy="239.00128333333333" r="2" fill="#4da74d" stroke="#ffffff"
+                                    stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="219.05691828675577" cy="221.21463333333332" r="2" fill="#4da74d"
+                                    stroke="#ffffff"
+                                    stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="295.6654009720535" cy="186.27895" r="2" fill="#4da74d" stroke="#ffffff"
+                                    stroke-width="1"
+                                    style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="371.43203219927096" cy="205.65488333333332" r="2" fill="#4da74d"
+                                    stroke="#ffffff"
+                                    stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="448.8823663426488" cy="197.7846" r="2" fill="#4da74d" stroke="#ffffff"
+                                    stroke-width="1"
+                                    style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="526.3327004860267" cy="213.40145" r="2" fill="#4da74d" stroke="#ffffff"
+                                    stroke-width="1"
+                                    style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="602.9411831713244" cy="61.02058333333335" r="2" fill="#4da74d" stroke="#ffffff"
+                                    stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="679.5496658566221" cy="147.05125" r="2" fill="#4da74d" stroke="#ffffff"
+                                    stroke-width="1"
+                                    style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="757" cy="158.8424" r="2" fill="#4da74d" stroke="#ffffff" stroke-width="1"
+                                    style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <path fill="#a8b4bd" stroke="none"
+                                  d="M64.15625,285.12856666666664C83.51883353584446,279.40429166666667,122.24400060753342,267.24556041666665,141.6065841433779,262.2314666666667C160.96916767922235,257.2173729166667,199.6943347509113,247.75724071038252,219.05691828675577,245.01581666666667C238.2090389580802,242.3041907103825,276.51328030072904,242.62378146869244,295.6654009720535,240.41926666666666C314.60705877885783,238.23897730202577,352.4903743924666,230.53435206043957,371.43203219927096,227.47660000000002C390.7946157351154,224.35089789377292,429.51978280680436,215.55578541666668,448.8823663426488,215.68545C468.2449498784933,215.81511458333333,506.9701169501823,241.76293679417122,526.3327004860267,228.51391666666666C545.4848211573511,215.40890762750456,583.7890625,118.03969166666667,602.9411831713244,110.26933333333335C622.0933038426488,102.49897500000002,660.3975451852978,158.19369355646631,679.5496658566221,166.35105000000001C698.9122493924666,174.598047723133,737.6374164641555,173.502825,757,175.88675L757,310.5L64.15625,310.5Z"
+                                  fill-opacity="1"
+                                  style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></path>
+                            <path fill="none" stroke="#7a92a3"
+                                  d="M64.15625,285.12856666666664C83.51883353584446,279.40429166666667,122.24400060753342,267.24556041666665,141.6065841433779,262.2314666666667C160.96916767922235,257.2173729166667,199.6943347509113,247.75724071038252,219.05691828675577,245.01581666666667C238.2090389580802,242.3041907103825,276.51328030072904,242.62378146869244,295.6654009720535,240.41926666666666C314.60705877885783,238.23897730202577,352.4903743924666,230.53435206043957,371.43203219927096,227.47660000000002C390.7946157351154,224.35089789377292,429.51978280680436,215.55578541666668,448.8823663426488,215.68545C468.2449498784933,215.81511458333333,506.9701169501823,241.76293679417122,526.3327004860267,228.51391666666666C545.4848211573511,215.40890762750456,583.7890625,118.03969166666667,602.9411831713244,110.26933333333335C622.0933038426488,102.49897500000002,660.3975451852978,158.19369355646631,679.5496658566221,166.35105000000001C698.9122493924666,174.598047723133,737.6374164641555,173.502825,757,175.88675"
+                                  stroke-width="3" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
+                            <circle cx="64.15625" cy="285.12856666666664" r="2" fill="#7a92a3" stroke="#ffffff"
+                                    stroke-width="1"
+                                    style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="141.6065841433779" cy="262.2314666666667" r="2" fill="#7a92a3" stroke="#ffffff"
+                                    stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="219.05691828675577" cy="245.01581666666667" r="2" fill="#7a92a3"
+                                    stroke="#ffffff"
+                                    stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="295.6654009720535" cy="240.41926666666666" r="2" fill="#7a92a3" stroke="#ffffff"
+                                    stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="371.43203219927096" cy="227.47660000000002" r="2" fill="#7a92a3"
+                                    stroke="#ffffff"
+                                    stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="448.8823663426488" cy="215.68545" r="2" fill="#7a92a3" stroke="#ffffff"
+                                    stroke-width="1"
+                                    style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="526.3327004860267" cy="228.51391666666666" r="2" fill="#7a92a3" stroke="#ffffff"
+                                    stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="602.9411831713244" cy="110.26933333333335" r="2" fill="#7a92a3" stroke="#ffffff"
+                                    stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="679.5496658566221" cy="166.35105000000001" r="2" fill="#7a92a3" stroke="#ffffff"
+                                    stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="757" cy="175.88675" r="2" fill="#7a92a3" stroke="#ffffff" stroke-width="1"
+                                    style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <path fill="#2677b5" stroke="none"
+                                  d="M64.15625,285.12856666666664C83.51883353584446,284.8621,122.24400060753342,286.7345041666667,141.6065841433779,284.0627C160.96916767922235,281.39089583333333,199.6943347509113,264.93706020036433,219.05691828675577,263.75413333333336C238.2090389580802,262.584064367031,276.51328030072904,276.9210200276243,295.6654009720535,274.65071666666665C314.60705877885783,272.40536169429095,352.4903743924666,247.93040041208792,371.43203219927096,245.69150000000002C390.7946157351154,243.40284624542127,429.51978280680436,254.1732291666667,448.8823663426488,256.5405C468.2449498784933,258.90777083333336,506.9701169501823,275.87644253187614,526.3327004860267,264.62966666666665C545.4848211573511,253.50513836520946,583.7890625,174.03456875,602.9411831713244,167.05528333333334C622.0933038426488,160.07599791666667,660.3975451852978,200.93852994080146,679.5496658566221,208.79538333333335C698.9122493924666,216.7385757741348,737.6374164641555,224.89044583333333,757,230.25546666666668L757,310.5L64.15625,310.5Z"
+                                  fill-opacity="1"
+                                  style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></path>
+                            <path fill="none" stroke="#0b62a4"
+                                  d="M64.15625,285.12856666666664C83.51883353584446,284.8621,122.24400060753342,286.7345041666667,141.6065841433779,284.0627C160.96916767922235,281.39089583333333,199.6943347509113,264.93706020036433,219.05691828675577,263.75413333333336C238.2090389580802,262.584064367031,276.51328030072904,276.9210200276243,295.6654009720535,274.65071666666665C314.60705877885783,272.40536169429095,352.4903743924666,247.93040041208792,371.43203219927096,245.69150000000002C390.7946157351154,243.40284624542127,429.51978280680436,254.1732291666667,448.8823663426488,256.5405C468.2449498784933,258.90777083333336,506.9701169501823,275.87644253187614,526.3327004860267,264.62966666666665C545.4848211573511,253.50513836520946,583.7890625,174.03456875,602.9411831713244,167.05528333333334C622.0933038426488,160.07599791666667,660.3975451852978,200.93852994080146,679.5496658566221,208.79538333333335C698.9122493924666,216.7385757741348,737.6374164641555,224.89044583333333,757,230.25546666666668"
+                                  stroke-width="3" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
+                            <circle cx="64.15625" cy="285.12856666666664" r="2" fill="#0b62a4" stroke="#ffffff"
+                                    stroke-width="1"
+                                    style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="141.6065841433779" cy="284.0627" r="2" fill="#0b62a4" stroke="#ffffff"
+                                    stroke-width="1"
+                                    style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="219.05691828675577" cy="263.75413333333336" r="2" fill="#0b62a4"
+                                    stroke="#ffffff"
+                                    stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="295.6654009720535" cy="274.65071666666665" r="2" fill="#0b62a4" stroke="#ffffff"
+                                    stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="371.43203219927096" cy="245.69150000000002" r="2" fill="#0b62a4"
+                                    stroke="#ffffff"
+                                    stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="448.8823663426488" cy="256.5405" r="2" fill="#0b62a4" stroke="#ffffff"
+                                    stroke-width="1"
+                                    style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="526.3327004860267" cy="264.62966666666665" r="2" fill="#0b62a4" stroke="#ffffff"
+                                    stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="602.9411831713244" cy="167.05528333333334" r="2" fill="#0b62a4" stroke="#ffffff"
+                                    stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="679.5496658566221" cy="208.79538333333335" r="2" fill="#0b62a4" stroke="#ffffff"
+                                    stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                            <circle cx="757" cy="230.25546666666668" r="2" fill="#0b62a4" stroke="#ffffff"
+                                    stroke-width="1"
+                                    style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
+                        </svg>
+                        <div class="morris-hover morris-default-style"
+                             style="left: 545.261px; top: 63px; display: none;">
+                            <div class="morris-hover-row-label">2011 Q4</div>
+                            <div class="morris-hover-point" style="color: #0b62a4">
+                                iPhone:
+                                15,073
+                            </div>
+                            <div class="morris-hover-point" style="color: #7A92A3">
+                                iPad:
+                                5,967
+                            </div>
+                            <div class="morris-hover-point" style="color: #4da74d">
+                                iPod Touch:
+                                5,175
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block extra-js %}
+
+    <script>
+
+
+    </script>
+
+{% endblock %}
+
+

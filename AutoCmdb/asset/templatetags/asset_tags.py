@@ -41,6 +41,9 @@ def get_pageer(data, search_field):
     # print("count",data.paginator.count)
     # print(data.paginator.page_range)  # range(1, 15)
 
+    # print('search_field',search_field)
+    # print('data.has_previous()',data.has_previous())
+
     # 拼接搜尋字段
     search_str = ""
     if search_field:
@@ -109,6 +112,26 @@ def get_pageer(data, search_field):
 @register.simple_tag
 def get_category_column(category_obj):
     return models.Asset.objects.filter(category=category_obj).count()
+
+
+@register.simple_tag
+def verify_permissions(request):
+    print('verify_permissions')
+    print('test')
+    # print(request)
+
+    # 驗證用戶
+    admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
+    # print('admindent', admindent)
+
+    if request.user.userprofile.dent in admindent:
+        print('管理用戶')
+        return True
+    else:
+        print('一般用戶')
+        return False
+
+
 
 
 

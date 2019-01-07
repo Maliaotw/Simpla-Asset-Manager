@@ -25,7 +25,7 @@ for i in range(200):
     print(num)
     print(name)
 
-    Asset.objects.create(number=num,name=name,price=400,category=cate,department=choice(dent_obj))
+    Asset.objects.create(number=num,name=name,price=400,category=cate,department=choice(dent_obj),status='使用中')
 
 
 
