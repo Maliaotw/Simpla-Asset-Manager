@@ -12,13 +12,22 @@
     {% url 'asset' as asset %}
     {% url 'asset_index' as asset_index %}
     {% url 'asset_input' as asset_input %}
+
+    {% url 'asset_repair' as asset_repair %}
+    {% url 'asset_repair_add' as asset_repair_add %}
+
     {% url 'host' as host %}
+
     {% url 'user' as user %}
     {% url 'user_input' as user_input %}
+
     {% url 'category' as category %}
     {% url 'category_input' as category_input %}
+
     {% url 'department' as department %}
     {% url 'department_input' as department_input %}
+
+
 
 
 
@@ -43,9 +52,9 @@
                 <!-- 資產管理 -->
                 <li class="list-group-item">
                     <a href="#assetSubmenu" data-toggle="collapse" aria-expanded="false"
-                                               class="dropdown-toggle collapsed"><span> <i
-                        class="fa fa-box"></i> 資產管理</span><span style="float:right"><i
-                        class="fa fa-angle-right"></i></span></a>
+                       class="dropdown-toggle collapsed"><span> <i
+                            class="fa fa-box"></i> 資產管理</span><span style="float:right"><i
+                            class="fa fa-angle-right"></i></span></a>
 
                     <ul class="list-unstyled collapse" id="assetSubmenu" style="">
                         <li {% if request.path == asset_index %}
@@ -62,11 +71,11 @@
                 <li class="list-group-item">
                     <a href="#userSubmenu" data-toggle="collapse" aria-expanded="false"
                        class="dropdown-toggle collapsed">
-                        <span><i class="fa fa-users"></i> 用戶列表</span>
+                        <span><i class="fa fa-users"></i> 用戶管理</span>
                         <span style="float:right"><i class="fa fa-angle-right"></i></span></a>
 
                     <ul class="list-unstyled collapse" id="userSubmenu" style="">
-                        <li {% if request.path == user %}class="active"{% endif %}><a href={{ user }}>用戶管理</a></li>
+                        <li {% if request.path == user %}class="active"{% endif %}><a href={{ user }}>用戶列表</a></li>
                         <li {% if request.path == user_input %}class="active"{% endif %}><a
                                 href="{{ user_input }}">匯入</a>
                         </li>
@@ -123,13 +132,30 @@
 
             <ul class="list-group">
 
-                <li class="list-group-item"><i class="fa fa-home {% if request.path == asset %}active{% endif %}"></i><a href={{ asset }}>資產首頁</a></li>
+                <li class="list-group-item"><i class="fa fa-home {% if request.path == asset %}active{% endif %}"></i><a
+                        href={{ asset }}>資產首頁</a></li>
 
-                <a href="{{ asset_index }}" class="list-group-item {% if request.path == asset_index %}active{% endif %}">
+                <a href="{{ asset_index }}"
+                   class="list-group-item {% if request.path == asset_index %}active{% endif %}">
                 <span>
                     <i class="fa fa-box"></i> 資產列表
                 </span>
                 </a>
+
+                <a href="{{ asset_repair }}"
+                   class="list-group-item {% if request.path == asset_repair %}active{% endif %}">
+                <span>
+                    <i class="fa fa-box"></i> 資產維修紀錄
+                </span>
+                </a>
+
+                <a href="{{ asset_repair_add }}"
+                   class="list-group-item {% if request.path == asset_repair_add %}active{% endif %}">
+                <span>
+                    <i class="fa fa-box"></i> 新增資產維修紀錄
+                </span>
+                </a>
+
 
             </ul>
 

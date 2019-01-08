@@ -29,6 +29,10 @@ urlpatterns = [
     url(r'^asset/input', views.asset_input, name="asset_input"),
     url(r'^asset/output', views.asset_output, name="asset_output"),
 
+    # --- asset_repair ---
+    url(r'^asset_repair$', views.asset_repair, name='asset_repair'),
+    url(r'^asset_repair/add$', views.asset_repair_add, name='asset_repair_add'),
+
     # --- asset_repair_detail ---
     url(r'^asset_repair_detail/$', views.asset_repair_detail, name="asset_repair_detail"),
 

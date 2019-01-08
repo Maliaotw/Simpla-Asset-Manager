@@ -79,7 +79,7 @@ class AssetForm(ModelForm):
         super(AssetForm, self).__init__(*args, **kwargs)
 
         admin_readonly_fields = ()
-        user_readonly_fields = ('status','department')
+        user_readonly_fields = ('status', 'department')
 
         # 對所有字段添加Css屬性
         for k, v in self.fields.items():
@@ -97,7 +97,7 @@ class AssetForm(ModelForm):
 
             self.fields[k].widget.attrs['class'] = 'form-control'
 
-    def verify_permissions(self,request):
+    def verify_permissions(self, request):
         print('verify_permissions')
         # print(request)
 
@@ -284,6 +284,126 @@ class Asset_Edit_Form(AssetForm):
         cleaned_data = super().clean()
 
         return cleaned_data
+
+
+# --- 資產維修記錄表 ---
+
+class AssetRepairForm(ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        request = kwargs.pop('request', None)
+
+        super(AssetRepairForm, self).__init__(*args, **kwargs)
+
+        admin_readonly_fields = ()
+        user_readonly_fields = ()
+
+        # 對所有字段添加Css屬性
+        for k, v in self.fields.items():
+
+            # 判斷是否為管理部門
+            if self.verify_permissions(request):
+                if k in admin_readonly_fields:
+                    self.fields[k].widget.attrs['disabled'] = 'ture'
+
+            else:
+                if k in user_readonly_fields:
+                    self.fields[k].widget.attrs['disabled'] = 'ture'
+                    # self.fields[k].widget.attrs['type'] = 'password'
+
+            self.fields[k].widget.attrs['class'] = 'form-control'
+
+    def verify_permissions(self, request):
+        print('verify_permissions')
+        # print(request)
+
+        # 驗證用戶
+        admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
+        # print('admindent', admindent)
+
+        if request.user.userprofile.dent in admindent:
+            # print('管理用戶')
+            return True
+        else:
+            # print('一般用戶')
+            return False
+
+    class Meta:
+        model = models.AssetRepair
+        fields = '__all__'
+
+
+class AssetRepair_ADD_Form(AssetRepairForm):
+
+
+    # asset_obj = forms.ModelChoiceField(queryset='')
+    category = forms.ModelChoiceField(
+        label='資產類型',
+        queryset=models.Category.objects.all(),
+        widget=forms.Select(attrs={"onchange": "foo(this)"}),
+        required=False,
+    )
+
+    def __init__(self, *args, **kwargs):
+        request = kwargs.get('request', None)
+        super(AssetRepair_ADD_Form, self).__init__(*args, **kwargs)
+
+        user_dent = request.user.userprofile.dent
+        self.fields['asset_obj'].queryset = models.Asset.objects.filter(department=user_dent).order_by('name')
+
+    class Meta(AssetRepairForm.Meta):
+        exclude = ('status', 'finish_date', 'repairer')
+
+
+# --- 資產維修詳細記錄表 ---
+
+class AssetRepairDetailForm(ModelForm):
+    '''
+    AssetRepairDetailForm
+
+    '''
+
+    def __init__(self, *args, **kwargs):
+        request = kwargs.pop('request', None)
+
+        super(AssetRepairDetailForm, self).__init__(*args, **kwargs)
+
+        admin_readonly_fields = ()
+        user_readonly_fields = ()
+
+        # 對所有字段添加Css屬性
+        for k, v in self.fields.items():
+
+            # 判斷是否為管理部門
+            if self.verify_permissions(request):
+                if k in admin_readonly_fields:
+                    self.fields[k].widget.attrs['disabled'] = 'ture'
+
+            else:
+                if k in user_readonly_fields:
+                    self.fields[k].widget.attrs['disabled'] = 'ture'
+                    # self.fields[k].widget.attrs['type'] = 'password'
+
+            self.fields[k].widget.attrs['class'] = 'form-control'
+
+    def verify_permissions(self, request):
+        print('verify_permissions')
+        # print(request)
+
+        # 驗證用戶
+        admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
+        # print('admindent', admindent)
+
+        if request.user.userprofile.dent in admindent:
+            # print('管理用戶')
+            return True
+        else:
+            # print('一般用戶')
+            return False
+
+    class Meta:
+        model = models.AssetRepairDetail
+        fields = '__all__'
 
 
 # --- 部門 ---
@@ -910,16 +1030,3 @@ class test1Form(forms.Form):
     id = forms.IntegerField(required=False, widget=forms.HiddenInput())
     dent = forms.ModelChoiceField(queryset=models.Department.objects.all())
     cary = forms.ModelChoiceField(queryset=models.Category.objects.all())
-
-
-# --- 資產維修詳細記錄表 ---
-
-class AssetRepairDetailForm(ModelForm):
-    '''
-    AssetRepairDetailForm
-
-    '''
-
-    class Meta:
-        model = models.AssetRepairDetail
-        fields = '__all__'

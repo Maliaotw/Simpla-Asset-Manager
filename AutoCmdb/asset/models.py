@@ -147,9 +147,9 @@ class AssetRepair(models.Model):
     資產維修紀錄表
     '''
 
-    asset_obj = models.ForeignKey('Asset')
-    title = models.CharField(max_length=255)
-    summary = models.TextField(null=True, blank=True)
+    asset_obj = models.ForeignKey('Asset',verbose_name='資產編號')
+    title = models.CharField(max_length=255,verbose_name='標題')
+    summary = models.TextField(verbose_name='內文',null=True, blank=True)
 
     creator = models.ForeignKey('UserProfile', verbose_name='創建者', null=True, blank=True, related_name='+')
 

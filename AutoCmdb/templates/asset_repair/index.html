@@ -1,0 +1,136 @@
+{% extends 'asset/base.html' %}
+{% load asset_tags %}
+
+<!-- 驗證用戶部門  -->
+{% verify_permissions request as admin_dent %}
+
+
+
+{% block title %}維修記錄表{% endblock %}
+
+{% block head %}
+
+
+
+
+{% endblock %}
+
+
+{% block content %}
+
+    <ol class="breadcrumb">
+        <li><a href="#">維修記錄表</a></li>
+
+    </ol>
+
+    <div class="panel panel-default" style="padding: 20px">
+
+        <div class="row">
+
+            <div class="col-md-4">
+
+                {% if admin_dent %}
+                {% endif %}
+
+            </div>
+
+            <!-- 篩選 -->
+            <div class="col-md-8" style="text-align: right">
+
+
+            </div>
+
+
+        </div>
+
+        <!--- 資產列表-->
+        <table class="table" id="mytable" style="margin-top: 20px">
+
+            <thead>
+            <tr>
+                <th>排序</th>
+                <th>資產編號</th>
+                <th>標題</th>
+                <th>內文</th>
+                <th>紀錄者</th>
+                <th>狀態</th>
+                <th>建立日期</th>
+                <th>完修時間</th>
+                <th>完修者</th>
+                <th>操作</th>
+
+            </tr>
+            </thead>
+
+
+            <tbody>
+            {% for asset_repair in asset_repair_obj %}
+                <tr>
+                    <td>
+                        {{ forloop.counter }}
+                    </td>
+
+                    <td>
+                        {{ asset_repair.asset_obj.name }}
+                    </td>
+                    <td>
+                        {{ asset_repair.title }}
+                    </td>
+                    <td>
+                        {{ asset_repair.summary }}
+                    </td>
+                    <td>
+                        {{ asset_repair.creator }}
+                    </td>
+                    <td>
+                        {{ asset_repair.status }}
+                    </td>
+                    <td>
+                        {{ asset_repair.create_date }}
+                    </td>
+                    <td>
+                        {{ asset_repair.finish_date }}
+                    </td>
+                    <td>
+                        {{ asset_repair.repairer }}
+                    </td>
+                    <td>
+                        <i class="fa fa-eye"></i>
+                    </td>
+
+
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">維修記錄表</h1>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+
+    <div class="row">
+
+        {{ asset_repair_obj }}
+
+
+    </div>
+
+
+
+{% endblock %}
+
+
+{% block extra-js %}
+
+    <script>
+
+
+    </script>
+
+{% endblock %}
+
+

@@ -10,16 +10,32 @@ import datetime
 import csv
 from django.http import StreamingHttpResponse
 import numpy as np
-
+import json
 
 # --- 資產 ---
 
 def asset(request):
-
     print('Assset')
 
+    # 驗證用戶
+    admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
+    if request.user.userprofile.dent in admindent:
+        print('管理用戶')
+        # category_obj = models.Category.objects.all()
+        asset_obj = models.Asset.objects.all()
+        asset_repair_obj = models.AssetRepair.objects.filter(status=False)
+        # user_obj = models.UserProfile.objects.all()
+
+    else:
+        print('一般用戶')
+
+        # search_field['dent_id'] = dent_id
+        # dent_id = request.user.userprofile.dent_id
+        asset_obj = models.Asset.objects.filter(department=request.user.userprofile.dent)
+        asset_repair_obj = models.AssetRepair.objects.filter(asset_obj__in=asset_obj, status=False)
 
     return render(request, "asset/home.html", locals())
+
 
 def asset_index(request):
     print('Asset_index')
@@ -54,7 +70,6 @@ def asset_index(request):
             dent_id = request.user.userprofile.dent_id
             search_field['dent_id'] = dent_id
 
-
         # print(search_field)
 
         # GET 字段 篩選
@@ -85,7 +100,6 @@ def asset_index(request):
         # print('asset_obj',asset_obj)
 
         return render(request, "asset/index.html", locals())
-
 
     if request.method == 'POST':
 
@@ -155,8 +169,6 @@ def asset_index(request):
             ret['status'] = 'error'
 
         return JsonResponse(ret)
-
-
 
 
 def asset_add(request):
@@ -359,7 +371,39 @@ def asset_output(request):
     return response
 
 
-# --- 資產維修紀錄
+# --- 資產維修紀錄 ---
+
+def asset_repair(request):
+    # 判斷管理用戶
+    admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
+    if request.user.userprofile.dent in admindent:
+        print('管理用戶')
+        asset_repair_obj = models.AssetRepair.objects.all()
+
+    else:
+        print('一般用戶')
+
+        # search_field['dent_id'] = dent_id
+        # dent_id = request.user.userprofile.dent_id
+        asset_repair_obj = models.AssetRepair.objects.filter(asset_obj__department=request.user.userprofile.dent)
+
+    return render(request, 'asset_repair/index.html', locals())
+
+
+def asset_repair_add(request):
+    forms_obj = forms.AssetRepair_ADD_Form(request=request)
+
+    category = models.Category.objects.all()
+    user_dent = request.user.userprofile.dent
+
+    data = {cate.id:list(models.Asset.objects.filter(category=cate,department=user_dent).values('id','name'))  for cate in category }
+    print(data)
+    # data = json.dumps(data)
+
+    return render(request, 'asset_repair/add.html', locals())
+
+
+# --- 資產維修詳細紀錄 ---
 
 def asset_repair_detail(request):
     if request.method == 'GET':

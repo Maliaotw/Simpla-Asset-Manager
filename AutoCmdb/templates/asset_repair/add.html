@@ -1,0 +1,90 @@
+{% extends 'asset_repair/base.html' %}
+{% load asset_tags %}
+
+<!-- 驗證用戶部門  -->
+{% verify_permissions request as admin_dent %}
+
+
+
+{% block title %}新增維修記錄表{% endblock %}
+
+{% block head %}
+
+
+
+
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">新增維修記錄表</h1>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+
+    <div class="" style="padding: 20px">
+        <form role="form" method="post" id="form">
+            <div class="row">
+{#                <div class="col-lg-12">#}
+                    <div class="col-lg-6 form-group has-feedback">
+                        {{ forms_obj.category.label_tag }}
+                        {{ forms_obj.category }}
+                    </div>
+
+                    <div class="col-lg-6 form-group has-feedback">
+                        {{ forms_obj.asset_obj.label_tag }}
+                        {{ forms_obj.asset_obj }}
+                    </div>
+
+                    <div class="col-lg-12 form-group has-feedback">
+                        {{ forms_obj.title.label_tag }}
+                        {{ forms_obj.title }}
+                    </div>
+
+                    <div class="col-lg-12 form-group has-feedback">
+                        {{ forms_obj.summary.label_tag }}
+                        {{ forms_obj.summary }}
+                    </div>
+
+                </div>
+
+
+{#            </div>#}
+        </form>
+    </div>
+
+
+
+
+{% endblock %}
+
+
+{% block extra-js %}
+
+    <script>
+
+        var data = {{ data|safe }};
+
+        function foo(e) {
+            console.log('foo');
+            console.log(e.value);
+            document.getElementById("id_asset_obj").options.length = 1;
+            $.each(data[e.value], function (i, item) {
+                $('#id_asset_obj').append($('<option>', {
+                    value: item.id,
+                    text: item.name,
+                }));
+
+            })
+
+
+        }
+
+    </script>
+
+{% endblock %}
+
+

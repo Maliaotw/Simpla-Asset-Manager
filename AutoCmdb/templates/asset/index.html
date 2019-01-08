@@ -2,7 +2,7 @@
 {% load asset_tags %}
 
 <!-- 驗證用戶部門  -->
-{% verify_permissions request as admin_dent %}
+
 
 
 
@@ -41,7 +41,7 @@
 
             <div class="col-md-4">
 
-
+                {% verify_permissions request as admin_dent %}
                 {% if admin_dent %}
                     <a href="{% url 'asset_add' %}" class="btn btn-primary" role="button">新增資產</a>
                 {% endif %}
@@ -73,7 +73,6 @@
 
 
                     {% if admin_dent %}
-                        <a href="{% url 'asset_add' %}" class="btn btn-primary" role="button">新增資產</a>
 
                         <div class="form-group">
                             <label class="col-form-label">部門</label>
