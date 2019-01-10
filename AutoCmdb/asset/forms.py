@@ -351,6 +351,8 @@ class AssetRepair_ADD_Form(AssetRepairForm):
         user_dent = request.user.userprofile.dent
         self.fields['asset_obj'].queryset = models.Asset.objects.filter(department=user_dent).order_by('name')
 
+        self.fields['asset_obj'].widget.attrs['disabled'] = 'ture'
+
     class Meta(AssetRepairForm.Meta):
         exclude = ('status', 'finish_date', 'repairer')
 

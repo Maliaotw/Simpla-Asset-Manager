@@ -11,6 +11,8 @@ import csv
 from django.http import StreamingHttpResponse
 import numpy as np
 import json
+from django.views.decorators.csrf import csrf_exempt,csrf_protect
+
 
 # --- 資產 ---
 
@@ -391,16 +393,44 @@ def asset_repair(request):
 
 
 def asset_repair_add(request):
-    forms_obj = forms.AssetRepair_ADD_Form(request=request)
 
-    category = models.Category.objects.all()
-    user_dent = request.user.userprofile.dent
 
-    data = {cate.id:list(models.Asset.objects.filter(category=cate,department=user_dent).values('id','name'))  for cate in category }
-    print(data)
-    # data = json.dumps(data)
+    if request.method == 'GET':
 
-    return render(request, 'asset_repair/add.html', locals())
+        forms_obj = forms.AssetRepair_ADD_Form(request=request)
+
+        category = models.Category.objects.all()
+        user_dent = request.user.userprofile.dent
+
+        data = {cate.id:list(models.Asset.objects.filter(category=cate,department=user_dent).values('id','name'))  for cate in category }
+        print(data)
+
+
+        return render(request, 'asset_repair/add.html', locals())
+
+    if request.method == 'POST':
+
+        print(request.POST)
+        print(request.FILES)
+
+        return HttpResponse('1123456')
+
+
+
+@csrf_exempt
+def asset_file(request):
+
+
+    if request.method == 'POST':
+
+
+        print(request)
+        print('PPPPPPPPPP'*10)
+
+
+        return JsonResponse({'msg':"POST"})
+
+    return HttpResponse("123")
 
 
 # --- 資產維修詳細紀錄 ---

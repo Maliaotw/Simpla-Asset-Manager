@@ -22,7 +22,7 @@ urlpatterns = [
     # url(r'^admin/', admin.site.urls),
 
     # --- asset ---
-    url(r'^asset$', views.asset, name="asset"),
+    url(r'^asset/$', views.asset, name="asset"),
     url(r'^asset/index$', views.asset_index, name="asset_index"),
     url(r'^asset/add', views.asset_add, name="asset_add"),
     url(r'^asset/edit/(?P<pk>\d+)', views.asset_edit, name="asset_edit"),
@@ -32,6 +32,9 @@ urlpatterns = [
     # --- asset_repair ---
     url(r'^asset_repair$', views.asset_repair, name='asset_repair'),
     url(r'^asset_repair/add$', views.asset_repair_add, name='asset_repair_add'),
+
+
+    url(r'^asset_file$', views.asset_file, name='asset_file'),
 
     # --- asset_repair_detail ---
     url(r'^asset_repair_detail/$', views.asset_repair_detail, name="asset_repair_detail"),
