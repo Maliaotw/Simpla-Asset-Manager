@@ -409,7 +409,14 @@ def asset_repair_add(request):
         print(request.POST)
         print(request.FILES)
 
-        return HttpResponse('1123456')
+        form = forms.AssetRepair_ADD_Form(request=request, data=request.POST)
+
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.creator = request.user.userprofile
+            obj.save()
+
+        return redirect('/asset_repair')
 
 
 '''
@@ -424,33 +431,58 @@ def upload_pic(request):
     return HttpResponseForbidden('allowed only via POST')
 '''
 
+
 @csrf_exempt
 def asset_file(request):
     if request.method == 'POST':
         print(request)
         print('POST' * 10)
 
-        name = request.FILES['photo'].name
+        name = request.FILES['img'].name
 
-        i = models.AssetRepairImage(name=name,photo=request.FILES['photo'])
-        print(i.save())
-        print(dir(i))
-        print(dir(i.photo))
-        print(i)
-        print(i.photo.url)
+        print(name)
 
-        return JsonResponse({})
+        i = models.AssetRepairImage(name=name, photo=request.FILES['img'])
+        i.save()
 
-    return HttpResponse("123")
+        # print(i.save())
+        # print(dir(i))
+        # print(dir(i.photo))
+        # print(i)
+        # print(i.photo.url)
+        # print(i.id)
+
+        return JsonResponse({'id': i.id})
+
+    return HttpResponse("")
 
 
 # --- 資產維修詳細紀錄 ---
 
-def asset_repair_detail(request):
-    if request.method == 'GET':
-        print('Get')
+def asset_repair_detail(request, pk):
 
-    elif request.method == 'POST':
+
+    print(pk)
+
+    asset_repair_obj = models.AssetRepair.objects.get(id=pk)
+
+    print(asset_repair_obj.photo.all())
+
+
+    asset_repair_detail = models.AssetRepairDetail.objects.filter(repair=asset_repair_obj)
+
+    return render(request, 'asset_repair/detail.html', locals())
+
+    # if request.method == 'GET':
+    #     print('Get')
+    #
+    #     repair_obj = models.AssetRepair.objects.get(id=pk)
+    #
+    #     return render(request,'asset_repair/detail.html',locals())
+
+
+def asset_repair_detail_add(request):
+    if request.method == 'POST':
         print('Post')
         # data = dict()
         # print(data)
@@ -460,9 +492,11 @@ def asset_repair_detail(request):
         # print(a)
 
         print(request.POST)
+
+
         froms_obj = forms.AssetRepairDetailForm(request.POST)
-        print(froms_obj.is_valid())
-        print(froms_obj.errors)
+        # print(froms_obj.is_valid())
+        # print(froms_obj.errors)
 
         if froms_obj.is_valid():
             ARD_obj = froms_obj.save()
@@ -495,8 +529,7 @@ def asset_repair_detail(request):
 
     else:
         print('else')
-
-    return HttpResponse("ppppp")
+        return JsonResponse({})
 
 
 # --- 部門 ---

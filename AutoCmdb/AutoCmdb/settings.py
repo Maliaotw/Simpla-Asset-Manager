@@ -124,8 +124,9 @@ STATICFILES_DIRS = (
 # File Path
 # https://docs.djangoproject.com/en/1.11/ref/settings/#std:setting-MEDIA_ROOT
 
-# MEDIA_URL = '/media/'
-# MEDIA_ROOT  = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 DEMO_ROOT = os.path.join(BASE_DIR, 'demo_files')
 DEMO_URL = '/demo/'

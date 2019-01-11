@@ -37,7 +37,8 @@ urlpatterns = [
     url(r'^asset_file$', views.asset_file, name='asset_file'),
 
     # --- asset_repair_detail ---
-    url(r'^asset_repair_detail/$', views.asset_repair_detail, name="asset_repair_detail"),
+    url(r'^asset_repair_detail/(?P<pk>\d+)', views.asset_repair_detail, name="asset_repair_detail"),
+    url(r'^asset_repair_detail/add/$', views.asset_repair_detail_add, name="asset_repair_detail_add"),
 
     # --- department ---
     url(r'^department/$', views.department, name="department"),

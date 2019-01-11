@@ -1,0 +1,257 @@
+{% extends 'asset/base.html' %}
+{% load asset_tags %}
+
+
+{% block title %}主機列表{% endblock %}
+
+{% block head %}
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+
+
+    <ol class="breadcrumb">
+        <li><a href="{% url 'asset_repair' %}">資產維修表 </a></li>
+        <li class="active">{{ host_obj.name }}</li>
+
+    </ol>
+
+
+
+    <div class="" style="padding: 20px">
+
+
+
+
+            <!-- /維修紀錄 Tab -->
+            <div class="tab-pane" id="tab_repair">
+
+
+
+                    <div class="well">
+                        <div class="media">
+
+                            <div id="post">
+                                <a class="pull-left" href="#" style="margin-right: 20px">
+                                    <img class="media-object" height="150" width="150"
+                                         src="http://2.bp.blogspot.com/-U77ROceRfZ4/VBZUKz_wccI/AAAAAAAAAL8/CHcrtv2dIcQ/s1600/187785.jpeg">
+                                </a>
+                                <div class="media-body" style="margin-bottom: 20px;height: 150px">
+                                    <h3 class="media-heading">
+                                        {{ asset_repair_obj.title }}
+
+                                        {% if asset_repair_obj.status %}
+                                            <span class="badge alert-success">已處理</span>
+                                        {% else %}
+
+                                            <span class="badge alert-danger">跟進中</span>
+                                        {% endif %}
+
+
+                                    </h3>
+                                    <p class="text-left"><span><i
+                                            style="color: black"
+                                            class="far fa-user"></i> {{ asset_repair_obj.creator.code }}</span></p>
+                                    <p>{{ asset_repair_obj.summary }}</p>
+
+
+                                    <ul class="list-inline list-unstyled">
+
+                                        <li>
+                                            <span><i class="glyphicon glyphicon-calendar"></i> {{ asset_repair_obj.create_date |date:"Y/m/d" }} </span>
+                                        </li>
+
+                                        <li>|</li>
+
+                                        <li><span><i class="glyphicon glyphicon-wrench"></i>
+                                        <!--- TODO 只篩選資訊部 User Code -->
+                                            {% for re in asset_repair_detail %}
+                                                {{ re.user.code }}
+                                            {% endfor %}
+                                    </span></li>
+
+                                        <li>|</li>
+                                        <span onclick="show_reply($(this))"><i
+                                                class="glyphicon glyphicon-comment "></i> {{ asset_repair_detail|length }} comments</span>
+
+                                    </ul>
+
+
+                                </div>
+                            </div>
+
+                            <div id="reply" class="hide">
+                                {% for ass_re in asset_repair_detail %}
+                                    <div class="panel panel-primary">
+                                        <div class="panel-heading">
+                                            <strong><i class="far fa-user"></i> {{ ass_re.user.code }}</strong>
+                                        </div>
+                                        <div class="panel-body">
+                                            {{ ass_re.content }}
+                                            <p class="text-right">{{ ass_re.create_date|date:'Y/m/d H:i' }}</p>
+                                        </div><!-- /panel-body -->
+                                    </div><!-- /panel panel-default -->
+
+                                {% endfor %}
+
+
+
+
+
+                                {% if not asset_repair_obj.status %}
+                                    <div class="panel " style="border-color:black">
+                                        <div class="panel-heading">
+                                            <strong>添加一條新回覆</strong>
+                                        </div>
+                                        <div class="panel-body" id="reply_post">
+
+                                    <textarea class="form-control" name="content" maxlength="10000"
+                                              style="overflow: hidden; overflow-wrap: break-word; resize: none; height: 100px"></textarea>
+
+                                            <input name="userid" value="{{ request.user.userprofile.id }}"
+                                                   style="display: none">
+                                            <input name="repairid" value="{{ asset_repair.id }}"
+                                                   style="display: none">
+                                            <button id='reply_btn' class="btn" style="margin-top: 15px"
+                                                    onclick="reply()">回覆
+                                            </button>
+                                        </div><!-- /panel-body -->
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+            </div>
+
+
+    <div>
+
+
+        {% for i in asset_repair_obj.photo.all %}
+
+
+            {{ i }}
+
+        {% endfor %}
+
+
+
+    </div>
+
+
+
+            <div>
+                {% for i in asset_repair_detail %}
+
+                    {{ i.url }}
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+
+{% endblock %}
+
+
+
+
+
+{% block extra-js %}
+
+
+
+
+    <script>
+
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        var inputs = $("input");
+        $.each(inputs, function (i, obj) {
+            //console.log(obj);
+            $(obj).attr('type', 'text');
+        });
+
+
+        //  Reply : Change icon
+        function reply(ele) {
+
+
+            user = $("#reply_post [name='userid']").val();
+            repair = $("#reply_post [name='repairid']").val();
+            content = $("#reply_post [name='content']").val();
+
+            console.log(user);
+
+            data = {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                content: content,
+                user: user,
+                repair: repair,
+
+            };
+
+            $.ajax({
+
+                url: "{% url 'asset_repair_detail_add' %}",
+                data: data,
+                type: 'POST',
+                async: false,
+                success: function (callback) {
+                    console.log(callback);
+                    console.log(callback.data);
+
+                    if (callback.status == 'ok') {
+
+                        $("#reply").append('<div class="panel panel-primary"><div class="panel-heading"><i class="far fa-user"></i> <strong>' + callback.data.user + '</strong></div><div class="panel-body">' + callback.data.content + '<p class="text-right">' + callback.data.date + '</p></div></div>');
+                        $("#reply_post [name='content']").val("");
+
+                    }
+
+                },
+                error: function () {
+                    put_status = false
+
+                }
+
+            });
+
+        }
+
+        function show_reply(ele) {
+            {#console.log($(this));#}
+            $('#reply').toggleClass('hide');
+
+        }
+
+
+    </script>
+
+{% endblock %}
+
+
+
