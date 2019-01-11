@@ -11,7 +11,7 @@ import csv
 from django.http import StreamingHttpResponse
 import numpy as np
 import json
-from django.views.decorators.csrf import csrf_exempt,csrf_protect
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
 
 # --- 資產 ---
@@ -393,42 +393,53 @@ def asset_repair(request):
 
 
 def asset_repair_add(request):
-
-
     if request.method == 'GET':
-
         forms_obj = forms.AssetRepair_ADD_Form(request=request)
 
         category = models.Category.objects.all()
         user_dent = request.user.userprofile.dent
 
-        data = {cate.id:list(models.Asset.objects.filter(category=cate,department=user_dent).values('id','name'))  for cate in category }
-        print(data)
-
+        data = {cate.id: list(models.Asset.objects.filter(category=cate, department=user_dent).values('id', 'name')) for
+                cate in category}
+        # print(data)
 
         return render(request, 'asset_repair/add.html', locals())
 
     if request.method == 'POST':
-
         print(request.POST)
         print(request.FILES)
 
         return HttpResponse('1123456')
 
 
+'''
+def upload_pic(request):
+    if request.method == 'POST':
+        form = ImageUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            m = ExampleModel.objects.get(pk=course_id)
+            m.model_pic = form.cleaned_data['image']
+            m.save()
+            return HttpResponse('image upload success')
+    return HttpResponseForbidden('allowed only via POST')
+'''
 
 @csrf_exempt
 def asset_file(request):
-
-
     if request.method == 'POST':
-
-
         print(request)
-        print('PPPPPPPPPP'*10)
+        print('POST' * 10)
 
+        name = request.FILES['photo'].name
 
-        return JsonResponse({'msg':"POST"})
+        i = models.AssetRepairImage(name=name,photo=request.FILES['photo'])
+        print(i.save())
+        print(dir(i))
+        print(dir(i.photo))
+        print(i)
+        print(i.photo.url)
+
+        return JsonResponse({})
 
     return HttpResponse("123")
 
