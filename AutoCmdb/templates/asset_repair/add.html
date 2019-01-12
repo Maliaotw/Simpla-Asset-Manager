@@ -58,10 +58,7 @@
                     {{ forms_obj.summary }}
                 </div>
 
-{#                <div class="col-lg-12 form-group has-feedback">#}
-{#                    {{ forms_obj.photo.label_tag }}#}
-{#                    {{ forms_obj.photo }}#}
-{#                </div>#}
+
 
 
 
@@ -142,7 +139,7 @@
             language: "zh-TW",
             previewFileType: 'any',
             allowedFileExtensions: ['jpg', 'gif', 'png'],
-            maxFileCount: 10,
+            maxFileCount: 3,
             showUpload: true,
             uploadExtraData: {
                 "csrfmiddlewaretoken": csrftoken //帶上CSRF参数

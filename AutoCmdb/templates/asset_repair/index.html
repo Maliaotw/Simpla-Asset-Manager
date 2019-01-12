@@ -1,4 +1,4 @@
-{% extends 'asset/base.html' %}
+{% extends 'asset_repair/base.html' %}
 {% load asset_tags %}
 
 <!-- 驗證用戶部門  -->
@@ -74,20 +74,24 @@
                         {{ asset_repair.asset_obj.name }}
                     </td>
                     <td>
-                        {{ asset_repair.title }}
+                        <span> <b>{{ asset_repair.title }}</b> </span>
                     </td>
                     <td>
                         {{ asset_repair.summary }}
                     </td>
                     <td>
-                        {{ asset_repair.creator }}
+                        {{ asset_repair.creator|default:"" }}
                     </td>
                     <td>
-                        {{ asset_repair.status }}
+                        {% if asset_repair.status %}
+                            <span style="color: green">已處理</span>
+                        {% else %}
+                            <span style="color: red">跟進中</span>
+                        {% endif %}
                     </td>
 
                     <td>
-                        {{ asset_repair.create_date|date:'Y/m/d h:s' }}
+                        {{ asset_repair.create_date|date:'Y/m/d H:i' }}
                     </td>
 
                     <td>

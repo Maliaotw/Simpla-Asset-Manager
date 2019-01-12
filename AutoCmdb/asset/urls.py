@@ -32,13 +32,14 @@ urlpatterns = [
     # --- asset_repair ---
     url(r'^asset_repair$', views.asset_repair, name='asset_repair'),
     url(r'^asset_repair/add$', views.asset_repair_add, name='asset_repair_add'),
-
+    url(r'^asset_repair/detail/(?P<pk>\d+)', views.asset_repair_detail, name="asset_repair_detail"),
 
     url(r'^asset_file$', views.asset_file, name='asset_file'),
 
     # --- asset_repair_detail ---
-    url(r'^asset_repair_detail/(?P<pk>\d+)', views.asset_repair_detail, name="asset_repair_detail"),
     url(r'^asset_repair_detail/add/$', views.asset_repair_detail_add, name="asset_repair_detail_add"),
+    url(r'^asset_repair_detail/edit/$', views.asset_repair_detail_edit, name="asset_repair_detail_edit"),
+    url(r'^asset_repair_detail/del/$', views.asset_repair_detail_del, name="asset_repair_detail_del"),
 
     # --- department ---
     url(r'^department/$', views.department, name="department"),

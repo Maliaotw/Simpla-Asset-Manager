@@ -185,15 +185,15 @@ def asset_add(request):
         print(request.POST)
         forms_obj = forms.Asset_Add_Form(data=request.POST, request=request)
 
-        print(forms_obj.errors)
+        # print(forms_obj.errors)
         #
         fields = set(list(dict(forms_obj.fields).keys()))
         errors = set(list(forms_obj.errors.keys()))
         #
         errors_fields = list(fields & errors)
         success_fields = list(fields - errors)
-        print(errors_fields)
-        print(success_fields)
+        # print(errors_fields)
+        # print(success_fields)
         #
 
         if forms_obj.is_valid():
@@ -393,6 +393,12 @@ def asset_repair(request):
 
 
 def asset_repair_add(request):
+    '''
+    新增維修表單
+
+    :param request:
+    :return:
+    '''
     if request.method == 'GET':
         forms_obj = forms.AssetRepair_ADD_Form(request=request)
 
@@ -411,12 +417,25 @@ def asset_repair_add(request):
 
         form = forms.AssetRepair_ADD_Form(request=request, data=request.POST)
 
+        m = models.AssetRepair()
+        # m.photo.obj
+
         if form.is_valid():
-            obj = form.save(commit=False)
+            obj = form.save()
             obj.creator = request.user.userprofile
+            print(form.cleaned_data['photo'])
+
+            # obj.photo.add(form.cleaned_data['photo'])
+            for i in form.cleaned_data['photo']:
+                obj.photo.add(i)
+
+
             obj.save()
 
         return redirect('/asset_repair')
+
+
+
 
 
 '''
@@ -466,7 +485,9 @@ def asset_repair_detail(request, pk):
 
     asset_repair_obj = models.AssetRepair.objects.get(id=pk)
 
-    print(asset_repair_obj.photo.all())
+    # ps = asset_repair_obj.photo.all()
+    # for p in ps:
+
 
 
     asset_repair_detail = models.AssetRepairDetail.objects.filter(repair=asset_repair_obj)
@@ -482,19 +503,21 @@ def asset_repair_detail(request, pk):
 
 
 def asset_repair_detail_add(request):
+    '''
+    新增留言
+
+    :param request:
+    :return:
+    '''
     if request.method == 'POST':
         print('Post')
-        # data = dict()
-        # print(data)
-        #
-        # request.POST.pop('csrfmiddlewaretoken')
-        # a = models.AssetRepairDetail(**data)
-        # print(a)
+
 
         print(request.POST)
+        # <QueryDict: {'csrfmiddlewaretoken': ['asd'], 'content': ['adsasd'], 'user': ['314'], 'repair': ['19']}>
 
 
-        froms_obj = forms.AssetRepairDetailForm(request.POST)
+        froms_obj = forms.AssetRepairDetailForm(request=request,data=request.POST)
         # print(froms_obj.is_valid())
         # print(froms_obj.errors)
 
@@ -527,9 +550,70 @@ def asset_repair_detail_add(request):
         # froms_obj.save()
 
 
+    elif request.method == 'PUT':
+        print("this is put")
+
+
     else:
         print('else')
         return JsonResponse({})
+
+
+def asset_repair_detail_edit(request):
+
+    '''
+    修改留言
+    :param request:
+    :return:
+    '''
+
+
+
+
+    if request.method == 'PUT':
+        print("This is PUT")
+
+        put = QueryDict(request.body)
+        print(put)
+
+        content = put.get('content')
+        user = put.get('user')
+        id = put.get('id')
+        repair = put.get('repair')
+
+        repair_detail_obj = models.AssetRepairDetail.objects.get(id=id)
+
+        froms_obj = forms.AssetRepairDetailForm(request=request, data=put,instance=repair_detail_obj)
+        print(froms_obj.errors)
+        if froms_obj.is_valid():
+            froms_obj.save()
+
+
+
+        return JsonResponse({})
+
+
+
+
+def asset_repair_detail_del(request):
+
+    '''
+    刪除留言
+    :param request:
+    :return:
+    '''
+
+    if request.method == 'DELETE':
+
+
+        return JsonResponse({})
+
+
+
+
+
+
+
 
 
 # --- 部門 ---
