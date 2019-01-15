@@ -13,6 +13,7 @@
 
 {% block content %}
 
+    {% csrf_token %}
 
 
     <ol class="breadcrumb">
@@ -42,10 +43,14 @@
                                 {{ asset_repair_obj.asset_obj.name }} {{ asset_repair_obj.title }}
 
                                 {% if asset_repair_obj.status %}
-                                    <span class="badge alert-success">已處理</span>
+                                    <button class="badge alert-success" onclick="ch_status()"
+                                            data-status="{{ asset_repair_obj.status }}">已處理
+                                    </button>
                                 {% else %}
 
-                                    <span class="badge alert-danger">跟進中</span>
+                                    <button class="badge alert-danger" onclick="ch_status()"
+                                            data-status="{{ asset_repair_obj.status }}">跟進中
+                                    </button>
                                 {% endif %}
 
 
@@ -73,8 +78,8 @@
 
                                 <li><span><i class="glyphicon glyphicon-wrench"></i>
                                     <!--- TODO 只篩選資訊部 User Code -->
-                                    {% for re in asset_repair_detail %}
-                                        {{ re.user.code }}
+                                    {% for re in fix_users %}
+                                        {{ re }}
                                     {% endfor %}
                                     </span></li>
 
@@ -123,7 +128,7 @@
             <!--- 留言  -->
             <div id="reply">
                 {% for ass_re in asset_repair_detail %}
-                    <div class="panel panel-primary" data-id="{{ ass_re.id }}" data-repair="{{ ass_re.user.id }}">
+                    <div class="panel panel-primary" data-id="{{ ass_re.id }}" data-repair="{{ asset_repair_obj.id }}">
                         <div class="panel-heading">
 
                             <strong><i class="far fa-user"></i> {{ ass_re.user.code }}</strong>
@@ -141,7 +146,8 @@
                                     <i class="fa fa-edit fa-fw"></i>編輯
                                 </button>
 
-                                <button class="pull-right commit_submit" style="background: transparent;border: none"
+                                <button class="pull-right commit_submit"
+                                        style="background: transparent;border: none;display: none"
                                         onclick="commit_submit(this)">
                                     修改
                                 </button>
@@ -183,10 +189,35 @@
                 </div>
             {% endif %}
 
+
         </div>
 
-        {% csrf_token %}
+
     </div>
+
+
+    <!--- 刪除部門表單 -->
+
+    <div class="modal fade" id="del_Modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">刪除留言</h4>
+                </div>
+                <div class="modal-body">
+                    <p>您確定要刪除<span style="color: red"></span><input type="number" style="display:none;">嗎</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="del_submit" type="button" class="btn btn-primary">確認</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
 
 
 
@@ -219,11 +250,20 @@
             }
         });
 
-        var inputs = $("input");
-        $.each(inputs, function (i, obj) {
-            //console.log(obj);
-            $(obj).attr('type', 'text');
-        });
+        //var inputs = $("input");
+        //$.each(inputs, function (i, obj) {
+        //console.log(obj);
+        //  $(obj).attr('type', 'text');
+        //});
+
+
+        // 更改狀態 :只有IT能修改
+        function ch_status(ele) {
+
+            console.log('ch_status');
+
+
+        }
 
 
         //  Reply : Change icon
@@ -319,7 +359,7 @@
                 id: id,
                 content: content.val(),
                 user: $("#reply_post [name='userid']").val(),
-                repair : repair
+                repair: repair
 
 
             };
@@ -332,6 +372,18 @@
                 async: false,
                 success: function (callback) {
                     console.log(callback);
+
+                    if (callback.status == 'ok') {
+
+                        content.hide();
+                        var span = primary.find('span');
+                        span.text(content.val());
+                        span.show();
+
+                        primary.find('button').show();
+                        primary.find('.commit_submit').hide();
+
+                    }
 
 
                 },
@@ -349,9 +401,57 @@
         function commit_del(ele) {
 
             console.log("del");
-            console.log($(ele).data('id'));
+
+
+            primary = $(ele).closest(".panel-primary");
+
+            var id = primary.data('id');
+            console.log(id);
+
+
+            var span = primary.find('span');
+            console.log(span.text());
+
+
+            $('#del_Modal .modal-body').find('span').text(span.text());
+            $('#del_Modal .modal-body').find('input').val(id);
+            $('#del_Modal').modal('show');
+
 
         }
+
+        // 提交刪除
+
+        $("#del_submit").on('click', function (event) {
+
+
+            var text = $('#del_Modal .modal-body').find('span').text();
+            var id = $('#del_Modal .modal-body').find('input').val();
+
+            console.log(text, id);
+
+            data = {id: id};
+
+            $.ajax({
+                url: "{% url 'asset_repair_detail_del' %}",
+                data: data,
+                type: 'DELETE',
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback.status == 'ok') {
+
+                        //tr.remove();
+                        primary.remove();
+                        $('#del_Modal').modal('hide');
+
+
+                    }
+                }
+            });
+
+
+        });
 
 
     </script>

@@ -429,13 +429,9 @@ def asset_repair_add(request):
             for i in form.cleaned_data['photo']:
                 obj.photo.add(i)
 
-
             obj.save()
 
         return redirect('/asset_repair')
-
-
-
 
 
 '''
@@ -479,8 +475,6 @@ def asset_file(request):
 # --- 資產維修詳細紀錄 ---
 
 def asset_repair_detail(request, pk):
-
-
     print(pk)
 
     asset_repair_obj = models.AssetRepair.objects.get(id=pk)
@@ -488,18 +482,14 @@ def asset_repair_detail(request, pk):
     # ps = asset_repair_obj.photo.all()
     # for p in ps:
 
-
-
     asset_repair_detail = models.AssetRepairDetail.objects.filter(repair=asset_repair_obj)
 
-    return render(request, 'asset_repair/detail.html', locals())
+    # 過濾留言為技術部人員
+    fix_users = list(
+        set([i['user__code'] for i in asset_repair_detail.filter(user__dent__code='IT').values('user__code')]))
+    print(fix_users)
 
-    # if request.method == 'GET':
-    #     print('Get')
-    #
-    #     repair_obj = models.AssetRepair.objects.get(id=pk)
-    #
-    #     return render(request,'asset_repair/detail.html',locals())
+    return render(request, 'asset_repair/detail.html', locals())
 
 
 def asset_repair_detail_add(request):
@@ -512,12 +502,10 @@ def asset_repair_detail_add(request):
     if request.method == 'POST':
         print('Post')
 
-
         print(request.POST)
         # <QueryDict: {'csrfmiddlewaretoken': ['asd'], 'content': ['adsasd'], 'user': ['314'], 'repair': ['19']}>
 
-
-        froms_obj = forms.AssetRepairDetailForm(request=request,data=request.POST)
+        froms_obj = forms.AssetRepairDetailForm(request=request, data=request.POST)
         # print(froms_obj.is_valid())
         # print(froms_obj.errors)
 
@@ -560,15 +548,11 @@ def asset_repair_detail_add(request):
 
 
 def asset_repair_detail_edit(request):
-
     '''
     修改留言
     :param request:
     :return:
     '''
-
-
-
 
     if request.method == 'PUT':
         print("This is PUT")
@@ -576,44 +560,44 @@ def asset_repair_detail_edit(request):
         put = QueryDict(request.body)
         print(put)
 
-        content = put.get('content')
-        user = put.get('user')
         id = put.get('id')
-        repair = put.get('repair')
+        # content = put.get('content')
+        # user = put.get('user')
+        # repair = put.get('repair')
 
         repair_detail_obj = models.AssetRepairDetail.objects.get(id=id)
 
-        froms_obj = forms.AssetRepairDetailForm(request=request, data=put,instance=repair_detail_obj)
+        froms_obj = forms.AssetRepairDetailForm(request=request, data=put, instance=repair_detail_obj)
         print(froms_obj.errors)
         if froms_obj.is_valid():
-            froms_obj.save()
 
+            if froms_obj.cleaned_data['user'] == repair_detail_obj.user:
 
+                froms_obj.save()
+
+                return JsonResponse({'status': 'ok', 'code': 200})
+
+            else:
+
+                return JsonResponse({'status': 'error', 'code': 201})
 
         return JsonResponse({})
 
 
-
-
 def asset_repair_detail_del(request):
-
     '''
     刪除留言
     :param request:
     :return:
     '''
 
-    if request.method == 'DELETE':
+    print("This is Delete")
+    put = QueryDict(request.body)
+    id = put.get('id')
+    dent_obj = models.AssetRepairDetail.objects.get(id=id)
+    dent_obj.delete()
 
-
-        return JsonResponse({})
-
-
-
-
-
-
-
+    return JsonResponse({'status':'ok','code':200})
 
 
 # --- 部門 ---
