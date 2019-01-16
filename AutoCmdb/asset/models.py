@@ -36,7 +36,7 @@ class UserProfile(models.Model):
         verbose_name_plural = "用戶"
 
     def __str__(self):
-        return "%s(%s)" % (self.code, self.name,)
+        return "%s(%s)" % (self.code, self.user.username,)
 
 
 class Location(models.Model):

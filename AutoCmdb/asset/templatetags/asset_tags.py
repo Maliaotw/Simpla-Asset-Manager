@@ -133,7 +133,21 @@ def verify_permissions(request):
 
 
 
+@register.simple_tag
+def verify_dent(request,code):
+    '''
 
+    :param request:
+    :param code: dent_id
+    :return:
+    '''
+
+    user = models.UserProfile.objects.get(user=request.user)
+
+    if user.dent.code == code:
+        return True
+    else:
+        return False
 
 
 

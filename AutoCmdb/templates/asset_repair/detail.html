@@ -42,13 +42,15 @@
                             <h3 class="media-heading">
                                 {{ asset_repair_obj.asset_obj.name }} {{ asset_repair_obj.title }}
 
+
+
                                 {% if asset_repair_obj.status %}
-                                    <button class="badge alert-success" onclick="ch_status()"
+                                    <button class="badge alert-success" onclick="ch_status(this)"
                                             data-status="{{ asset_repair_obj.status }}">已處理
                                     </button>
                                 {% else %}
 
-                                    <button class="badge alert-danger" onclick="ch_status()"
+                                    <button class="badge alert-danger" onclick="ch_status(this)"
                                             data-status="{{ asset_repair_obj.status }}">跟進中
                                     </button>
                                 {% endif %}
@@ -260,7 +262,42 @@
         // 更改狀態 :只有IT能修改
         function ch_status(ele) {
 
-            console.log('ch_status');
+
+             data = {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                ststus: $(ele).attr('data-status'),
+                user: {{ request.user.userprofile.id }},
+                repair: {{ asset_repair_obj.id }},
+
+            };
+            console.log(data);
+
+
+            $.ajax({
+
+                url: "{% url 'asset_repair_detail' asset_repair_obj.id %}",
+                data: data,
+                type: 'PUT',
+                async: false,
+                success: function (callback) {
+                    console.log(callback);
+                    console.log(callback.msg);
+                    $(ele).text(callback.data.text);
+                    $(ele).attr('data-status',callback.data.status);
+                    $(ele).toggleClass('alert-danger');
+                    $(ele).toggleClass('alert-succes');
+
+
+                },
+                error: function () {
+
+
+                }
+
+            });
+
+
+
 
 
         }

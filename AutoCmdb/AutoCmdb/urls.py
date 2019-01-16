@@ -19,9 +19,14 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.views.static import serve
 
+from asset.views import acc_login,acc_logout
 from api import views
 
 urlpatterns = [
+
+                  url(r'^login/', acc_login, name="login"),
+                  url(r'^logout/', acc_logout, name="logout"),
+
                   url(r'^admin/', admin.site.urls),
                   # url(r'^host/', include('host.urls')),
                   url(r'^', include('host.urls')),

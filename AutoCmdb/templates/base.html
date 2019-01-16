@@ -8,12 +8,12 @@
     <meta name="author" content="">
 
 
-    <title >{% block title %}CMDB{% endblock %}</title>
+    <title>{% block title %}CMDB{% endblock %}</title>
 
     <!-- Bootstrap core CSS -->
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/css/dashboard.css" rel="stylesheet">
-{#    <link href="/static/css/all.css" rel="stylesheet">#}
+    {#    <link href="/static/css/all.css" rel="stylesheet">#}
     <link href="/static/css/font-awesome.min.css" rel="stylesheet">
 
 
@@ -23,7 +23,6 @@
     <script src="/static/js/jquery-3.3.1.js"></script>
     <script src="/static/js/bootstrap.js"></script>
     <script src="/static/js/all.js"></script>
-
 
 
     <link href="/static/css/custom.css" rel="stylesheet">
@@ -40,7 +39,11 @@
 <body>
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
+
+
     <div class="container-fluid">
+
+
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
                     aria-expanded="false" aria-controls="navbar">
@@ -51,19 +54,48 @@
             </button>
             <a class="navbar-brand" href="#"><span style="color: white">CMDB</span></a>
         </div>
+
+
         <div id="navbar" class="navbar-collapse collapse">
+
+            <ul class="nav navbar-nav navbar-lfet">
+
+                {% block navbar_left %}
+
+                <li class=""><a href="{% url 'asset' %}">資產</a></li>
+                <li><a href="{% url 'host' %}">運維</a></li>
+
+                {% endblock %}
+
+            </ul>
+
+
             <ul class="nav navbar-nav navbar-right">
                 <!--<li><a href="#"><i class="far fa-bell"></i></a>-->
                 <!--<li><a href="#"><i class="far fa-envelope"></i></a>-->
+
+                <!-- 取消訪客判斷與span顯示
                 <li>
                     {% if request.user == 'AnonymousUser' %}
-                       <a href="#">
+                        <a href="#">
                     {% else %}
 
-                         <a href="#"><span style="color: #ffffff">{{ request.user }}</span>
+                        <a href="#"><span style="color: #ffffff">{{ request.user }}</span>
                     {% endif %}
 
                     <i class="far fa-user"></i></a>
+                </li>
+
+                -->
+
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"><span style="color: #ffffff">{{ request.user }}</span> <i
+                            class="far fa-user"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">個人中心</a></li>
+                        <li><a href="{% url 'logout' %}">登出</a></li>
+                    </ul>
                 </li>
 
             </ul>
@@ -75,6 +107,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-2 col-md-2 col-lg-2 sidebar bg-info">
+
             {% block sideber_menu %}
 
                 <ul class="nav nav-sidebar">

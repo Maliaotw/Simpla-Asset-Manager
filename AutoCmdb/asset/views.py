@@ -12,10 +12,13 @@ from django.http import StreamingHttpResponse
 import numpy as np
 import json
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 
 
 # --- 資產 ---
 
+@login_required
 def asset(request):
     print('Assset')
 
@@ -475,21 +478,65 @@ def asset_file(request):
 # --- 資產維修詳細紀錄 ---
 
 def asset_repair_detail(request, pk):
-    print(pk)
+    if request.method == 'GET':
+        print(pk)
 
-    asset_repair_obj = models.AssetRepair.objects.get(id=pk)
+        asset_repair_obj = models.AssetRepair.objects.get(id=pk)
 
-    # ps = asset_repair_obj.photo.all()
-    # for p in ps:
+        # ps = asset_repair_obj.photo.all()
+        # for p in ps:
 
-    asset_repair_detail = models.AssetRepairDetail.objects.filter(repair=asset_repair_obj)
+        asset_repair_detail = models.AssetRepairDetail.objects.filter(repair=asset_repair_obj)
 
-    # 過濾留言為技術部人員
-    fix_users = list(
-        set([i['user__code'] for i in asset_repair_detail.filter(user__dent__code='IT').values('user__code')]))
-    print(fix_users)
+        # 過濾留言為技術部人員
+        fix_users = list(
+            set([i['user__code'] for i in asset_repair_detail.filter(user__dent__code='IT').values('user__code')]))
+        print(fix_users)
 
-    return render(request, 'asset_repair/detail.html', locals())
+        return render(request, 'asset_repair/detail.html', locals())
+
+    if request.method == 'PUT':
+        print("This is PUT")
+
+        ret = {'status': '', 'code': '', 'msg': '','data':{}}
+
+        put = QueryDict(request.body)
+        print(put)
+
+        # id = put.get('id')
+        ststus = put.get('ststus')
+        user = put.get('user')
+        repair = put.get('repair')
+
+        user = models.UserProfile.objects.get(id=user)
+        print(user)
+
+        if user.dent.code == 'IT':
+
+            repair_obj = models.AssetRepair.objects.get(id=repair)
+
+            print(ststus)
+
+            if ststus == 'True':
+                repair_obj.status = False
+                repair_obj.repairer = None
+                repair_obj.finish_date = None
+                ret['data']['text']="處理中"
+                ret['data']['status']='False'
+
+            else:
+                repair_obj.status = True
+                repair_obj.repairer = request.user.userprofile
+                repair_obj.finish_date = datetime.datetime.now()
+                ret['data']['text'] = "已處理"
+                ret['data']['status'] = 'True'
+
+            repair_obj.save()
+
+            ret['status'] = 'ok'
+            ret['code'] = 200
+
+        return JsonResponse(ret)
 
 
 def asset_repair_detail_add(request):
@@ -597,7 +644,7 @@ def asset_repair_detail_del(request):
     dent_obj = models.AssetRepairDetail.objects.get(id=id)
     dent_obj.delete()
 
-    return JsonResponse({'status':'ok','code':200})
+    return JsonResponse({'status': 'ok', 'code': 200})
 
 
 # --- 部門 ---
@@ -1308,6 +1355,41 @@ def user_output(request):
     response['Content-Disposition'] = 'attachment;filename="%s"' % output_name
 
     return response
+
+
+# --- 登入/登出 ---
+
+def acc_login(request):
+    error_msg = ""
+
+    if request.method == 'GET':
+
+        # 判斷是否已登入
+        if request.user.is_authenticated():
+            return redirect(request.GET.get('next', '/asset'))
+
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(username=username, password=password)
+        if user:
+            login(request, user)
+
+            return redirect(request.GET.get('next', '/asset'))
+
+        else:
+            error_msg = "使用者或密碼有誤!!"
+
+        print(user, username, password)
+
+    return render(request, 'login.html', {'error_msg': error_msg})
+
+
+def acc_logout(request):
+    logout(request)
+    print("logout")
+    return redirect('/login')
 
 
 # --- 測試 ---

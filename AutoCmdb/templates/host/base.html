@@ -4,7 +4,12 @@
     CDMB
 {% endblock %}
 
+{% block navbar_left %}
 
+    <li class=""><a href="{% url 'asset' %}">資產</a></li>
+    <li class="active"><a href="{% url 'host' %}">運維</a></li>
+
+{% endblock %}
 
 {% block sideber_menu %}
 
