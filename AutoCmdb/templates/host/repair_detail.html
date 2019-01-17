@@ -1,15 +1,7 @@
-{% extends 'base.html' %}
 
-{% block title %}
-    CDMB
-{% endblock %}
 
-{% block navbar_left %}
+{% extends 'asset_repair/detail.html' %}
 
-    <li class=""><a href="{% url 'asset' %}">資產</a></li>
-    <li class="active"><a href="{% url 'host' %}">運維</a></li>
-
-{% endblock %}
 
 {% block sideber_menu %}
 
@@ -73,21 +65,3 @@
 
 
 {% endblock %}
-
-
-{% block content %}
-
-
-
-{% endblock %}
-
-
-{% block base-js %}
-
-    <script>
-
-
-    </script>
-{% endblock %}
-
-

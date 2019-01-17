@@ -1,14 +1,24 @@
 from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
 from host import models
-from asset.models import Location, UserProfile, Asset, Category, Department,AssetRecord,AssetRepair,AssetRepairDetail
+from asset.models import Location, UserProfile, Asset, Department, AssetRecord, AssetRepair, AssetRepairDetail
 from host import forms
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import QueryDict
+from django.contrib.auth.decorators import login_required
+import datetime
+
+@login_required
+def host(request):
+    print('host')
+
+    return render(request, "host/home.html", locals())
 
 
 # Create your views here.
-def host(request):
+
+@login_required
+def host_index(request):
     ret = {"status": "", "re_html": "", "msg": ""}
 
     if request.method == 'GET':
@@ -34,17 +44,16 @@ def host(request):
         print('search_field', search_field)
 
         if status and dent_id:
-            host_obj = models.Host.objects.filter(name__contains=name,status__contains=status,asset__department_id=dent_id)
+            host_obj = models.Host.objects.filter(name__contains=name, status__contains=status,
+                                                  asset__department_id=dent_id)
         elif status:
-            host_obj = models.Host.objects.filter(name__contains=name,status__contains=status)
+            host_obj = models.Host.objects.filter(name__contains=name, status__contains=status)
         elif dent_id:
-            host_obj = models.Host.objects.filter(name__contains=name,asset__department_id=dent_id)
+            host_obj = models.Host.objects.filter(name__contains=name, asset__department_id=dent_id)
         elif name:
             host_obj = models.Host.objects.filter(name__contains=name)
         else:
             host_obj = models.Host.objects.all()
-
-
 
         # 分頁功能
         paginator = Paginator(host_obj, 10)  # Show 10 contacts per page
@@ -80,6 +89,102 @@ def host(request):
     return render(request, "host/index.html", locals())
 
 
+@login_required
+def host_repair(request):
+    search_field = {}
+
+    # Get字段
+    name = request.GET.get("name", '')
+    status = request.GET.get("status", '')
+
+
+    asset_repair_obj = AssetRepair.objects.all()
+
+    paginator = Paginator(asset_repair_obj, 10)  # Show 10 contacts per page
+
+    page = request.GET.get('page')
+    try:
+        asset_repair_obj = paginator.page(page)
+    except PageNotAnInteger:
+        asset_repair_obj = paginator.page(1)
+    except EmptyPage:
+        asset_repair_obj = paginator.page(paginator.num_pages)
+
+
+    return render(request, "host/repair.html", locals())
+
+
+# --- 資產維修詳細紀錄 ---
+
+@login_required
+def host_repair_detail(request, pk):
+
+    print('host_repair_detail')
+
+
+    if request.method == 'GET':
+        print(pk)
+
+        asset_repair_obj = AssetRepair.objects.get(id=pk)
+
+        # ps = asset_repair_obj.photo.all()
+        # for p in ps:
+
+        asset_repair_detail = AssetRepairDetail.objects.filter(repair=asset_repair_obj)
+
+        # 過濾留言為技術部人員
+        fix_users = list(
+            set([i['user__code'] for i in asset_repair_detail.filter(user__dent__code='IT').values('user__code')]))
+        print(fix_users)
+
+        return render(request, 'host/repair_detail.html', locals())
+
+    if request.method == 'PUT':
+        print("This is PUT")
+
+        ret = {'status': '', 'code': '', 'msg': '','data':{}}
+
+        put = QueryDict(request.body)
+        print(put)
+
+        # id = put.get('id')
+        ststus = put.get('ststus')
+        user = put.get('user')
+        repair = put.get('repair')
+
+        user = UserProfile.objects.get(id=user)
+        print(user)
+
+        if user.dent.code == 'IT':
+
+            repair_obj = AssetRepair.objects.get(id=repair)
+
+            print(ststus)
+
+            if ststus == 'True':
+                repair_obj.status = False
+                repair_obj.repairer = None
+                repair_obj.finish_date = None
+                ret['data']['text']="跟進中"
+                ret['data']['status']='False'
+
+            else:
+                repair_obj.status = True
+                repair_obj.repairer = request.user.userprofile
+                repair_obj.finish_date = datetime.datetime.now()
+                ret['data']['text'] = "已處理"
+                ret['data']['status'] = 'True'
+
+            repair_obj.save()
+
+            ret['status'] = 'ok'
+            ret['code'] = 200
+
+        return JsonResponse(ret)
+
+
+
+@login_required
 def host_info(request, pk):
     host_obj = models.Host.objects.get(id=pk)
     host_form_obj = forms.HostForm(instance=host_obj)
@@ -96,25 +201,14 @@ def host_info(request, pk):
     return render(request, "host/host_info.html", locals())
 
 
+@login_required
 def host_input(request):
     return render(request, "host/input.html", locals())
-
-
-
-
-
 
 
 def host_output(request):
     host_obj = models.Host.objects.all()
     return render(request, "host/output.html", locals())
-
-
-
-
-
-
-
 
 
 def location(requesrt):

@@ -1,4 +1,4 @@
-{% extends 'asset_repair/base.html' %}
+{% extends 'host/base.html' %}
 {% load asset_tags %}
 
 <!-- 驗證用戶部門  -->
@@ -131,7 +131,7 @@
                     </td>
 
                     <td>
-                        <a href="{% url 'asset_repair_detail' asset_repair.id %}">詳細</a>
+                        <a href="{% url 'host_repair_detail' asset_repair.id %}">詳細</a>
                     </td>
 
 

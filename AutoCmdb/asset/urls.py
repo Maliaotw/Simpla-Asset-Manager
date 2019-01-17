@@ -21,6 +21,10 @@ from asset import views
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
 
+    # --- homepage ---
+
+    url(r'^$', views.home_redirect),
+
     # --- asset ---
     url(r'^asset/$', views.asset, name="asset"),
     url(r'^asset/index$', views.asset_index, name="asset_index"),

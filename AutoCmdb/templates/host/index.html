@@ -146,7 +146,7 @@
 
                         <td name="manufacturer" style="display: none">
                             <span class="form-control-static">
-                               {{ host.manufacturer }}
+                               {{ host.manufacturer|default:'' }}
                             </span>
 
                             <input type="text" class='form-control input-sm' value="{{ host.manufacturer }}"
@@ -155,7 +155,7 @@
 
                         <td name="model" style="display: none">
                             <span class="form-control-static">
-                               {{ host.model }}
+                               {{ host.model|default:'' }}
                             </span>
 
                             <input type="text" class='form-control input-sm' value="{{ host.model }}"
@@ -163,10 +163,10 @@
                         </td>
 
 
-                        <td name="manage_ip" class="">
+                        <td name="manage_ip" class="col-xs-1">
 
                             <span class="form-control-static">
-                               {{ host.manage_ip }}
+                               {{ host.manage_ip|default:'' }}
                             </span>
 
                             <input type="text" class='form-control input-sm' value="{{ host.manage_ip }}"
@@ -174,9 +174,9 @@
 
                         </td>
 
-                        <td name="os_platform" class="">
+                        <td name="os_platform" class="col-xs-1">
                             <span class="form-control-static">
-                               {{ host.os_platform }}
+                               {{ host.os_platform|default:'' }}
                             </span>
 
                             <input type="text" class='form-control input-sm' value="{{ host.os_platform }}"
@@ -186,7 +186,7 @@
 
                         <td name="location" class="col-xs-2">
                             <span class="form-control-static">
-                               {{ host.location }}
+                               {{ host.location|default:'' }}
                             </span>
 
                             <select class="form-control" style="display: none">
@@ -207,7 +207,7 @@
 
                         <td name="ops_owner" class="col-xs-2">
                             <span class="form-control-static">
-                               {{ host.ops_owner }}
+                               {{ host.ops_owner|default:'' }}
                             </span>
 
                             <select class="form-control" style="display: none">
@@ -224,13 +224,13 @@
                             </select>
                         </td>
 
-                        <td class="col-xs-1">
+                        <td class="col-xs-2">
                             {{ host.asset.department.name | default:'' }}
                         </td>
 
-                        <td name="asset" class="col-xs-2">
+                        <td name="asset" class="col-xs-1">
                             <span class="form-control-static">
-                               {{ host.asset }}
+                               {{ host.asset|default:'' }}
                             </span>
 
                             <input type="text" class='form-control input-sm'

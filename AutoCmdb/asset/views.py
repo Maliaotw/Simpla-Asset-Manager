@@ -14,6 +14,8 @@ import json
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
 
 
 # --- 資產 ---
@@ -379,6 +381,15 @@ def asset_output(request):
 # --- 資產維修紀錄 ---
 
 def asset_repair(request):
+
+
+    search_field = {}
+
+    # Get字段
+    name = request.GET.get("name", '')
+    status = request.GET.get("status", '')
+
+
     # 判斷管理用戶
     admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
     if request.user.userprofile.dent in admindent:
@@ -391,6 +402,22 @@ def asset_repair(request):
         # search_field['dent_id'] = dent_id
         # dent_id = request.user.userprofile.dent_id
         asset_repair_obj = models.AssetRepair.objects.filter(asset_obj__department=request.user.userprofile.dent)
+
+    # 篩選
+    # if
+    asset_repair_obj.filter()
+
+
+    paginator = Paginator(asset_repair_obj, 10)  # Show 10 contacts per page
+
+    page = request.GET.get('page')
+    try:
+        asset_repair_obj = paginator.page(page)
+    except PageNotAnInteger:
+        asset_repair_obj = paginator.page(1)
+    except EmptyPage:
+        asset_repair_obj = paginator.page(paginator.num_pages)
+
 
     return render(request, 'asset_repair/index.html', locals())
 
@@ -1390,6 +1417,15 @@ def acc_logout(request):
     logout(request)
     print("logout")
     return redirect('/login')
+
+
+# --- ---
+
+# redirect
+def home_redirect(request):
+    return HttpResponseRedirect(
+        reverse('asset')
+    )
 
 
 # --- 測試 ---

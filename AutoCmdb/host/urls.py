@@ -17,13 +17,22 @@ from django.conf.urls import url, include
 from django.contrib import admin
 
 from host import views
+from asset.views import asset_repair_detail
 
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
 
     # --- host ---
     url(r'^host$', views.host, name="host"),
-    url(r'^host/(\d+)', views.host_info, name="host_info"),
+    url(r'^host/index$', views.host_index, name="host_index"),
+    url(r'^host/repair$', views.host_repair, name="host_repair"),
+
+
+    url(r'^host/repair/detail/(?P<pk>\d+)', views.host_repair_detail, name="host_repair_detail"),
+
+
+
+    url(r'^host/(?P<pk>\d+)$', views.host_info, name="host_info"),
     url(r'^host/input', views.host_input, name="host_input"),
     url(r'^host/output', views.host_output, name="host_output"),
 
