@@ -12,13 +12,14 @@
     <!-- CSS -->
     <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="/static/css/bootstrap-select.css">
+
 
     <!--  JavaScript -->
     <script src="/static/js/bootstrap-datepicker.js"></script>
     <script src="/static/js/bootstrap-datepicker.zh-TW.min.js"></script>
 
     <!-- Latest compiled and minified JavaScript -->
+     <link rel="stylesheet" href="/static/css/bootstrap-select.css">
     <script src="/static/js/bootstrap-select.js"></script>
 
 
@@ -83,6 +84,7 @@
                                 {% endfor %}
                             </select>
                         </div>
+
                     {% endif %}
 
 
@@ -215,10 +217,7 @@
                     </td>
 
                     <td>
-
                         <a href="{% url 'asset_edit' asset.id %}"><i class="fas fa-pen"></i></a>
-
-
                     </td>
                 </tr>
             {% endfor %}

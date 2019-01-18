@@ -16,6 +16,7 @@
     {% csrf_token %}
 
 
+    {% block breadcrumb  %}
     <ol class="breadcrumb">
         <li>
             <a href="{% url 'asset_repair' %}">資產維修表</a>
@@ -23,6 +24,7 @@
         <li class="active">{{ asset_repair_obj.asset_obj.name }} {{ asset_repair_obj.title }}</li>
 
     </ol>
+        {% endblock %}
 
 
 
@@ -43,17 +45,33 @@
                                 {{ asset_repair_obj.asset_obj.name }} {{ asset_repair_obj.title }}
 
 
+                                {% verify_dent request 'IT' as user_dent %}
+                                {% if user_dent %}
 
-                                {% if asset_repair_obj.status %}
-                                    <button class="badge alert-success" onclick="ch_status(this)"
-                                            data-status="{{ asset_repair_obj.status }}">已處理
-                                    </button>
+                                    {% if asset_repair_obj.status %}
+                                        <button class="badge alert-success" onclick="ch_status(this)"
+                                                data-status="{{ asset_repair_obj.status }}">已處理
+                                        </button>
+                                    {% else %}
+
+                                        <button class="badge alert-danger" onclick="ch_status(this)"
+                                                data-status="{{ asset_repair_obj.status }}">跟進中
+                                        </button>
+                                    {% endif %}
                                 {% else %}
 
-                                    <button class="badge alert-danger" onclick="ch_status(this)"
-                                            data-status="{{ asset_repair_obj.status }}">跟進中
-                                    </button>
+                                     {% if asset_repair_obj.status %}
+                                        <span class="badge alert-success">已處理
+                                        </span>
+                                    {% else %}
+
+                                        <span class="badge alert-danger">跟進中
+                                        </span>
+                                    {% endif %}
+
                                 {% endif %}
+
+
 
 
                             </h3>
@@ -184,7 +202,7 @@
                                style="display: none">
                         <input name="repairid" value="{{ asset_repair_obj.id }}"
                                style="display: none">
-                        <button id='reply_btn' class="btn" style="margin-top: 15px"
+                        <button id='reply_btn' class="btn btn-info" style="margin-top: 15px"
                                 onclick="reply()">回覆
                         </button>
                     </div><!-- /panel-body -->
@@ -285,7 +303,7 @@
                     $(ele).text(callback.data.text);
                     $(ele).attr('data-status',callback.data.status);
                     $(ele).toggleClass('alert-danger');
-                    $(ele).toggleClass('alert-succes');
+                    $(ele).toggleClass('alert-success');
 
 
                 },

@@ -98,7 +98,7 @@ class AssetForm(ModelForm):
             self.fields[k].widget.attrs['class'] = 'form-control'
 
     def verify_permissions(self, request):
-        print('verify_permissions')
+        # print('verify_permissions')
         # print(request)
 
         # 驗證用戶
@@ -314,7 +314,7 @@ class AssetRepairForm(ModelForm):
             self.fields[k].widget.attrs['class'] = 'form-control'
 
     def verify_permissions(self, request):
-        print('verify_permissions')
+        # print('verify_permissions')
         # print(request)
 
         # 驗證用戶
@@ -389,7 +389,7 @@ class AssetRepairDetailForm(ModelForm):
             self.fields[k].widget.attrs['class'] = 'form-control'
 
     def verify_permissions(self, request):
-        print('verify_permissions')
+        # print('verify_permissions')
         # print(request)
 
         # 驗證用戶

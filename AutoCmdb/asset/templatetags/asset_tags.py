@@ -116,8 +116,8 @@ def get_category_column(category_obj):
 
 @register.simple_tag
 def verify_permissions(request):
-    print('verify_permissions')
-    print('test')
+    # print('verify_permissions')
+    # print('test')
     # print(request)
 
     # 驗證用戶
@@ -125,10 +125,10 @@ def verify_permissions(request):
     # print('admindent', admindent)
 
     if request.user.userprofile.dent in admindent:
-        print('管理用戶')
+        # print('管理用戶')
         return True
     else:
-        print('一般用戶')
+        # print('一般用戶')
         return False
 
 
@@ -148,7 +148,6 @@ def verify_dent(request,code):
         return True
     else:
         return False
-
 
 
 

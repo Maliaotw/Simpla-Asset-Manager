@@ -1,19 +1,79 @@
-{% extends 'host/base.html' %}
+{% extends 'asset_repair/index.html' %}
 {% load asset_tags %}
 
-<!-- 驗證用戶部門  -->
-{% verify_permissions request as admin_dent %}
+
+{% block navbar_left %}
+
+    <li class=""><a href="{% url 'asset' %}">部門資產</a></li>
+    <li class="active"><a href="{% url 'host' %}">IT運維</a></li>
+
+{% endblock %}
 
 
 
-{% block title %}維修記錄表{% endblock %}
+{% block sideber_menu %}
 
-{% block head %}
+
+    {% url 'host' as host %}
+    {% url 'host_index' as host_index %}
+    {% url 'host_repair' as host_repair %}
+
+    {% url 'host_input' as host_input %}
+    {% url 'host_output' as host_output %}
+
+    {% url 'location' as location %}
+
+    {% url 'asset' as asset %}
+
+
+    <ul class="nav nav-sidebar">
+
+        <ul class="list-group">
+
+            <li class="list-group-item">
+                <a href={{ host }}><i class="fa fa-home"></i> 運維首頁</a>
+            </li>
+
+
+            <!-- 資產管理 -->
+            <li class="list-group-item">
+                <a href="#assetSubmenu" data-toggle="collapse" aria-expanded="false"
+                   class="dropdown-toggle collapsed"><span> <i
+                        class="fa fa-laptop"></i> 主機管理</span><span style="float:right"><i
+                        class="fa fa-angle-right"></i></span></a>
+
+                <ul class="list-unstyled collapse" id="assetSubmenu" style="">
+                    <li {% if request.path == host_index %}
+                        class="active"{% endif %}><a href={{ host_index }}> 主機列表</a></li>
+
+                    <li {% if request.path == host_repair %}
+                        class="active"{% endif %}><a href={{ host_repair }}> 電腦維修紀錄表</a></li>
+
+
+                    <li {% if request.path == asset_input %}class="active"{% endif %}><a
+                            href="{{ host_input }}">匯入</a>
+                    </li>
+
+                    <li><a href="{% url 'host_output' %}" target="_blank">匯出</a></li>
+                </ul>
+            </li>
+
+
+            <a href="{{ location }}"
+               class="list-group-item {% if request.path == location %}active{% endif %}">
+                <span>
+                    <i class="fa fa-box"></i> 位置列表
+                </span>
+            </a>
+
+        </ul>
+    </ul>
 
 
 
 
 {% endblock %}
+
 
 
 {% block content %}
@@ -128,10 +188,21 @@
 
                     <td>
                         {{ asset_repair.repairer|default:"" }}
+
                     </td>
 
                     <td>
                         <a href="{% url 'host_repair_detail' asset_repair.id %}">詳細</a>
+
+                        {% verify_permissions request as admin_dent %}
+                        {% if request.user.userprofile == asset_repair.creator or admin_dent %}
+                            <a href="#" style="cursor:pointer" data-id="{{ asset_repair.id }}"
+                               data-name="{{ asset_repair }} {{ asset_repair.title }}"
+                               onclick="record_del(this)"> 刪除</a>
+                            {#                            <a href="{% url 'asset_repair_detail' asset_repair.id %}">刪除</a>#}
+                        {% endif %}
+
+
                     </td>
 
 
@@ -142,13 +213,12 @@
             <tfoot>
 
 
-            <th colspan="8">
+            <th colspan="10">
                 <nav aria-label="Page navigation">
                     <ul class="pagination pull-right">
                         {% get_pageer asset_repair_obj search_field %}
                     </ul>
                 </nav>
-
             </th>
 
 
@@ -161,16 +231,37 @@
 
 
 
+    <!--- 刪除維修紀錄 -->
+
+    <div class="modal fade" id="del_Modal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">刪除維修紀錄</h4>
+                </div>
+
+
+                <div class="modal-body">
+                    <p>您確定要刪除<span style="color: red"></span><input type="number" style="display:none;">嗎</p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="del_submit" type="button" class="btn btn-primary">確認</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+
+    {% csrf_token %}
+
+
+
 {% endblock %}
 
 
-{% block extra-js %}
-
-    <script>
-
-
-    </script>
-
-{% endblock %}
 
 

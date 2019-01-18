@@ -65,3 +65,16 @@
 
 
 {% endblock %}
+
+
+    {% block breadcrumb  %}
+    <ol class="breadcrumb">
+        <li>
+            <a href="{% url 'host_repair' %}">電腦維修表</a>
+        </li>
+        <li class="active">{{ asset_repair_obj.asset_obj.name }} {{ asset_repair_obj.title }}</li>
+
+    </ol>
+        {% endblock %}
+
+

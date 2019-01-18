@@ -1,6 +1,5 @@
 from django.shortcuts import render, HttpResponse, redirect
-from django.http import JsonResponse, FileResponse
-from django.http import QueryDict
+from django.http import JsonResponse, FileResponse, HttpResponseRedirect, StreamingHttpResponse, QueryDict
 from asset import models
 from asset import forms
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -8,14 +7,13 @@ from django.contrib.auth.models import User
 import pandas as pd
 import datetime
 import csv
-from django.http import StreamingHttpResponse
 import numpy as np
 import json
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 
 
 # --- 資產 ---
@@ -34,7 +32,7 @@ def asset(request):
         # user_obj = models.UserProfile.objects.all()
 
     else:
-        print('一般用戶')
+        # print('一般用戶')
 
         # search_field['dent_id'] = dent_id
         # dent_id = request.user.userprofile.dent_id
@@ -70,7 +68,7 @@ def asset_index(request):
             search_field['cate_id'] = cate_id
             search_field['dent_id'] = dent_id
         else:
-            print('一般用戶')
+            # print('一般用戶')
             search_field['name'] = name
             search_field['cate_id'] = cate_id
             # search_field['dent_id'] = dent_id
@@ -381,45 +379,83 @@ def asset_output(request):
 # --- 資產維修紀錄 ---
 
 def asset_repair(request):
+    if request.method == 'GET':
 
+        search_field = {}
 
-    search_field = {}
+        # Get字段
+        name = request.GET.get("name", '')
+        status = request.GET.get("status", '')
 
-    # Get字段
-    name = request.GET.get("name", '')
-    status = request.GET.get("status", '')
+        # 判斷管理用戶
+        admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
 
+        if request.user.userprofile.dent in admindent:
+            # print('管理用戶')
+            asset_repair_obj = models.AssetRepair.objects.all().order_by('-create_date')
+            # asset_repair_obj = models.AssetRepair.objects.filter(=)
 
-    # 判斷管理用戶
-    admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
-    if request.user.userprofile.dent in admindent:
-        print('管理用戶')
-        asset_repair_obj = models.AssetRepair.objects.all()
+        else:
+            # print('一般用戶')
 
-    else:
-        print('一般用戶')
+            # search_field['dent_id'] = dent_id
+            # dent_id = request.user.userprofile.dent_id
+            asset_repair_obj = models.AssetRepair.objects.filter(
+                asset_obj__department=request.user.userprofile.dent).order_by('-create_date')
 
-        # search_field['dent_id'] = dent_id
-        # dent_id = request.user.userprofile.dent_id
-        asset_repair_obj = models.AssetRepair.objects.filter(asset_obj__department=request.user.userprofile.dent)
+        # 篩選
+        # if status
 
-    # 篩選
-    # if
-    asset_repair_obj.filter()
+        status_choices = (False, True)
 
+        print('name', name)
 
-    paginator = Paginator(asset_repair_obj, 10)  # Show 10 contacts per page
+        if status:
+            asset_repair_obj = asset_repair_obj.filter(Q(asset_obj__name__contains=name) | Q(title__contains=name),
+                                                       status=status_choices[int(status)])
 
-    page = request.GET.get('page')
-    try:
-        asset_repair_obj = paginator.page(page)
-    except PageNotAnInteger:
-        asset_repair_obj = paginator.page(1)
-    except EmptyPage:
-        asset_repair_obj = paginator.page(paginator.num_pages)
+        elif name:
+            asset_repair_obj = asset_repair_obj.filter(Q(asset_obj__name__contains=name) | Q(title__contains=name))
 
+        else:
+            pass
 
-    return render(request, 'asset_repair/index.html', locals())
+        #     Question.objects.filter(Q(question_text_Q_contains='you') | Q(question_text__contains='who'))
+
+        paginator = Paginator(asset_repair_obj, 10)  # Show 10 contacts per page
+
+        page = request.GET.get('page')
+        try:
+            asset_repair_obj = paginator.page(page)
+        except PageNotAnInteger:
+            asset_repair_obj = paginator.page(1)
+        except EmptyPage:
+            asset_repair_obj = paginator.page(paginator.num_pages)
+
+        return render(request, 'asset_repair/index.html', locals())
+
+    if request.method == 'DELETE':
+        ret = {'status': '', 'code': '', 'msg': '', 'data': ''}
+
+        print("DELETE")
+        put = QueryDict(request.body)
+
+        print(put)
+
+        user = put.get('user')
+        id = put.get('id')
+
+        user = models.UserProfile.objects.get(id=user)
+
+        if request.user.userprofile == user:
+            asset_repair_obj = models.AssetRepair.objects.get(id=id)
+            asset_repair_obj.delete()
+
+            ret['msg'] = '成功'
+            ret['status'] = 'ok'
+            ret['code'] = 200
+
+        return JsonResponse(ret)
 
 
 def asset_repair_add(request):
@@ -464,21 +500,13 @@ def asset_repair_add(request):
         return redirect('/asset_repair')
 
 
-'''
-def upload_pic(request):
-    if request.method == 'POST':
-        form = ImageUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            m = ExampleModel.objects.get(pk=course_id)
-            m.model_pic = form.cleaned_data['image']
-            m.save()
-            return HttpResponse('image upload success')
-    return HttpResponseForbidden('allowed only via POST')
-'''
-
-
 @csrf_exempt
 def asset_file(request):
+    '''
+    上傳資產紀錄附件檔案
+    :param request:
+    :return:
+    '''
     if request.method == 'POST':
         print(request)
         print('POST' * 10)
@@ -525,7 +553,7 @@ def asset_repair_detail(request, pk):
     if request.method == 'PUT':
         print("This is PUT")
 
-        ret = {'status': '', 'code': '', 'msg': '','data':{}}
+        ret = {'status': '', 'code': '', 'msg': '', 'data': {}}
 
         put = QueryDict(request.body)
         print(put)
@@ -548,8 +576,8 @@ def asset_repair_detail(request, pk):
                 repair_obj.status = False
                 repair_obj.repairer = None
                 repair_obj.finish_date = None
-                ret['data']['text']="處理中"
-                ret['data']['status']='False'
+                ret['data']['text'] = "跟進中"
+                ret['data']['status'] = 'False'
 
             else:
                 repair_obj.status = True
@@ -1420,6 +1448,7 @@ def acc_logout(request):
 
 
 # --- ---
+
 
 # redirect
 def home_redirect(request):

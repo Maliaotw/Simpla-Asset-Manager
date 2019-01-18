@@ -20,12 +20,12 @@
 
     {% if admin_dent or ITdent %}
 
-        <li class="active"><a href="{% url 'asset' %}">資產</a></li>
-        <li><a href="{% url 'host' %}">運維</a></li>
+        <li class="active"><a href="{% url 'asset' %}">部門資產</a></li>
+        <li><a href="{% url 'host' %}">IT運維</a></li>
 
     {% else %}
 
-        <li class="active"><a href="{% url 'asset' %}">資產</a></li>
+        <li class="active"><a href="{% url 'asset' %}">部門資產</a></li>
 
     {% endif %}
 

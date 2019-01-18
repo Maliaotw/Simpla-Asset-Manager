@@ -1,4 +1,4 @@
-{% extends 'asset_repair/base.html' %}
+{% extends 'host/base.html' %}
 {% load asset_tags %}
 
 <!-- 驗證用戶部門  -->
@@ -10,22 +10,6 @@
 
 {% block head %}
 
-    <link rel="stylesheet" href="/static/css/bootstrap-select.css">
-    <script src="/static/js/bootstrap-select.js"></script>
-
-    <style>
-
-
-        .modal-dialog {
-
-            width: 600px;
-            left: 50%;
-            top: 50%;
-            margin-top: -134.5px;
-            margin-left: -250px;
-
-        }
-    </style>
 
 
 
@@ -144,21 +128,10 @@
 
                     <td>
                         {{ asset_repair.repairer|default:"" }}
-
                     </td>
 
                     <td>
-                        <a href="{% url 'asset_repair_detail' asset_repair.id %}">詳細</a>
-
-                        {% verify_permissions request as admin_dent %}
-                        {% if request.user.userprofile == asset_repair.creator or admin_dent %}
-                            <a href="#" style="cursor:pointer" data-id="{{ asset_repair.id }}"
-                               data-name="{{ asset_repair }} {{ asset_repair.title }}"
-                               onclick="record_del(this)"> 刪除</a>
-                            {#                            <a href="{% url 'asset_repair_detail' asset_repair.id %}">刪除</a>#}
-                        {% endif %}
-
-
+                        <a href="{% url 'host_repair_detail' asset_repair.id %}">詳細</a>
                     </td>
 
 
@@ -169,12 +142,13 @@
             <tfoot>
 
 
-            <th colspan="10">
+            <th colspan="8">
                 <nav aria-label="Page navigation">
                     <ul class="pagination pull-right">
                         {% get_pageer asset_repair_obj search_field %}
                     </ul>
                 </nav>
+
             </th>
 
 
@@ -187,35 +161,6 @@
 
 
 
-    <!--- 刪除維修紀錄 -->
-
-    <div class="modal fade" id="del_Modal">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <h4 class="modal-title">刪除維修紀錄</h4>
-                </div>
-
-
-                <div class="modal-body">
-                    <p>您確定要刪除<span style="color: red"></span><input type="number" style="display:none;">嗎</p>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                    <button id="del_submit" type="button" class="btn btn-primary">確認</button>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
-
-
-
-    {% csrf_token %}
-
-
-
 {% endblock %}
 
 
@@ -223,80 +168,6 @@
 
     <script>
 
-        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
-
-        function csrfSafeMethod(method) {
-            // these HTTP methods do not require CSRF protection
-            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-        }
-
-        $.ajaxSetup({
-            beforeSend: function (xhr, settings) {
-                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                }
-            }
-        });
-
-
-        $(".selectpicker[name='status']").selectpicker('val', {{ status }});
-
-        function record_del(ele) {
-
-
-            console.log('record_del');
-
-
-            var tr = $(ele).closest("tr");
-            console.log(tr);
-
-
-            var id = $(ele).data('id');
-            var name = $(ele).data('name');
-            console.log(id);
-            console.log(name);
-
-
-            data = {
-                csrfmiddlewaretoken: '{{ csrf_token }}',
-                id: id,
-                user:{{ request.user.userprofile.id }},
-
-            };
-
-            console.log(data);
-
-            $('#del_Modal .modal-body').find('span').text(name);
-            $('#del_Modal .modal-body').find('input').val(id);
-            $('#del_Modal').modal({backdrop: 'static', keyboard: false});
-
-
-            $("#del_submit").on('click', function (event) {
-
-                console.log("del_submit");
-
-
-                $.ajax({
-                    url: "{% url 'asset_repair' %}",
-                    data: data,
-                    type: 'DELETE',
-                    success: function (callback) {
-                        console.log(callback);
-
-                        if (callback.status == 'ok') {
-                            tr.remove();
-                            $('#del_Modal').modal('hide');
-
-                        }
-
-                    }
-                });
-
-
-            });
-
-
-        }
 
     </script>
 

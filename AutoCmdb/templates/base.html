@@ -62,8 +62,8 @@
 
                 {% block navbar_left %}
 
-                <li class=""><a href="{% url 'asset' %}">資產</a></li>
-                <li><a href="{% url 'host' %}">運維</a></li>
+                <li class=""><a href="{% url 'asset' %}">部門資產</a></li>
+                <li><a href="{% url 'host' %}">IT運維</a></li>
 
                 {% endblock %}
 
@@ -90,7 +90,7 @@
 
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                       aria-expanded="false"><span style="color: #ffffff">{{ request.user }}</span> <i
+                       aria-expanded="false"><span style="color: #ffffff">{{ request.user.userprofile.dent.name }}部 {{ request.user }}</span> <i
                             class="far fa-user"></i></a>
                     <ul class="dropdown-menu">
                         <li><a href="#">個人中心</a></li>
