@@ -51,7 +51,10 @@ class AutoBase(object):
             json=json.dumps(msg),
             headers={settings.AUTH_KEY_NAME: authkey}
         )
-        print(r.text)
+
+        return r.json()
+
+
 
     def process(self):
         """
@@ -79,9 +82,10 @@ class AutoAgent(AutoBase):
         :return:
         """
         server_info = plugins.get_server_info()
-        print(type(server_info))
-        self.post_asset(server_info)
+        # print(type(server_info))
 
+        ret = self.post_asset(server_info)
+        print(ret)
 
 
 class AutoSSH(AutoBase):

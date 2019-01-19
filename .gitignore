@@ -3,6 +3,7 @@
 .idea
 .DS_Store
 AutoCmdb/db.sqlite3
+test_script
 
 
 # Byte-compiled / optimized / DLL files
@@ -18,7 +19,7 @@ __pycache__/
 build/
 develop-eggs/
 dist/
-downloads/
+downloads/d
 eggs/
 .eggs/
 lib/
@@ -27,6 +28,7 @@ parts/
 sdist/
 var/
 wheels/
+share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -45,6 +47,7 @@ pip-delete-this-directory.txt
 # Unit test / coverage reports
 htmlcov/
 .tox/
+.nox/
 .coverage
 .coverage.*
 .cache
@@ -60,7 +63,8 @@ coverage.xml
 
 # Django stuff:
 *.log
-
+local_settings.py
+# db.sqlite3
 
 # Flask stuff:
 instance/
@@ -77,6 +81,10 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
 
 # pyenv
 .python-version
@@ -108,3 +116,8 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
