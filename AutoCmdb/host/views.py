@@ -195,7 +195,7 @@ def host_info(request, pk):
     disk_forms_obj = [forms.DiskForm(instance=disk) for disk in host_obj.disk.all()]
     mem_forms_obj = [forms.MemoryForm(instance=memory) for memory in host_obj.memory.all()]
 
-    asset_record_obj = AssetRecord.objects.filter(asset_obj__Host=host_obj)
+    host_record_obj = models.HostRecord.objects.filter(host_obj=host_obj)
     # print(asset_record_obj)
     asset_repair_obj = AssetRepair.objects.filter(asset_obj__Host=host_obj)
 

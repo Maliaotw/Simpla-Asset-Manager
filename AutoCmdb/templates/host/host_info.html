@@ -232,7 +232,7 @@
             <div class="tab-pane" id="tab_record">
 
 
-                {% for assset_record in asset_record_obj %}
+                {% for host_record in host_record_obj %}
 
                     <div class="well">
                         <div class="media">
@@ -240,9 +240,9 @@
 
                             </a>
                             <div class="media-body">
-                                <h4 class="media-heading">{{ assset_record.create_date|date:'Y/m/d' }}</h4>
-                                <p class="text-right">{{ assset_record.get_assetrecord_type_id_display }}</p>
-                                <p>{{ assset_record.summary }}</p>
+                                <h4 class="media-heading">{{ host_record.create_date|date:'Y/m/d' }}</h4>
+                                <p class="text-right">{{ host_record.get_assetrecord_type_id_display }}</p>
+                                <p>{{ host_record.summary }}</p>
 
                             </div>
                         </div>
