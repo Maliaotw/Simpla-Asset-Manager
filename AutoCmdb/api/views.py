@@ -250,6 +250,8 @@ def asset_by_hostname(request):
             host_obj.number = hostname.split('-')[1]
             host_obj.manage_ip = remote_ip
             host_obj.name = hostname
+            print(host_dict)
+            print(host_obj)
             host_obj.save()
 
             ret['status'] = 'ADD PC'
