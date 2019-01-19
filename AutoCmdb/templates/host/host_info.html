@@ -16,7 +16,7 @@
 
 
     <ol class="breadcrumb">
-        <li><a href="{% url 'host' %}">主機列表 </a></li>
+        <li><a href="{% url 'host_index' %}">主機列表 </a></li>
         <li class="active">{{ host_obj.name }}</li>
 
     </ol>
@@ -263,98 +263,82 @@
                         <div class="media">
 
                             <div id="post">
-                                <a class="pull-left" href="#" style="margin-right: 20px">
-                                    <img class="media-object" height="150" width="150"
-                                         src="http://2.bp.blogspot.com/-U77ROceRfZ4/VBZUKz_wccI/AAAAAAAAAL8/CHcrtv2dIcQ/s1600/187785.jpeg">
-                                </a>
+
                                 <div class="media-body" style="margin-bottom: 20px;height: 150px">
-
                                     <h3 class="media-heading">
-                                        {{ asset_repair.title }}
+                                        <a href="{% url 'host_repair_detail' asset_repair.id %}">{{ asset_repair.asset_obj.name }} {{ asset_repair.title }}</a>
 
-                                        {% if asset_repair.status %}
-                                            <span class="badge alert-success">已處理</span>
+
+                                        {% verify_dent request 'IT' as user_dent %}
+                                        {% if user_dent %}
+
+                                            {% if asset_repair.status %}
+                                                <button class="badge alert-success" onclick="ch_status(this)"
+                                                        data-status="{{ asset_repair.status }}">已處理
+                                                </button>
+                                            {% else %}
+
+                                                <button class="badge alert-danger" onclick="ch_status(this)"
+                                                        data-status="{{ asset_repair.status }}">跟進中
+                                                </button>
+                                            {% endif %}
                                         {% else %}
 
-                                            <span class="badge alert-danger">跟進中</span>
+                                            {% if asset_repair.status %}
+                                                <span class="badge alert-success">已處理
+                                        </span>
+                                            {% else %}
+
+                                                <span class="badge alert-danger">跟進中
+                                        </span>
+                                            {% endif %}
+
                                         {% endif %}
 
 
                                     </h3>
-                                    <p class="text-left"><span><i
-                                            style="color: black"
-                                            class="far fa-user"></i> {{ asset_repair.creator.code }}</span></p>
-                                    <p>{{ asset_repair.summary }}</p>
+
+                                    <p class="text-left">
+                                <span>
+                                    <i style="color: black" class="far fa-user"></i> {{ asset_repair.creator.code }}
+                                </span>
+                                    </p>
 
 
-                                    <ul class="list-inline list-unstyled">
+                                    <p style="height: 60px">{{ asset_repair.summary }}</p>
+
+
+                                    <ul class="list-inline">
 
                                         <li>
-                                            <span><i class="glyphicon glyphicon-calendar"></i> {{ asset_repair.create_date |date:"Y/m/d" }} </span>
+                                    <span>
+                                        <i class="glyphicon glyphicon-calendar"></i> {{ asset_repair.create_date |date:"Y/m/d" }}
+                                    </span>
                                         </li>
 
                                         <li>|</li>
 
                                         <li><span><i class="glyphicon glyphicon-wrench"></i>
-                                        <!--- TODO 只篩選資訊部 User Code -->
-                                            {% for re in asset_repair_detail %}
-                                                {{ re.user.code }}
-                                            {% endfor %}
+                                            <!--- TODO 只篩選資訊部 User Code -->
+                                    {% it_fix_user asset_repair %}
                                     </span></li>
 
                                         <li>|</li>
-                                        <span onclick="show_reply($(this))"><i
-                                                class="glyphicon glyphicon-comment "></i> {{ asset_repair_detail|length }} comments</span>
+
+                                        <span>
+                                    <i class="glyphicon glyphicon-comment "></i> {% comment_count asset_repair %}留言
+                                </span>
 
                                     </ul>
 
-
                                 </div>
                             </div>
-
-                            <div id="reply" class="hide">
-                                {% for ass_re in asset_repair_detail %}
-                                    <div class="panel panel-primary">
-                                        <div class="panel-heading">
-                                            <strong><i class="far fa-user"></i> {{ ass_re.user.code }}</strong>
-                                        </div>
-                                        <div class="panel-body">
-                                            {{ ass_re.content }}
-                                            <p class="text-right">{{ ass_re.create_date|date:'Y/m/d H:i' }}</p>
-                                        </div><!-- /panel-body -->
-                                    </div><!-- /panel panel-default -->
-
-                                {% endfor %}
-
-
-
-
-
-                                {% if not asset_repair.status %}
-                                    <div class="panel " style="border-color:black">
-                                        <div class="panel-heading">
-                                            <strong>添加一條新回覆</strong>
-                                        </div>
-                                        <div class="panel-body" id="reply_post">
-
-                                    <textarea class="form-control" name="content" maxlength="10000"
-                                              style="overflow: hidden; overflow-wrap: break-word; resize: none; height: 100px"></textarea>
-
-                                            <input name="userid" value="{{ request.user.userprofile.id }}"
-                                                   style="display: none">
-                                            <input name="repairid" value="{{ asset_repair.id }}"
-                                                   style="display: none">
-                                            <button id='reply_btn' class="btn" style="margin-top: 15px"
-                                                    onclick="reply()">回覆
-                                            </button>
-                                        </div><!-- /panel-body -->
-                                    </div>
-                                {% endif %}
-                            </div>
-
                         </div>
 
+
                     </div>
+
+
                 {% endfor %}
 
 

@@ -118,6 +118,7 @@ class Asset(models.Model):
 
 class AssetRecord(models.Model):
     """
+    TODO 待刪除
     資產變更紀錄表
     """
     asset_obj = models.ForeignKey('Asset')

@@ -62,95 +62,127 @@
     {% if admin_dent %}
 
 
-
         <!--- nav-sidebar -->
         <ul class="nav nav-sidebar">
 
 
             <ul class="list-group">
 
-                <li class="list-group-item">
-                    <a href={{ asset }}><i class="fa fa-home"></i> 資產首頁</a>
-                </li>
+                <!-- 資產首頁 --->
+                <a href="{{ asset }}"
+                   class="list-group-item {% if request.path == asset %}active{% endif %}">
+                <span>
+                    <i class="fa fa-box"></i> 資產首頁
+                </span>
+                </a>
 
 
                 <!-- 資產管理 -->
-                <li class="list-group-item">
+                <li class="">
                     <a href="#assetSubmenu" data-toggle="collapse" aria-expanded="false"
-                       class="dropdown-toggle collapsed"><span> <i
+                       class="list-group-item dropdown-toggle collapsed"><span> <i
                             class="fa fa-box"></i> 資產管理</span><span style="float:right"><i
                             class="fa fa-angle-right"></i></span></a>
 
                     <ul class="list-unstyled collapse" id="assetSubmenu" style="">
-                        <li {% if request.path == asset_index %}
-                            class="active"{% endif %}><a href={{ asset_index }}>資產列表</a></li>
 
 
-                        <li {% if request.path == asset_repair %}class="active"{% endif %}><a
-                                href="{{ asset_repair }}">資產維修紀錄表</a>
+                        <li class="list-group-item  {% if request.path == asset_index %}active{% endif %}">
+                            <a href={{ asset_index }}>資產列表</a>
                         </li>
 
 
-                        <li {% if request.path == asset_input %}class="active"{% endif %}><a
-                                href="{{ asset_input }}">匯入</a>
+                        <li class="list-group-item  {% if request.path == asset_repair %}active{% endif %}">
+                            <a href="{{ asset_repair }}">電腦維修紀錄表</a>
                         </li>
-                        <li><a href="{% url 'asset_output' %}" target="_blank">匯出</a></li>
+
+
+                        <li class="list-group-item  {% if request.path == asset_input %}active{% endif %}">
+                            <a href="{{ asset_input }}">匯入</a>
+                        </li>
+
+
+                        <li class="list-group-item">
+                            <a href="{% url 'asset_output' %}" target="_blank">匯出</a>
+                        </li>
+
                     </ul>
                 </li>
 
 
                 <!--- 用戶管理 -->
-                <li class="list-group-item">
+                <li class="">
                     <a href="#userSubmenu" data-toggle="collapse" aria-expanded="false"
-                       class="dropdown-toggle collapsed">
+                       class="list-group-item dropdown-toggle collapsed">
                         <span><i class="fa fa-users"></i> 用戶管理</span>
                         <span style="float:right"><i class="fa fa-angle-right"></i></span></a>
 
                     <ul class="list-unstyled collapse" id="userSubmenu" style="">
-                        <li {% if request.path == user %}class="active"{% endif %}><a href={{ user }}>用戶列表</a></li>
-                        <li {% if request.path == user_input %}class="active"{% endif %}><a
-                                href="{{ user_input }}">匯入</a>
+
+
+                        <li class="list-group-item  {% if request.path == user %}active{% endif %}">
+                            <a href={{ user }}>用戶列表</a>
                         </li>
-                        <li><a href="{% url 'user_output' %}" target="_blank">匯出</a></li>
+
+                        <li class="list-group-item  {% if request.path == user_input %}active{% endif %}">
+                            <a href={{ user_input }}>匯入</a>
+                        </li>
+
+                        <li class="list-group-item">
+                            <a href="{% url 'user_output' %}" target="_blank">匯出</a>
+                        </li>
+
 
                     </ul>
                 </li>
 
 
                 <!--- 部門管理 -->
-                <li class="list-group-item">
+                <li class="">
                     <a href="#dentSubmenu" data-toggle="collapse" aria-expanded="false"
-                       class="dropdown-toggle collapsed">
+                       class="list-group-item dropdown-toggle collapsed">
                         <span><i class="fa fa-sitemap"></i> 部門管理</span>
                         <span style="float:right"><i class="fa fa-angle-right"></i></span></a>
 
                     <ul class="list-unstyled collapse" id="dentSubmenu" style="">
-                        <li {% if request.path == department %}class="active"{% endif %}><a
-                                href={{ department }}>部門列表</a>
+
+                        <li class="list-group-item  {% if request.path == department %}active{% endif %}">
+                            <a href={{ department }}>部門列表</a>
                         </li>
 
-                        <li {% if request.path == category_input %}class="active"{% endif %}><a
-                                href="{{ category_input }}">匯入</a></li>
-                        <li><a href="{% url 'category_output' %}" target="_blank">匯出</a></li>
+                        <li class="list-group-item  {% if request.path == category_input %}active{% endif %}">
+                            <a href={{ category_input }}>匯入</a>
+                        </li>
+
+                        <li class="list-group-item">
+                            <a href="{% url 'category_output' %}" target="_blank">匯出</a>
+                        </li>
 
                     </ul>
                 </li>
 
 
                 <!--- 類型管理 -->
-                <li class="list-group-item">
+                <li class="">
                     <a href="#categorySubmenu" data-toggle="collapse" aria-expanded="false"
-                       class="dropdown-toggle collapsed">
+                       class="list-group-item dropdown-toggle collapsed">
                         <span><i class="fa fa-th"></i> 類型管理</span>
                         <span style="float:right"><i class="fa fa-angle-right"></i></span></a>
 
                     <ul class="list-unstyled collapse" id="categorySubmenu" style="">
-                        <li {% if request.path == category %}class="active"{% endif %}><a href={{ category }}>類型列表</a>
+
+
+                        <li class="list-group-item  {% if request.path == category %}active{% endif %}">
+                            <a href={{ category }}>類型列表</a>
                         </li>
 
-                        <li {% if request.path == category_input %}class="active"{% endif %}><a
-                                href="{{ category_input }}">匯入</a></li>
-                        <li><a href="{% url 'category_output' %}" target="_blank">匯出</a></li>
+                        <li class="list-group-item  {% if request.path == category_input %}active{% endif %}">
+                            <a href={{ category_input }}>匯入</a>
+                        </li>
+
+                        <li class="list-group-item">
+                            <a href="{% url 'category_output' %}" target="_blank">匯出</a>
+                        </li>
 
                     </ul>
                 </li>

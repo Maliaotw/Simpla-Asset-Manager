@@ -28,7 +28,12 @@
     <link href="/static/css/custom.css" rel="stylesheet">
 
 
+    <style>
+        .list-group-item.active > a {
 
+            color: white;
+        }
+    </style>
 
     {% block head %}
     {% endblock %}
@@ -62,8 +67,8 @@
 
                 {% block navbar_left %}
 
-                <li class=""><a href="{% url 'asset' %}">部門資產</a></li>
-                <li><a href="{% url 'host' %}">IT運維</a></li>
+                    <li class=""><a href="{% url 'asset' %}">部門資產</a></li>
+                    <li><a href="{% url 'host' %}">IT運維</a></li>
 
                 {% endblock %}
 
@@ -90,8 +95,10 @@
 
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                       aria-expanded="false"><span style="color: #ffffff">{{ request.user.userprofile.dent.name }}部 {{ request.user }}</span> <i
-                            class="far fa-user"></i></a>
+                       aria-expanded="false"><span
+                            style="color: #ffffff">{{ request.user.userprofile.dent.name }}部 {{ request.user }}</span>
+                        <i
+                                class="far fa-user"></i></a>
                     <ul class="dropdown-menu">
                         <li><a href="#">個人中心</a></li>
                         <li><a href="{% url 'logout' %}">登出</a></li>
@@ -165,7 +172,47 @@
 </div>
 
 
+<script>
+
+    {% url 'host' as host %}
+    {% if host in request.path %}
+        $('#hostSubmenu').collapse();
+    {% endif %}
+
+
+    {% url 'asset' as asset %}
+    {% if asset in request.path %}
+        $('#assetSubmenu').collapse();
+    {% endif %}
+
+    {% url 'user' as user %}
+    {% if user in request.path %}
+        $('#userSubmenu').collapse();
+    {% endif %}
+
+
+    {% url 'category' as category %}
+        {% if category in request.path %}
+        $('#categorySubmenu').collapse();
+    {% endif %}
+
+    {% url 'department' as department %}
+    {% if department in request.path %}
+        $('#dentSubmenu').collapse();
+    {% endif %}
+
+</script>
+
+
+
+
+
 {% block base-js %}
+
+
+
+
+
 {% endblock %}
 
 

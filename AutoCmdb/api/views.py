@@ -5,7 +5,7 @@ import json
 import hashlib
 import time
 from asset.models import Category, Asset, Department, UserProfile
-from host.models import Host, Memory, Disk, NIC
+from host.models import Host, Memory, Disk, NIC, HostRecord
 
 # Create your views here.
 
@@ -15,6 +15,11 @@ auth_list = []
 
 @csrf_exempt
 def asset_no_hostname(request):
+    '''
+    自增資產
+    :param request:
+    :return:
+    '''
     if request.method == 'GET':
         print(request.META)
 
@@ -74,7 +79,6 @@ def asset_no_hostname(request):
         host_dict.update(basic)
         hostname = host_dict.pop('hostname')
 
-
         if hosts:  # 有編號就更新
             host_obj = hosts.first()
             host_obj.manage_ip = remote_ip
@@ -123,12 +127,10 @@ def asset_no_hostname(request):
                 d_obj.host_obj = host_obj
                 d_obj.save()
 
-
         for nic in nics:
 
-
             n = NIC.objects.filter(model=nic['model'])
-            if n :
+            if n:
                 n_obj = n.first()
                 n_obj.host_obj = host_obj
                 n_obj.save()
@@ -142,13 +144,26 @@ def asset_no_hostname(request):
 
 @csrf_exempt
 def asset_by_hostname(request):
+    '''
+    根據電腦名稱 新增/更新資產
+    :param request:
+    :return:
+    '''
     if request.method == 'GET':
-        print(request.META)
-        print(request.META['REMOTE_ADDR'])
-        print(request.META['REMOTE_HOST'])
+        # print(request.META)
+        # print(request.META['REMOTE_ADDR'])
+        # print(request.META['REMOTE_HOST'])
         return HttpResponse("GET")
 
     elif request.method == 'POST':
+
+        ret = {
+            'code': '',
+            'status': '',
+            'msg': '',
+            'data': {'mems': [], 'nics': [], 'disks': [], 'record': ''}
+        }
+
         # print(request.META)
         auth_key_time = request.META["HTTP_AUTH_KEY"]
         auth_key_client, client_ctime = auth_key_time.split("|")
@@ -229,6 +244,7 @@ def asset_by_hostname(request):
                 setattr(host_obj, k, v)
             host_obj.save()
 
+
         else:  # 自動編上最新編號
             host_obj = Host(manage_ip=remote_ip, **host_dict)
             host_obj.number = hostname.split('-')[1]
@@ -236,50 +252,143 @@ def asset_by_hostname(request):
             host_obj.name = hostname
             host_obj.save()
 
-        # print(host_obj.number)
-        # print(host_obj.name)
-        # print(disks)
+            ret['status'] = 'ADD PC'
 
+        nics_obj = []
+        for nic in nics:
+            n = NIC.objects.filter(model=nic['model'])
+            if n:
+                n_obj = n.first()
 
+                if n_obj in host_obj.nic.all():
+                    pass
+                else:
+                    # print('更新')
+                    ret['status'] = 'UPDATE'
+                    ret['data']['nics'].append('更新 %s %s' % (n_obj.model, n_obj.macaddress))
+                n_obj.host_obj = host_obj
+                n_obj.save()
+
+            else:  # 新增 (資料庫未出現的內存
+                # print(nic)
+                n_obj = NIC(**nic)
+                n_obj.host_obj = host_obj
+                n_obj.save()
+                # print('新增')
+                ret['data']['nics'].append('新增 %s %s' % (n_obj.model, n_obj.macaddress))
+
+            nics_obj.append(n_obj)
+
+        # print(nics_obj)
+
+        # 沒有被匹配到的 (刪除
+        for i in host_obj.nic.all():
+            if i in nics_obj:
+                pass
+            else:
+                i.delete()
+                ret['data']['nics'].append('移除 %s %s' % (i.model, i.macaddress))
+
+        # print(ret['data']['nics'])
+
+        # 内存
+        mems_obj = []
         for mem in mems:
-
             m = Memory.objects.filter(model=mem['model'])
             if m:
-                print(m)
+                # print(m)
                 m_obj = m.first()
+
+                if m_obj in host_obj.memory.all():
+                    pass
+                else:
+                    # print('更新')
+                    ret['status'] = 'UPDATE'
+                    ret['data']['mems'].append('更新 %s %s' % (m_obj.model, m_obj.capacity))
+
                 m_obj.host_obj = host_obj
                 m_obj.save()
             else:
                 m_obj = Memory(**mem)
                 m_obj.host_obj = host_obj
                 m_obj.save()
+                # print('新增')
+                ret['data']['mems'].append('新增 %s %s' % (m_obj.model, m_obj.capacity))
 
+            mems_obj.append(m_obj)
+
+        # print(mems_obj)
+
+        # 沒有被匹配到的 (刪除
+        for i in host_obj.memory.all():
+            if i in mems_obj:
+                pass
+            else:
+                i.delete()
+                ret['data']['mems'].append('移除 %s %s' % (i.model, i.capacity))
+
+        # print(ret['data']['mems'])
+
+        # 硬盤
+
+        disks_obj = []
         for disk in disks:
 
             d = Disk.objects.filter(model=disk['model'])
             if d:
                 d_obj = d.first()
+
+                if d_obj in host_obj.disk.all():
+                    pass
+                else:
+                    # print('更新')
+                    ret['status'] = 'UPDATE'
+                    ret['data']['disks'].append('更新 %s %s' % (d_obj.model, d_obj.capacity))
+
                 d_obj.host_obj = host_obj
                 d_obj.save()
             else:
                 d_obj = Disk(**disk)
                 d_obj.host_obj = host_obj
                 d_obj.save()
+                # print('新增')
+                ret['data']['disks'].append('新增 %s %s' % (d_obj.model, d_obj.capacity))
 
+            disks_obj.append(d_obj)
 
-        for nic in nics:
-
-            n = NIC.objects.filter(model=nic['model'])
-            if n :
-                n_obj = n.first()
-                n_obj.host_obj = host_obj
-                n_obj.save()
+        # 沒有被匹配到的 (刪除
+        for i in host_obj.disk.all():
+            if i in disks_obj:
+                pass
             else:
-                n_obj = NIC(**nic)
-                n_obj.host_obj = host_obj
-                n_obj.save()
+                i.delete()
+                ret['data']['disks'].append('移除 %s %s' % (i.model, i.capacity))
 
-        return HttpResponse("成功")
+        # print(ret['data']['disks'])
+
+        # 返回前 Msg 處理 新增主機更變紀錄
+
+        if ret['status'] == 'ADD PC':
+            ret['data']['record'] = "新增主機"
+        elif ret['status'] == 'UPDATE':
+            data = ret['data']
+            ret['data']['record'] = ""
+            for key in list(data.keys()):
+                ret['data']['record'] += "%s:\n\n" % key
+                ret['data']['record'] += '\n'.join(data[key])
+                ret['data']['record'] += '\n\n'
+
+        if ret['data']['record']:
+            HostRecord.objects.create(
+                host_obj=host_obj,
+                title='%s update' % time.strftime("%Y%m%d"),
+                summary=ret['data']['record']
+            )
+
+        # 返回
+        ret['code'] = 200
+        ret['msg'] = '成功'
+        return JsonResponse(ret)
 
 
 def category(request):
@@ -427,6 +536,7 @@ def host(request):
                 'id': asset.id
             }
             asset_list.append(asset_data)
+
         ret['data'] = asset_list
 
         return JsonResponse(ret)

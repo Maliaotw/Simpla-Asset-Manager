@@ -230,6 +230,10 @@ def asset_edit(request, pk):
     if request.method == 'GET':
         forms_obj = forms.Asset_Edit_Form(instance=asset_obj, request=request)
 
+        asset_record_obj = models.AssetRecord.objects.filter(asset_obj=asset_obj)
+        # print(asset_record_obj)
+        asset_repair_obj = models.AssetRepair.objects.filter(asset_obj=asset_obj)
+
     if request.method == 'POST':
 
         forms_obj = forms.Asset_Edit_Form(data=request.POST, instance=asset_obj, request=request)
@@ -547,6 +551,8 @@ def asset_repair_detail(request, pk):
         fix_users = list(
             set([i['user__code'] for i in asset_repair_detail.filter(user__dent__code='IT').values('user__code')]))
         print(fix_users)
+
+
 
         return render(request, 'asset_repair/detail.html', locals())
 

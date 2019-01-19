@@ -7,14 +7,16 @@
     <li class=""><a href="{% url 'asset' %}">部門資產</a></li>
     <li class="active"><a href="{% url 'host' %}">IT運維</a></li>
 
-{% endblock %}
 
+{% endblock %}
 
 
 {% block sideber_menu %}
 
 
     {% url 'host' as host %}
+
+
     {% url 'host_index' as host_index %}
     {% url 'host_repair' as host_repair %}
 
@@ -30,32 +32,41 @@
 
         <ul class="list-group">
 
-            <li class="list-group-item">
-                <a href={{ host }}><i class="fa fa-home"></i> 運維首頁</a>
-            </li>
+            <a href="{{ host }}"
+               class="list-group-item {% if request.path == host %}active{% endif %}">
+                <span>
+                    <i class="fa fa-box"></i> 運維首頁
+                </span>
+            </a>
 
-
-            <!-- 資產管理 -->
-            <li class="list-group-item">
-                <a href="#assetSubmenu" data-toggle="collapse" aria-expanded="false"
-                   class="dropdown-toggle collapsed"><span> <i
-                        class="fa fa-laptop"></i> 主機管理</span><span style="float:right"><i
+            <li class="">
+                <a href="#hostSubmenu" data-toggle="collapse" aria-expanded="false"
+                   class="list-group-item dropdown-toggle collapsed"><span> <i
+                        class="fa fa-box"></i> 主機管理</span><span style="float:right"><i
                         class="fa fa-angle-right"></i></span></a>
 
-                <ul class="list-unstyled collapse" id="assetSubmenu" style="">
-                    <li {% if request.path == host_index %}
-                        class="active"{% endif %}><a href={{ host_index }}> 主機列表</a></li>
-
-                    <li {% if request.path == host_repair %}
-                        class="active"{% endif %}><a href={{ host_repair }}> 電腦維修紀錄表</a></li>
+                <ul class="list-unstyled collapse" id="hostSubmenu" style="">
 
 
-                    <li {% if request.path == asset_input %}class="active"{% endif %}><a
-                            href="{{ host_input }}">匯入</a>
+                    <li class="list-group-item  {% if request.path == host_index %}active{% endif %}">
+                        <a href={{ host_index }}>主機列表</a>
                     </li>
 
-                    <li><a href="{% url 'host_output' %}" target="_blank">匯出</a></li>
+
+                    <li class="list-group-item  {% if host_repair in request.path %}active{% endif %}">
+                        <a href="{{ host_repair }}">電腦維修紀錄表</a>
+                    </li>
+
+                    <li class="list-group-item  {% if request.path == host_input %}active{% endif %}">
+                        <a href="{{ host_input }}">匯入</a>
+                    </li>
+
+                    <li class="list-group-item">
+                        <a href="{% url 'host_output' %}" target="_blank">匯出</a>
+                    </li>
+
                 </ul>
+
             </li>
 
 
@@ -67,13 +78,12 @@
             </a>
 
         </ul>
+
+
     </ul>
 
 
-
-
 {% endblock %}
-
 
 
 {% block content %}

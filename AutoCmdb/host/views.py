@@ -91,6 +91,9 @@ def host_index(request):
 
 @login_required
 def host_repair(request):
+
+    print('host_repair')
+
     search_field = {}
 
     # Get字段
@@ -196,7 +199,9 @@ def host_info(request, pk):
     # print(asset_record_obj)
     asset_repair_obj = AssetRepair.objects.filter(asset_obj__Host=host_obj)
 
-    asset_repair_detail = AssetRepairDetail.objects.filter(repair=asset_repair_obj)
+    # print(asset_repair_obj)
+
+
 
     return render(request, "host/host_info.html", locals())
 
@@ -205,12 +210,13 @@ def host_info(request, pk):
 def host_input(request):
     return render(request, "host/input.html", locals())
 
-
+@login_required
 def host_output(request):
     host_obj = models.Host.objects.all()
     return render(request, "host/output.html", locals())
 
 
+@login_required
 def location(requesrt):
     local_obj = Location.objects.all()
     data = {'local_obj': local_obj}

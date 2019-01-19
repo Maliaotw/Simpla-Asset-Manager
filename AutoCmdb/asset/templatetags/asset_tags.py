@@ -79,7 +79,7 @@ def get_pageer(data, search_field):
             part2 += data.number + 5
         else:
             # print("data.paginator.num_pages - part1", 10 - (data.paginator.num_pages - part1))
-            part2 = data.paginator.num_pages+1
+            part2 = data.paginator.num_pages + 1
             part1 = part1 - (10 - (data.paginator.num_pages - part1))
 
         # print(part1, part2)
@@ -93,7 +93,8 @@ def get_pageer(data, search_field):
         if page_number == data.number:
             # <li class="page-item active"><a class="page-link" href="#">2 <span class="sr-only">(current)</span></a></li>
             # txt += '<a class="active item" href="?page=%s%s">%s</a>' % (page_number, search_str, page_number)
-            txt += '<li class="page-item active"><a class="page-link" href="?page=%s%s">%s<span class="sr-only">(current)</span></a></li>' % (page_number, search_str, page_number)
+            txt += '<li class="page-item active"><a class="page-link" href="?page=%s%s">%s<span class="sr-only">(current)</span></a></li>' % (
+            page_number, search_str, page_number)
         else:
             # <li class="page-item"><a class="page-link" href="#">1</a></li>
             # txt += '<a class="item" href="?page=%s%s">%s</a>' % (page_number, search_str, page_number)
@@ -104,7 +105,8 @@ def get_pageer(data, search_field):
     if data.has_next():
         # <li><a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
         # txt += '<a class="icon item" href="?page=%s%s"><i class="right chevron icon"></i></a>' % (data.paginator.num_pages, search_str)
-        txt += '<li><a href="?page=%s%s" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>' % (data.paginator.num_pages, search_str)
+        txt += '<li><a href="?page=%s%s" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>' % (
+        data.paginator.num_pages, search_str)
 
     return mark_safe(txt)
 
@@ -132,9 +134,8 @@ def verify_permissions(request):
         return False
 
 
-
 @register.simple_tag
-def verify_dent(request,code):
+def verify_dent(request, code):
     '''
 
     :param request:
@@ -150,4 +151,17 @@ def verify_dent(request,code):
         return False
 
 
+@register.simple_tag
+def comment_count(asset_repair_obj):
+    asset_repair_detail = models.AssetRepairDetail.objects.filter(repair=asset_repair_obj)
+    return asset_repair_detail.count()
 
+
+@register.simple_tag
+def it_fix_user(asset_repair_obj):
+    asset_repair_detail = models.AssetRepairDetail.objects.filter(repair=asset_repair_obj).distinct()
+
+    fix_users = list(
+        [i['user__code'] for i in asset_repair_detail.filter(user__dent__code='IT').values('user__code')])
+
+    return ",".join(fix_users)

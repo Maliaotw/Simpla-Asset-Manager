@@ -191,3 +191,33 @@ class IPPhone(models.Model):
 
 
 
+
+class HostRecord(models.Model):
+    """
+    TODO 待刪除
+    主機變更紀錄表
+    """
+    host_obj = models.ForeignKey('Host')
+    title = models.CharField(max_length=255)
+    summary = models.TextField(null=True, blank=True)
+    creator = models.ForeignKey('asset.UserProfile', verbose_name='創建者', null=True, blank=True, related_name='+')
+
+    # 類型: 自動上傳，IT維護
+    type_choice = (
+        (1, '自動上傳'),
+        (2, 'IT維護'),
+    )
+
+    type = models.IntegerField(choices=type_choice, default=0)
+
+    create_date = models.DateTimeField(auto_now_add=True, verbose_name='創建日期')
+
+    class Meta:
+        verbose_name_plural = "主機紀錄表"
+
+    def __str__(self):
+        return "%s" % (self.host_obj)
+
+
+
+

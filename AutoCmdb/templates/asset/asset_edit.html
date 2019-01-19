@@ -74,113 +74,193 @@
     <div class="" style="padding: 0px">
 
 
-    <div id="myTabContent" class="tab-content">
+        <div id="myTabContent" class="tab-content">
 
-    <div class="tab-pane fade in active" id="tab_asset">
+            <div class="tab-pane fade in active" id="tab_asset">
 
-        <div class="panel panel-default" style="padding: 20px">
-            <form role="form" method="post" id="form">
-                {% csrf_token %}
-
-
-                <!-- 錯誤提示-->
-                <div class="alert" style="display: none">
-                    <strong></strong>
-                </div>
+                <div class="panel panel-default" style="padding: 20px">
+                    <form role="form" method="post" id="form">
+                        {% csrf_token %}
 
 
-                <div class="form-group">
-                    <label> 基本信息</label>
-
-
-                </div>
-
-                <div class="row" style="padding-left: 15px">
-
-                    {{ forms_obj.name }}
-
-                    <div class="col-md-6 form-group has-feedback">
-                        {{ forms_obj.category.label_tag }}
-                        {{ forms_obj.category }}
-                        <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
-
-                    </div>
-
-                    <div class="col-md-6 form-group has-feedback">
-                        {{ forms_obj.number.label_tag }}
-                        {{ forms_obj.number }}
-                        <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
-                    </div>
-
-                    <!-- 管理部門 -->
-                    {% verify_permissions request as admin_dent %}
-                    {% if admin_dent %}
-                        <div class="col-md-6 form-group has-feedback">
-                            {{ forms_obj.purchase_date.label_tag }}
-                            {{ forms_obj.purchase_date }}
-                            <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                        <!-- 錯誤提示-->
+                        <div class="alert" style="display: none">
+                            <strong></strong>
                         </div>
 
-                        <div class="col-md-6 form-group has-feedback">
-                            {{ forms_obj.price.label_tag }}
-                            {{ forms_obj.price }}
-                            <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+                        <div class="form-group">
+                            <label> 基本信息</label>
+
+
                         </div>
-                    {% endif %}
+
+                        <div class="row" style="padding-left: 15px">
+
+                            {{ forms_obj.name }}
+
+                            <div class="col-md-6 form-group has-feedback">
+                                {{ forms_obj.category.label_tag }}
+                                {{ forms_obj.category }}
+                                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+                            </div>
+
+                            <div class="col-md-6 form-group has-feedback">
+                                {{ forms_obj.number.label_tag }}
+                                {{ forms_obj.number }}
+                                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                            </div>
+
+                            <!-- 管理部門 -->
+                            {% verify_permissions request as admin_dent %}
+                            {% if admin_dent %}
+                                <div class="col-md-6 form-group has-feedback">
+                                    {{ forms_obj.purchase_date.label_tag }}
+                                    {{ forms_obj.purchase_date }}
+                                    <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                                </div>
+
+                                <div class="col-md-6 form-group has-feedback">
+                                    {{ forms_obj.price.label_tag }}
+                                    {{ forms_obj.price }}
+                                    <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="form-group">
+                            <label> 使用狀態</label>
+                        </div>
+
+
+                        <div class="row" style="padding-left: 15px">
+
+
+                            <div class="col-md-12 form-group has-feedback">
+                                {{ forms_obj.status.label_tag }}
+                                {{ forms_obj.status }}
+                                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                            </div>
+
+                            <div class="col-md-6 form-group has-feedback">
+                                {{ forms_obj.department.label_tag }}
+                                {{ forms_obj.department }}
+                                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                            </div>
+
+
+                            <div class="col-md-6 form-group has-feedback">
+                                {{ forms_obj.manager.label_tag }}
+                                {{ forms_obj.manager }}
+                                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                            </div>
+
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="form-group">
+                                <button id="submit" type="button" class="btn btn-primary center-block">更改</button>
+                            </div>
+                        </div>
+
+                    </form>
 
                 </div>
+            </div>
 
 
-                <div class="form-group">
-                    <label> 使用狀態</label>
-                </div>
+            <div class="tab-pane fade" id="tab_repair">
+
+                {% for asset_repair in asset_repair_obj %}
+
+                    <div class="well">
+                        <div class="media">
+
+                            <div id="post">
+
+                                <div class="media-body" style="margin-bottom: 20px;height: 150px">
+                                    <h3 class="media-heading">
+                                        <a href="{% url 'asset_repair_detail' asset_repair.id %}">{{ asset_repair.asset_obj.name }} {{ asset_repair.title }}</a>
 
 
-                <div class="row" style="padding-left: 15px">
+                                        {% verify_dent request 'IT' as user_dent %}
+                                        {% if user_dent %}
+
+                                            {% if asset_repair.status %}
+                                                <button class="badge alert-success" onclick="ch_status(this)"
+                                                        data-status="{{ asset_repair.status }}">已處理
+                                                </button>
+                                            {% else %}
+
+                                                <button class="badge alert-danger" onclick="ch_status(this)"
+                                                        data-status="{{ asset_repair.status }}">跟進中
+                                                </button>
+                                            {% endif %}
+                                        {% else %}
+
+                                            {% if asset_repair.status %}
+                                                <span class="badge alert-success">已處理
+                                        </span>
+                                            {% else %}
+
+                                                <span class="badge alert-danger">跟進中
+                                        </span>
+                                            {% endif %}
+
+                                        {% endif %}
 
 
-                    <div class="col-md-12 form-group has-feedback">
-                        {{ forms_obj.status.label_tag }}
-                        {{ forms_obj.status }}
-                        <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                                    </h3>
+
+                                    <p class="text-left">
+                                <span>
+                                    <i style="color: black" class="far fa-user"></i> {{ asset_repair.creator.code }}
+                                </span>
+                                    </p>
+
+
+                                    <p style="height: 60px">{{ asset_repair.summary }}</p>
+
+
+                                    <ul class="list-inline">
+
+                                        <li>
+                                    <span>
+                                        <i class="glyphicon glyphicon-calendar"></i> {{ asset_repair.create_date |date:"Y/m/d" }}
+                                    </span>
+                                        </li>
+
+                                        <li>|</li>
+
+                                        <li><span><i class="glyphicon glyphicon-wrench"></i>
+                                            <!--- TODO 只篩選資訊部 User Code -->
+                                    {% it_fix_user asset_repair %}
+                                    </span></li>
+
+                                        <li>|</li>
+
+                                        <span>
+                                    <i class="glyphicon glyphicon-comment "></i> {% comment_count asset_repair %}留言
+                                </span>
+
+                                    </ul>
+
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
-                    <div class="col-md-6 form-group has-feedback">
-                        {{ forms_obj.department.label_tag }}
-                        {{ forms_obj.department }}
-                        <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
-                    </div>
-
-
-                    <div class="col-md-6 form-group has-feedback">
-                        {{ forms_obj.manager.label_tag }}
-                        {{ forms_obj.manager }}
-                        <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
-                    </div>
-
-
-                </div>
-
-                <div class="row">
-
-                    <div class="form-group">
-                        <button id="submit" type="button" class="btn btn-primary center-block">更改</button>
-                    </div>
-                </div>
-
-            </form>
+                {% endfor %}
+            </div>
 
         </div>
     </div>
-
-
-    <div class="tab-pane fade in active" id="tab_repair">
-
-
-
-
-    </div>
-
 
 
 

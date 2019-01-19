@@ -18,9 +18,9 @@
     <script src="/static/js/bootstrap-select.js"></script>
 
     <style>
-        a {
-            text-decoration: none;
-            color: black;
+        .list-group-item .active > a {
+
+            color: white;
         }
     </style>
 
@@ -291,29 +291,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 {% endblock %}
 
 
@@ -384,9 +361,7 @@
                         input_tag.show()
                     }
 
-
                 });
-
 
             });
 
@@ -424,7 +399,7 @@
 
                 // Ajax put請求 /host
                 $.ajax({
-                    url: "{% url 'host' %}",
+                    url: "{% url 'host_index' %}",
                     data: data,
                     type: 'PUT',
                     async: false,
@@ -488,7 +463,7 @@
         // 發送hostid 向請求API進行請求
         function get_asset(hostid, assetid, select_obj) {
 
-            console.log("dd", select_obj.children('option'));
+            //console.log("dd", select_obj.children('option'));
 
             $.ajax({
                 url: "/api/host",
