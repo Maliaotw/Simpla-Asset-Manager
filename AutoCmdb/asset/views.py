@@ -1,9 +1,7 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.http import JsonResponse, FileResponse, HttpResponseRedirect, StreamingHttpResponse, QueryDict
-from asset import models
-from asset import forms
+from asset import models, forms, roles
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.contrib.auth.models import User
 import pandas as pd
 import datetime
 import csv
@@ -14,6 +12,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.models import User, Group, Permission
 
 
 # --- 資產 ---
@@ -42,6 +42,8 @@ def asset(request):
     return render(request, "asset/home.html", locals())
 
 
+@login_required
+@permission_required('asset.can_view_asset')
 def asset_index(request):
     print('Asset_index')
 
@@ -176,6 +178,8 @@ def asset_index(request):
         return JsonResponse(ret)
 
 
+@login_required
+@permission_required('asset.can_view_asset')
 def asset_add(request):
     ret = {"status": "", "re_html": "", "msg": ""}
 
@@ -222,6 +226,8 @@ def asset_add(request):
     return render(request, "asset/asset_add.html", locals())
 
 
+@login_required
+@permission_required('asset.can_view_asset')
 def asset_edit(request, pk):
     ret = {"status": "", "re_html": "", "msg": ""}
 
@@ -267,6 +273,8 @@ def asset_edit(request, pk):
     return render(request, "asset/asset_edit.html", locals())
 
 
+@login_required
+@permission_required('asset.can_view_asset')
 def asset_input(request):
     ret = {'status': '', "msg": '', 'errordict': {}}
 
@@ -345,6 +353,8 @@ def asset_input(request):
         return JsonResponse(ret)
 
 
+@login_required
+@permission_required('asset.can_view_asset')
 def asset_output(request):
     opts = models.Asset.objects.all().model._meta
 
@@ -382,6 +392,8 @@ def asset_output(request):
 
 # --- 資產維修紀錄 ---
 
+@login_required
+@permission_required('asset.can_view_asset')
 def asset_repair(request):
     if request.method == 'GET':
 
@@ -462,6 +474,8 @@ def asset_repair(request):
         return JsonResponse(ret)
 
 
+@login_required
+@permission_required('asset.can_view_asset')
 def asset_repair_add(request):
     '''
     新增維修表單
@@ -536,6 +550,8 @@ def asset_file(request):
 
 # --- 資產維修詳細紀錄 ---
 
+@login_required
+@permission_required('asset.can_view_asset')
 def asset_repair_detail(request, pk):
     if request.method == 'GET':
         print(pk)
@@ -551,8 +567,6 @@ def asset_repair_detail(request, pk):
         fix_users = list(
             set([i['user__code'] for i in asset_repair_detail.filter(user__dent__code='IT').values('user__code')]))
         print(fix_users)
-
-
 
         return render(request, 'asset_repair/detail.html', locals())
 
@@ -600,6 +614,8 @@ def asset_repair_detail(request, pk):
         return JsonResponse(ret)
 
 
+@login_required
+@permission_required('asset.can_view_asset')
 def asset_repair_detail_add(request):
     '''
     新增留言
@@ -655,6 +671,8 @@ def asset_repair_detail_add(request):
         return JsonResponse({})
 
 
+@login_required
+@permission_required('asset.can_view_asset')
 def asset_repair_detail_edit(request):
     '''
     修改留言
@@ -692,6 +710,8 @@ def asset_repair_detail_edit(request):
         return JsonResponse({})
 
 
+@login_required
+@permission_required('asset.can_view_asset')
 def asset_repair_detail_del(request):
     '''
     刪除留言
@@ -710,6 +730,8 @@ def asset_repair_detail_del(request):
 
 # --- 部門 ---
 
+@login_required
+@permission_required('asset.can_view_department')
 def department(request):
     ret = {"status": "", "re_html": "", "msg": ""}
 
@@ -785,6 +807,8 @@ def department(request):
     return render(request, "department/index.html", locals())
 
 
+@login_required
+@permission_required('asset.can_view_department')
 def department_input(request):
     ret = {'status': '', "msg": '', 'errordict': {}}
 
@@ -874,6 +898,8 @@ def department_input(request):
         return JsonResponse(ret)
 
 
+@login_required
+@permission_required('asset.can_view_department')
 def department_output(request):
     opts = models.Department.objects.all().model._meta
 
@@ -904,6 +930,8 @@ def department_output(request):
 
 # --- 類型 ---
 
+@login_required
+@permission_required('asset.can_view_category')
 def category(request):
     ret = {"status": "", "re_html": "", "msg": ""}
 
@@ -989,6 +1017,8 @@ def category(request):
     return render(request, "category/index.html", locals())
 
 
+@login_required
+@permission_required('asset.can_view_category')
 def category_input(request):
     ret = {'status': '', "msg": '', 'errordict': {}}
 
@@ -1062,6 +1092,8 @@ def category_input(request):
         return JsonResponse(ret)
 
 
+@login_required
+@permission_required('asset.can_view_category')
 def category_output(request):
     opts = models.Category.objects.all().model._meta
     # print(request)
@@ -1092,6 +1124,8 @@ def category_output(request):
 
 # --- 用戶 ---
 
+@login_required
+@permission_required('asset.can_view_userprofile')
 def user(request):
     ret = {"status": "", "re_html": "", "msg": ""}
     search_field = {}
@@ -1119,13 +1153,25 @@ def user(request):
         # GET 字段 篩選
 
         if sex and dent_id:
-            user_obj = models.UserProfile.objects.filter(name__contains=name, sex=sex, dent_id=dent_id)
+            user_obj = models.UserProfile.objects.filter(
+                Q(name__contains=name) | Q(code__contains=name) | Q(user__username__contains=name),
+                sex=sex,
+                dent_id=dent_id
+            )
         elif sex:
-            user_obj = models.UserProfile.objects.filter(name__contains=name, sex=sex)
+            user_obj = models.UserProfile.objects.filter(
+                Q(name__contains=name) | Q(code__contains=name) | Q(user__username__contains=name),
+                sex=sex
+            )
         elif dent_id:
-            user_obj = models.UserProfile.objects.filter(name__contains=name, dent_id=dent_id)
+            user_obj = models.UserProfile.objects.filter(
+                Q(name__contains=name) | Q(code__contains=name) | Q(user__username__contains=name),
+                dent_id=dent_id
+            )
         else:
-            user_obj = models.UserProfile.objects.filter(name__contains=name)
+            user_obj = models.UserProfile.objects.filter(
+                Q(name__contains=name) | Q(code__contains=name) | Q(user__username__contains=name)
+            )
 
     # 分頁功能
 
@@ -1205,10 +1251,14 @@ def user(request):
     return render(request, 'user/index.html', locals())
 
 
+@login_required
+@permission_required('asset.can_view_userprofile')
 def user_info(request):
     pass
 
 
+@login_required
+@permission_required('asset.can_view_userprofile')
 def user_add(request):
     ret = {"status": "", "re_html": "", "msg": ""}
 
@@ -1242,7 +1292,19 @@ def user_add(request):
             data['user'] = user_obj
             models.UserProfile.objects.create(**data)
 
-            print("ok")
+            # print(user)
+
+            dent = user_obj.userprofile.dent.code
+
+            perms_list = [i.split('.') for i in roles.perms.get(dent) or roles.perms.get('other')]
+            # print(perms_list)
+
+            perms_obj = [Permission.objects.get(content_type__model=model, codename=codename) for model, codename in
+                         perms_list]
+
+            user_obj.user_permissions = perms_obj
+
+            # print("ok")
             ret['status'] = 'ok'
             ret['msg'] = '新增成功'
             ret['errors_fields'] = errors_fields
@@ -1264,6 +1326,8 @@ def user_add(request):
     return render(request, "user/user_add.html", locals())
 
 
+@login_required
+@permission_required('asset.can_view_userprofile')
 def user_edit(request, pk):
     ret = {"status": "", "re_html": "", "msg": ""}
 
@@ -1311,6 +1375,8 @@ def user_edit(request, pk):
     return render(request, "user/user_edit.html", locals())
 
 
+@login_required
+@permission_required('asset.can_view_userprofile')
 def user_input(request):
     ret = {'status': '', "msg": '', 'errordict': {}}
 
@@ -1387,6 +1453,8 @@ def user_input(request):
         return JsonResponse(ret)
 
 
+@login_required
+@permission_required('asset.can_view_userprofile')
 def user_output(request):
     opts = models.UserProfile.objects.all().model._meta
 
@@ -1512,3 +1580,39 @@ def test2(request):
         print(forms_userproinfo_obj.errors)
 
     return render(request, "test/test2.html", locals())
+
+
+@login_required
+def user_permission(request):
+    # user = request.user
+    # print(user)
+
+    # p = Permission.objects.all()
+    #
+    # print(p)
+
+    '''
+    p = Permission.objects.all()
+    for i in p:
+        # print(i)
+        # print()
+        print("%s.%s" % (i.content_type.model,i.codename))
+
+    '''
+
+    # request.user.user_permissions.clear()
+    # print(request.user.get_all_permissions())
+
+    perm_list = [i.split('.') for i in ['asset.can_view_asset']]
+    print(perm_list)
+    # p = Permission.objects.get(content_type__model='asset',codename='can_view')
+    # print(p)
+
+    # perm_list =
+
+    perms_obj = [Permission.objects.get(content_type__model=model, codename=codename) for model, codename in perm_list]
+    print(perms_obj)
+    #
+    request.user.user_permissions = perms_obj
+
+    return HttpResponse(request.user.username)

@@ -46,6 +46,11 @@ class Host(models.Model):
     class Meta:
         verbose_name_plural = "主機資產表"
 
+        permissions = (
+            ("can_view_host", "Can view host"),
+        )
+
+
     def __str__(self):
         return "%s %s" % (self.name, self.manage_ip)
 
@@ -63,6 +68,9 @@ class NIC(models.Model):
 
     class Meta:
         verbose_name_plural = "網卡表"
+
+
+
 
     def __str__(self):
         return "%s %s" % (self.host_obj, self.ipaddress)
@@ -83,6 +91,8 @@ class Disk(models.Model):
     class Meta:
         verbose_name_plural = "硬盤表"
 
+
+
     def __str__(self):
         return "%s %s" % (self.host_obj, self.capacity)
 
@@ -101,6 +111,8 @@ class Memory(models.Model):
 
     class Meta:
         verbose_name_plural = "内存表"
+
+
 
     def __str__(self):
         return "%s %s" % (self.host_obj, self.model)
@@ -133,6 +145,7 @@ class NetworkDevice(models.Model):
         verbose_name = '網絡設備'
 
 
+
 class CCTV(models.Model):
     '''
     CCTV
@@ -160,6 +173,7 @@ class CCTV(models.Model):
 
     class Meta:
         verbose_name = 'CCTV'
+
 
 
 class IPPhone(models.Model):
@@ -191,10 +205,8 @@ class IPPhone(models.Model):
 
 
 
-
 class HostRecord(models.Model):
     """
-    TODO 待刪除
     主機變更紀錄表
     """
     host_obj = models.ForeignKey('Host')
@@ -214,6 +226,9 @@ class HostRecord(models.Model):
 
     class Meta:
         verbose_name_plural = "主機紀錄表"
+
+
+
 
     def __str__(self):
         return "%s" % (self.host_obj)

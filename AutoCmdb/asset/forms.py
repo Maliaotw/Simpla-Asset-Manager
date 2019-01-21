@@ -817,6 +817,7 @@ class User_Add_Form(UserForm):
     def save(self, commit=True):
         user_obj = super(UserForm, self).save(commit=False)
         user_obj.set_password(self.password)
+
         user_obj.save()
         return user_obj
 

@@ -7,8 +7,10 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import QueryDict
 from django.contrib.auth.decorators import login_required
 import datetime
+from django.contrib.auth.decorators import permission_required
 
 @login_required
+@permission_required('host.can_view_host')
 def host(request):
     print('host')
 
@@ -18,6 +20,7 @@ def host(request):
 # Create your views here.
 
 @login_required
+@permission_required('host.can_view_host')
 def host_index(request):
     ret = {"status": "", "re_html": "", "msg": ""}
 
@@ -90,6 +93,7 @@ def host_index(request):
 
 
 @login_required
+@permission_required('host.can_view_host')
 def host_repair(request):
 
     print('host_repair')
@@ -120,6 +124,7 @@ def host_repair(request):
 # --- 資產維修詳細紀錄 ---
 
 @login_required
+@permission_required('host.can_view_host')
 def host_repair_detail(request, pk):
 
     print('host_repair_detail')
@@ -188,6 +193,7 @@ def host_repair_detail(request, pk):
 
 
 @login_required
+@permission_required('host.can_view_host')
 def host_info(request, pk):
     host_obj = models.Host.objects.get(id=pk)
     host_form_obj = forms.HostForm(instance=host_obj)
@@ -207,16 +213,19 @@ def host_info(request, pk):
 
 
 @login_required
+@permission_required('host.can_view_host')
 def host_input(request):
     return render(request, "host/input.html", locals())
 
 @login_required
+@permission_required('host.can_view_host')
 def host_output(request):
     host_obj = models.Host.objects.all()
     return render(request, "host/output.html", locals())
 
 
 @login_required
+@permission_required('asset.can_view_location')
 def location(requesrt):
     local_obj = Location.objects.all()
     data = {'local_obj': local_obj}

@@ -67,5 +67,6 @@ urlpatterns = [
 
     url(r'^test1/', views.test1, name="test1"),
     url(r'^test2/', views.test2, name="test2"),
+    url(r'^user_permissions/', views.user_permission, name="user_permissions"),
 
 ]
