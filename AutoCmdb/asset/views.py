@@ -489,8 +489,20 @@ def asset_repair_add(request):
         category = models.Category.objects.all()
         user_dent = request.user.userprofile.dent
 
-        data = {cate.id: list(models.Asset.objects.filter(category=cate, department=user_dent).values('id', 'name')) for
-                cate in category}
+        # 驗證用戶
+        admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
+        if request.user.userprofile.dent in admindent:
+            data = {
+                cate.id: list(
+                    models.Asset.objects.filter(category=cate).values('id', 'name')
+                ) for cate in category
+            }
+        else:
+            data = {
+                cate.id: list(
+                    models.Asset.objects.filter(category=cate, department=user_dent).values('id', 'name')
+                ) for cate in category
+            }
         # print(data)
 
         return render(request, 'asset_repair/add.html', locals())
@@ -501,8 +513,9 @@ def asset_repair_add(request):
 
         form = forms.AssetRepair_ADD_Form(request=request, data=request.POST)
 
-        m = models.AssetRepair()
+        # m = models.AssetRepair()
         # m.photo.obj
+        print(form.errors)
 
         if form.is_valid():
             obj = form.save()
@@ -515,7 +528,7 @@ def asset_repair_add(request):
 
             obj.save()
 
-        return redirect('/asset_repair')
+        return redirect('/asset/repair')
 
 
 @csrf_exempt
@@ -1297,10 +1310,13 @@ def user_add(request):
             dent = user_obj.userprofile.dent.code
 
             perms_list = [i.split('.') for i in roles.perms.get(dent) or roles.perms.get('other')]
+
+            print('perms_list', perms_list)
             # print(perms_list)
 
             perms_obj = [Permission.objects.get(content_type__model=model, codename=codename) for model, codename in
                          perms_list]
+            print(perms_obj)
 
             user_obj.user_permissions = perms_obj
 
@@ -1531,6 +1547,57 @@ def home_redirect(request):
     )
 
 
+# --- 個人首頁 ---
+
+@login_required
+def userprofile(request):
+    ret = {"status": "", "re_html": "", "msg": ""}
+
+    userinfo_obj = request.user.userprofile
+
+    print("request.method", request.method)
+
+    if request.method == 'GET':
+        # forms_user_obj = forms.User_Edit_Form(instance=userinfo_obj.user, request=request)
+        forms_userproinfo_obj = forms.UserProfile_Edit_Form(instance=userinfo_obj, request=request)
+
+    elif request.method == 'POST':
+
+        print("request.POST", request.POST)
+
+        # forms_user_obj = forms.User_Edit_Form(request.POST, instance=userinfo_obj.user, request=request)
+        forms_userproinfo_obj = forms.UserProfile_Edit_Form(request.POST, instance=userinfo_obj, request=request)
+
+        fields = set(list(dict(forms_userproinfo_obj.fields).keys()))
+        errors = set(dict(forms_userproinfo_obj.errors.keys()))
+        print(fields)
+        print(errors)
+
+        errors_fields = list(fields & errors)
+        success_fields = list(fields - errors)
+
+        # 確認表單提交無誤
+        if forms_userproinfo_obj.is_valid():
+            # 把判斷都交給Form表單並儲存
+            forms_userproinfo_obj.save()
+
+            ret['status'] = 'ok'
+            ret['msg'] = '修改成功'
+            ret['errors_fields'] = errors_fields
+            ret['success_fields'] = success_fields
+
+        else:
+
+            ret['status'] = 'error'
+            ret['msg'] = '用戶信息輸入不正確!'
+            ret['errors_fields'] = errors_fields
+            ret['success_fields'] = success_fields
+
+        return JsonResponse(ret)
+
+    return render(request, 'userprofile.html', locals())
+
+
 # --- 測試 ---
 
 def test1(request):
@@ -1584,35 +1651,14 @@ def test2(request):
 
 @login_required
 def user_permission(request):
-    # user = request.user
-    # print(user)
 
-    # p = Permission.objects.all()
-    #
-    # print(p)
+    dent = request.user.userprofile.dent.code
 
-    '''
-    p = Permission.objects.all()
-    for i in p:
-        # print(i)
-        # print()
-        print("%s.%s" % (i.content_type.model,i.codename))
+    perms_list = [i.split('.') for i in roles.perms.get(dent) or roles.perms.get('other')]
 
-    '''
-
-    # request.user.user_permissions.clear()
-    # print(request.user.get_all_permissions())
-
-    perm_list = [i.split('.') for i in ['asset.can_view_asset']]
-    print(perm_list)
-    # p = Permission.objects.get(content_type__model='asset',codename='can_view')
-    # print(p)
-
-    # perm_list =
-
-    perms_obj = [Permission.objects.get(content_type__model=model, codename=codename) for model, codename in perm_list]
-    print(perms_obj)
-    #
+    perms_obj = [Permission.objects.get(content_type__model=model, codename=codename) for model, codename in perms_list]
+    # print('perms_obj',perms_obj)
+    # #
     request.user.user_permissions = perms_obj
 
     return HttpResponse(request.user.username)

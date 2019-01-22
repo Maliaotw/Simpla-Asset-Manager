@@ -1,54 +1,26 @@
+client
+===
 
-# Basic
+# 說明
 
-Superuser
 
-- Create cmd
-    
-    ```
-    python manage.py createsuperuser
-    ```
+資產管理結合主機管理，IT人員可以對Windows主機的系統硬件資訊進行採集，並回傳給服務器，其他部門可以發起資產報修以及檢視資產維修紀錄，管理者可以管理用戶、部門、資產。
 
-- use this
+## 如何設置
 
-    ```
-    maliao
-    m12345678
-    ```
+**asset/roles.py**
 
-Create Project
-```
-django-admin startproject <Project Name>
-```
+簡易定義用戶權限。
 
-Create App
-```
-python manage.py startapp <App Name>
-```
+**api/views.py**
 
-更新資料庫
+編輯`asset_by_hostname`定義API接口。
+
+
+## 如何運行
+
+**啟動服務器**
 
 ```
-python manage.py makemigrations
-python manage.py migrate
-```
-
-
-創建測試帳號
-
-
-```
-001
-m12345678
-```
-
-
-
-# Module
-
-- Windows
-
-```
-pip install pywin32
-pip install wmi
+python manage.py runserver 0:8000
 ```

@@ -1,4 +1,4 @@
-{% extends 'asset/base.html' %}
+{% extends 'user/base.html' %}
 {% load asset_tags %}
 
 {% block title %}匯入用戶{% endblock %}
@@ -62,7 +62,7 @@
 
     <div class="panel panel-default" style="padding: 20px">
 
-        你可以在這裡下載`範例檔案`, 或是直接上傳檔案進行匯入。
+        你可以在這裡下載<a href="/demo/用戶/DEMO_用戶.xlsx">範例檔案</a>, 或是直接上傳檔案進行匯入。
 
         <input id="input-b2" name="file" type="file" class="file" data-show-preview="false">
 

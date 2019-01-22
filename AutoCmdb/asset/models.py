@@ -29,7 +29,7 @@ class UserProfile(models.Model):
         ('退休', '退休'),
     )
 
-    in_service = models.CharField(verbose_name='在職狀態', choices=in_service_choice, max_length=16)
+    in_service = models.CharField(verbose_name='在職狀態', choices=in_service_choice, max_length=64)
     birthday = models.DateField(null=True, blank=True, verbose_name='生日日期')
 
     class Meta:
@@ -37,8 +37,8 @@ class UserProfile(models.Model):
 
         permissions = (
             ("can_view_userprofile", "Can view UserProfile"),
+            ("can_change_userprofile", "Can change UserProfile"),
         )
-
 
     def __str__(self):
         return "%s(%s)" % (self.code, self.user.username,)
@@ -79,8 +79,6 @@ class Department(models.Model):
             ("can_view_department", "Can view department"),
         )
 
-
-
     def __str__(self):
         return "%s部(%s)" % (self.name, self.code)
 
@@ -98,8 +96,6 @@ class Category(models.Model):
         permissions = (
             ("can_view_category", "Can view category"),
         )
-
-
 
     def __str__(self):
         return "%s(%s)" % (self.code, self.name)
@@ -137,7 +133,6 @@ class Asset(models.Model):
             ("can_view_asset", "Can view asset"),
         )
 
-
     def __str__(self):
         return "%s" % (self.name)
 
@@ -164,8 +159,6 @@ class AssetRecord(models.Model):
 
     class Meta:
         verbose_name_plural = "資產紀錄表"
-
-
 
     def __str__(self):
         return "%s" % (self.asset_obj)
@@ -197,8 +190,6 @@ class AssetRepair(models.Model):
     class Meta:
         verbose_name_plural = "資產維修表"
 
-
-
     def __str__(self):
         return "%s" % (self.asset_obj)
 
@@ -217,9 +208,6 @@ class AssetRepairDetail(models.Model):
     class Meta:
         verbose_name_plural = "資產維修詳細紀錄表"
 
-
-
-
     def __str__(self):
         return "%s %s %s" % (self.repair, self.user.code, self.content)
 
@@ -234,8 +222,6 @@ class AssetRepairImage(models.Model):
 
     class Meta:
         verbose_name_plural = "資產紀錄圖片表"
-
-
 
     def __str__(self):
         return "%s" % (self.name)

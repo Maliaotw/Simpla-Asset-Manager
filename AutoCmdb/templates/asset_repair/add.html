@@ -137,7 +137,7 @@
             previewFileType: 'any',
             allowedFileExtensions: ['jpg', 'gif', 'png'],
             maxFileCount: 3,
-            showUpload: false,
+            showUpload: true,
             uploadExtraData: {
                 "csrfmiddlewaretoken": csrftoken //帶上CSRF参数
             },
@@ -159,7 +159,7 @@
 
             // bind button
             $("#submit").on("click", function (e) {
-                $('#input-id').fileinput('upload');
+                //$('#input-id').fileinput('upload');
                 $("#form").submit();
             });
 

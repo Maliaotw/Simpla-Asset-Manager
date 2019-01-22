@@ -348,8 +348,10 @@ class AssetRepair_ADD_Form(AssetRepairForm):
         request = kwargs.get('request', None)
         super(AssetRepair_ADD_Form, self).__init__(*args, **kwargs)
 
-        user_dent = request.user.userprofile.dent
-        self.fields['asset_obj'].queryset = models.Asset.objects.filter(department=user_dent).order_by('name')
+
+        if not self.verify_permissions(request):
+            user_dent = request.user.userprofile.dent
+            self.fields['asset_obj'].queryset = models.Asset.objects.filter(department=user_dent).order_by('name')
 
         self.fields['asset_obj'].widget.attrs['disabled'] = 'ture'
 
@@ -578,6 +580,21 @@ class UserProfileForm(ModelForm):
         for k, v in self.fields.items():
             self.fields[k].widget.attrs['class'] = 'form-control'
 
+    def verify_permissions(self, request):
+        # print('verify_permissions')
+        # print(request)
+
+        # 驗證用戶
+        admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
+        # print('admindent', admindent)
+
+        if request.user.userprofile.dent in admindent:
+            # print('管理用戶')
+            return True
+        else:
+            # print('一般用戶')
+            return False
+
     class Meta:
         model = models.UserProfile
         fields = "__all__"
@@ -719,25 +736,28 @@ class UserProfile_Edit_Form(UserProfileForm):
         super(UserProfileForm, self).__init__(*args, **kwargs)
 
         admin_readonly_fields = ("username",)
-        user_readonly_fields = ("username", "dent", "code",)
+        user_readonly_fields = ("username", "dent", "code",'in_service')
 
         # print(self.request)
 
         # 對所有字段添加Css屬性
         for k, v in self.fields.items():
 
-            if self.request.user.is_anonymous:
-                if k in user_readonly_fields:
+            if self.verify_permissions(request=self.request):
+                if k in admin_readonly_fields:
                     self.fields[k].widget.attrs.update({'disabled': 'ture'})
                     self.fields[k].widget.attrs.update({'readonly': 'ture'})
 
 
             else:
-                if k in admin_readonly_fields:
+                if k in user_readonly_fields:
                     self.fields[k].widget.attrs.update({'disabled': 'ture'})
                     self.fields[k].widget.attrs.update({'readonly': 'ture'})
 
             self.fields[k].widget.attrs['class'] = 'form-control'
+
+
+
 
 
 # --- User ---

@@ -1,10 +1,10 @@
 # 定義用戶群組
 
-admin_perms = ['asset.can_view_asset', 'asset.can_view_category', 'asset.can_view_location',
-               'asset.can_view_department', 'asset.can_view_userprofile',
+admin_perms = ['asset.can_view_asset', 'asset.can_view_category',
+               'asset.can_view_department', 'asset.can_view_userprofile','location.can_view_location',
                'host.can_view_host']
 
-it_perms = ['host.can_view_host','asset.can_view_asset']
+it_perms = ['host.can_view_host','asset.can_view_asset','location.can_view_location']
 
 other_perms = ['asset.can_view_asset']
 

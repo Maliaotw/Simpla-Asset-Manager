@@ -63,7 +63,11 @@ urlpatterns = [
     url(r'^user/input', views.user_input, name="user_input"),
     url(r'^user/output', views.user_output, name="user_output"),
 
-    # delete
+    # --- userprofile ---
+    url(r'^userprofile/$', views.userprofile, name="userprofile"),
+
+
+    # test
 
     url(r'^test1/', views.test1, name="test1"),
     url(r'^test2/', views.test2, name="test2"),
