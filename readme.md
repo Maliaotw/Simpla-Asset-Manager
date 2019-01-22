@@ -1,24 +1,37 @@
+CMDB
+===
 
-# 需求
+# 說明
 
-基本功能
+資產管理結合主機管理，IT人員可以對Windows主機的系統硬件資訊進行採集，並回傳給服務器，其他部門可以發起資產報修以及檢視資產維修紀錄，管理者可以管理用戶、部門、資產。
 
-1. 能支持Windows/Linux/OSX
-2. 採集網卡、硬體、主板等硬體信息
-3. 以主板SN號作為唯一電腦，與資料庫比對，沒有就新增電腦編號，存在就更新。
-    1. 獲取SN號
-    2. request api post data
-        1. if SN in list return hostname, else add this SN.
-    3. reponse Hostname
-4. 結合Zabbix API
-5. 結合堡壘機
+# 目錄結構
 
-開發環境
+目錄結構分二個部分，[AutoCmdb]()負責資產管理網頁，[client]()負責採集主機硬件資訊到資料庫。
 
-Python 3.6
+# Demo
 
-Module
+url: [http://18.210.234.25:8000](http://18.210.234.25:8000)
 
-platform
+![](https://i.imgur.com/uEP0Mbj.png)
+
+## 測試用戶
+
+- 管理員fa
+
+    帳號： Tony
+    密碼： 12345678
+
+- IT人員
+    
+    帳號： Alice
+    密碼： 1234
+
+- 一般人員
+
+    帳號： Afra
+    密碼： 1234
+
+    
 
 
