@@ -12,12 +12,12 @@ from host.models import Host, Memory, Disk, NIC, HostRecord
 ck = "mdfmsijfiosdjoidfjdf"
 auth_list = []
 
-
 modeldata = {
-        '20H5A036TW': 'E570',
-        '20C6A05FTW': 'E540',
-        '20LX000DTW': 'L580'
-    }
+    '20H5A036TW': 'E570',
+    '20C6A05FTW': 'E540',
+    '20LX000DTW': 'L580',
+    '20150': 'G580'
+}
 
 
 @csrf_exempt
@@ -245,9 +245,9 @@ def asset_by_hostname(request):
         # --- 對電腦編號與資料庫相符的筆數
         hostname = host_dict.pop('hostname')
 
-        host_dict['model'] = modeldata.get(host_dict['model']) if modeldata.get(host_dict['model']) else host_dict['model']
+        host_dict['model'] = modeldata.get(host_dict['model']) if modeldata.get(host_dict['model']) else host_dict[
+            'model']
         print('host_dict', host_dict)
-
 
         hosts = Host.objects.filter(name=hostname)
         print("HOST", hosts)
