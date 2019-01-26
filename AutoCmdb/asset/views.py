@@ -1624,40 +1624,69 @@ def test1(request):
 
 
 def test2(request):
-    userinfo_obj = models.UserProfile.objects.get(id=796)
-    # dent_obj = models.Department.objects.all()
 
-    if request.method == 'GET':
-        forms_user_obj = forms.UserForm(instance=userinfo_obj.user, request=request)
-        forms_userproinfo_obj = forms.UserProfileForm(instance=userinfo_obj, request=request)
 
-    elif request.method == 'POST':
 
-        print(request.POST)
+    remote_ip = request.META['REMOTE_ADDR']
+    print(remote_ip)
 
-        forms_user_obj = forms.UserForm(request.POST, instance=userinfo_obj.user, request=request)
-        forms_userproinfo_obj = forms.UserProfileForm(request.POST, instance=userinfo_obj, request=request)
-
-        if forms_user_obj.is_valid() and forms_userproinfo_obj.is_valid():
-            print("ok")
-        else:
-            print("error")
-
-        print(forms_user_obj.errors)
-        print(forms_userproinfo_obj.errors)
-
-    return render(request, "test/test2.html", locals())
+    return HttpResponse("")
 
 
 @login_required
 def user_permission(request):
+    # user = request.user
+    # print(user)
+
+    # p = Permission.objects.all()
+    #
+    # print(p)
+
+    '''
+    p = Permission.objects.all()
+    for i in p:
+        # print(i)
+        # print()
+        print("%s.%s" % (i.content_type.model,i.codename))
+
+    '''
+
+    # request.user.user_permissions.clear()
+    # print(request.user.get_all_permissions())
 
     dent = request.user.userprofile.dent.code
 
     perms_list = [i.split('.') for i in roles.perms.get(dent) or roles.perms.get('other')]
 
+    print('perms_list', perms_list)
+    # p = Permission.objects.get(content_type__model='asset',codename='can_view_asset')
+    # print(p)
+    # p = Permission.objects.get(content_type__model='host',codename='can_view_host')
+    # print(p)
+    # p = Permission.objects.get(content_type__model='location',codename='can_view_location')
+    # print(p)
+    # # p = Permission.objects.get(content_type__model='host',codename='can_view_host')
+    # # print(p)
+    #
+    # # perm_list =
+    #
+    # # request.user.get_all_permissions()
+    # #
+    # # for i in Permission.objects.all():
+    # #     print(i.content_type.model,i.codename)
+    #
+    # # acan = Permission.objects.filter(content_type__model='asset',codename='can_view_asset')
+    # # print(acan)
+    #
+    # # p = Permission.objects.get(content_type__model='asset', codename='can_view_asset')
+    # # print(p)
+    #
+    #
+    # #
+    # #
+    # #
     perms_obj = [Permission.objects.get(content_type__model=model, codename=codename) for model, codename in perms_list]
-    # print('perms_obj',perms_obj)
+    print('perms_obj',perms_obj)
     # #
     request.user.user_permissions = perms_obj
 

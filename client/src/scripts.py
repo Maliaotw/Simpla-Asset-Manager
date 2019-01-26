@@ -3,7 +3,7 @@ from src.client import AutoAgent
 from src.client import AutoSSH
 from src.client import AutoSalt
 from conf import settings
-
+import os
 
 def client():
     if settings.MODE == 'agent':
@@ -28,4 +28,8 @@ def update_client():
     else:
         raise Exception('请配置资产采集模式，如：ssh、agent、salt')
 
-    cli.process()
+    ret = cli.process()
+    print(ret)
+    # os.system('pause')
+
+

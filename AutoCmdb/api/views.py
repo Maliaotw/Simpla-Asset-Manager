@@ -13,6 +13,13 @@ ck = "mdfmsijfiosdjoidfjdf"
 auth_list = []
 
 
+modeldata = {
+        '20H5A036TW': 'E570',
+        '20C6A05FTW': 'E540',
+        '20LX000DTW': 'L580'
+    }
+
+
 @csrf_exempt
 def asset_no_hostname(request):
     '''
@@ -63,6 +70,7 @@ def asset_no_hostname(request):
         #  Mem Nic Disk Basic Cpu
 
         mems = data['mem']
+        print(mems)
         nics = data['nic']
         disks = data['disk']
         basic = data['basic']
@@ -150,6 +158,9 @@ def asset_by_hostname(request):
     :return:
     '''
     if request.method == 'GET':
+
+        remote_ip = request.META['REMOTE_ADDR']
+        print(remote_ip)
         # print(request.META)
         # print(request.META['REMOTE_ADDR'])
         # print(request.META['REMOTE_HOST'])
@@ -202,6 +213,7 @@ def asset_by_hostname(request):
 
         #  Mem Nic Disk Basic Cpu
         mems = data['mem']
+        # print(mems)
         nics = data['nic']
         disks = data['disk']
         basic = data['basic']
@@ -233,8 +245,12 @@ def asset_by_hostname(request):
         # --- 對電腦編號與資料庫相符的筆數
         hostname = host_dict.pop('hostname')
 
-        hosts = Host.objects.filter(name=hostname)
+        host_dict['model'] = modeldata.get(host_dict['model']) if modeldata.get(host_dict['model']) else host_dict['model']
+        print('host_dict', host_dict)
 
+
+        hosts = Host.objects.filter(name=hostname)
+        print("HOST", hosts)
         if hosts:  # 有編號就更新
             host_obj = hosts.first()
             host_obj.name = hostname
@@ -245,20 +261,22 @@ def asset_by_hostname(request):
             host_obj.save()
 
 
+
         else:  # 自動編上最新編號
             host_obj = Host(manage_ip=remote_ip, **host_dict)
             host_obj.number = hostname.split('-')[1]
             host_obj.manage_ip = remote_ip
             host_obj.name = hostname
-            print(host_dict)
-            print(host_obj)
+            # print(host_dict)
+            # print(host_obj)
             host_obj.save()
 
             ret['status'] = 'ADD PC'
+        print("HOST")
 
         nics_obj = []
         for nic in nics:
-            n = NIC.objects.filter(model=nic['model'])
+            n = NIC.objects.filter(model=nic['model'], ipaddress=nic['ipaddress'])
             if n:
                 n_obj = n.first()
 
@@ -280,6 +298,7 @@ def asset_by_hostname(request):
                 ret['data']['nics'].append('新增 %s %s' % (n_obj.model, n_obj.macaddress))
 
             nics_obj.append(n_obj)
+        print("NIC")
 
         # print(nics_obj)
 
@@ -296,9 +315,10 @@ def asset_by_hostname(request):
         # 内存
         mems_obj = []
         for mem in mems:
-            m = Memory.objects.filter(model=mem['model'])
+            m = Memory.objects.filter(sn=mem['sn'])
+            print(m)
             if m:
-                # print(m)
+                print('存在', m)
                 m_obj = m.first()
 
                 if m_obj in host_obj.memory.all():
@@ -311,6 +331,7 @@ def asset_by_hostname(request):
                 m_obj.host_obj = host_obj
                 m_obj.save()
             else:
+                print('新增', m)
                 m_obj = Memory(**mem)
                 m_obj.host_obj = host_obj
                 m_obj.save()
@@ -329,14 +350,14 @@ def asset_by_hostname(request):
                 i.delete()
                 ret['data']['mems'].append('移除 %s %s' % (i.model, i.capacity))
 
-        # print(ret['data']['mems'])
+        print("MEM")
 
         # 硬盤
 
         disks_obj = []
         for disk in disks:
 
-            d = Disk.objects.filter(model=disk['model'])
+            d = Disk.objects.filter(sn=disk['sn'])
             if d:
                 d_obj = d.first()
 
@@ -388,6 +409,7 @@ def asset_by_hostname(request):
             )
 
         # 返回
+        print('成功')
         ret['code'] = 200
         ret['msg'] = '成功'
         return JsonResponse(ret)

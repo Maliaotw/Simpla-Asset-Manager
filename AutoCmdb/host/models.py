@@ -37,7 +37,7 @@ class Host(models.Model):
 
     os_distribution = models.CharField('發行版本', max_length=64, blank=True, null=True)
     os_platform = models.CharField('系統', max_length=16, null=True, blank=True)
-    os_version = models.CharField('系統版本', max_length=16, null=True, blank=True)
+    os_version = models.CharField('系統版本', max_length=64, null=True, blank=True)
 
     cpu_count = models.IntegerField('邏輯處理器', null=True, blank=True)
     cpu_physical_count = models.IntegerField('處理器內核', null=True, blank=True)

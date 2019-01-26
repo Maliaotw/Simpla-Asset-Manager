@@ -131,13 +131,11 @@ STATICFILES_DIRS = (
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-
 DEMO_ROOT = os.path.join(BASE_DIR, 'demo_files')
 DEMO_URL = '/demo/'
 
-
 LOGIN_URL = "/login/"
 
-
-
 from .local_settings import *
+
+

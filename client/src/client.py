@@ -83,9 +83,10 @@ class AutoAgent(AutoBase):
         """
         server_info = plugins.get_server_info()
         # print(type(server_info))
+        # print(server_info)
 
         ret = self.post_asset(server_info)
-        print(ret)
+        return ret
 
 
 class AutoSSH(AutoBase):
