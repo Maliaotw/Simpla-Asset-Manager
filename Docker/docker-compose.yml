@@ -1,0 +1,9 @@
+version: '2'
+services:
+  cmdbdemo:
+    build: .
+    ports:
+    - 8000:8000/tcp
+    volumes:
+    - /cmdb_media:/AutoCmdb/media
+    restart: always
