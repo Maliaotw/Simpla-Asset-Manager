@@ -8,6 +8,21 @@ except ImportError:
 
 
 
+'''
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'MaliaoDB',
+        'USER': 'maliao',
+        'PASSWORD': 'E78pqXeq',
+        'HOST': 'maliao20190122.cmvr3bru64lc.us-east-1.rds.amazonaws.com',
+        'PORT': '3306',
+    }
+}
+'''
+
+
 # 測試
 '''
 DATABASES = {
