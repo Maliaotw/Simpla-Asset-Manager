@@ -9,6 +9,7 @@ except ImportError:
 
 
 # 測試
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -19,10 +20,10 @@ DATABASES = {
         'PORT': '3306',
     }
 }
-
-
-
 '''
+
+
+
 # 生產
 DATABASES = {
     'default': {
@@ -34,7 +35,7 @@ DATABASES = {
         'PORT': '3306',
     }
 }
-'''
 
-STATIC_ROOT = 'static'
-DEBUG = False
+
+# STATIC_ROOT = 'static'
+# DEBUG = False
