@@ -5,5 +5,5 @@ services:
     ports:
     - 8000:8000/tcp
     volumes:
-    - /cmdb_media:../AutoCmdb/media
+    - /cmdb_media:/AutoCmdb/media
     restart: always
