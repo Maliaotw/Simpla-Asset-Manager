@@ -1632,6 +1632,17 @@ def test2(request):
 
     return HttpResponse("")
 
+def formatdata(request):
+    from test_script import create01_dent_data,create02_admin,create03_user_data,create04_data,create05_asset_data
+    create01_dent_data.main()
+    create02_admin.main()
+    create03_user_data.main()
+    create04_data.main()
+    create05_asset_data.main()
+
+    return HttpResponse("OK")
+
+
 
 @login_required
 def user_permission(request):
