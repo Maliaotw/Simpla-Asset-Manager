@@ -8,4 +8,4 @@ RUN pip install -U pip setuptools
 RUN pip install -r /AutoCmdb/requirements.txt
 
 CMD ["python", "manage.py", "runserver","0.0.0.0:8000"]
-EXPOSE 8001
+EXPOSE 8000
