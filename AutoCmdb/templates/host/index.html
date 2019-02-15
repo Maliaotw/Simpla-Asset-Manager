@@ -328,14 +328,14 @@
                 console.log('edit');
 
                 $(this).attr('data-icon', 'file');
-
+                console.log($(this));
                 tds = $(this).parent().prevAll();
                 tr = $(this).closest("tr");
                 var obj_id = $.trim(tr.find("[name='id']").text());
                 var asset_id = tr.find("[name='asset'] input").val();
                 var select_obj = tr.find("[name='asset'] select");
                 console.log(asset_id);
-
+                console.log(tds);
                 // 請求asset
                 get_asset(obj_id, asset_id, select_obj);
 

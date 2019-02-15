@@ -32,6 +32,7 @@ urlpatterns = [
     url(r'^asset/edit/(?P<pk>\d+)', views.asset_edit, name="asset_edit"),
     url(r'^asset/input', views.asset_input, name="asset_input"),
     url(r'^asset/output', views.asset_output, name="asset_output"),
+    url(r'^asset/busunit', views.asset_busunit, name="asset_busunit"),
 
     # --- asset_repair ---
     url(r'^asset/repair$', views.asset_repair, name='asset_repair'),
@@ -65,6 +66,9 @@ urlpatterns = [
 
     # --- userprofile ---
     url(r'^userprofile/$', views.userprofile, name="userprofile"),
+
+    # --- bus ---
+    url(r'^busunit/$', views.busunit, name="busunit"),
 
 
     # test

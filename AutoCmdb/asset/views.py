@@ -18,6 +18,7 @@ from django.contrib.auth.models import User, Group, Permission
 
 # --- 資產 ---
 
+
 @login_required
 def asset(request):
     print('Assset')
@@ -33,7 +34,6 @@ def asset(request):
 
     else:
         # print('一般用戶')
-
         # search_field['dent_id'] = dent_id
         # dent_id = request.user.userprofile.dent_id
         asset_obj = models.Asset.objects.filter(department=request.user.userprofile.dent)
@@ -50,6 +50,7 @@ def asset_index(request):
     if request.method == "GET":
 
         search_field = {}
+        contacts = 10
 
         # GET 字段
         name = request.GET.get("name", '')
@@ -81,20 +82,36 @@ def asset_index(request):
 
         # GET 字段 篩選
         if cate_id and dent_id:
-            asset_obj = models.Asset.objects.filter(name__contains=name, category_id=cate_id, department_id=dent_id)
+            # asset_repair_obj = asset_repair_obj.filter(
+            #   Q(asset_obj__name__contains=name) | Q(title__contains=name)
+            # )
+            asset_obj = models.Asset.objects.filter(
+                Q(
+                    name__contains=name, category_id=cate_id, department_id=dent_id
+                ) | Q(
+                    manager__code__contains=name, category_id=cate_id, department_id=dent_id
+                )
+            )
         elif cate_id:
-            asset_obj = models.Asset.objects.filter(name__contains=name, category_id=cate_id)
+            asset_obj = models.Asset.objects.filter(
+                Q(name__contains=name, category_id=cate_id) | Q(manager__code__contains=name, category_id=cate_id)
+            )
+            contacts = asset_obj.count()
         elif dent_id:
-            asset_obj = models.Asset.objects.filter(name__contains=name, department_id=dent_id)
+            asset_obj = models.Asset.objects.filter(
+                Q(name__contains=name, department_id=dent_id) | Q(manager__code__contains=name, department_id=dent_id)
+            )
         elif name:
-            asset_obj = models.Asset.objects.filter(name__contains=name)
+            asset_obj = models.Asset.objects.filter(
+                Q(name__contains=name) | Q(manager__code__contains=name)
+            )
         else:
             asset_obj = models.Asset.objects.all()
 
         # print('asset_obj', asset_obj)
         # 分頁功能
 
-        paginator = Paginator(asset_obj, 10)  # Show 10 contacts per page
+        paginator = Paginator(asset_obj, contacts)  # Show 10 contacts per page
 
         page = request.GET.get('page')
         try:
@@ -390,6 +407,146 @@ def asset_output(request):
     return response
 
 
+@login_required
+def asset_busunit(request):
+    '''
+    資產業務線表
+    :param request:
+    :return:
+    '''
+
+    if request.method == 'GET':
+        search_field = {}
+
+        # GET 字段
+        name = request.GET.get("name", '')
+        cate_id = request.GET.get("cate_id", '')
+        dent_id = request.GET.get("dent_id", '')
+        busunit_id = request.GET.get("busunit_id", '')
+
+        # asset_busunit_obj = models.AssetBusiness.objects.all()
+        category_obj = models.Category.objects.all()
+
+        if busunit_id:
+            asset_obj = models.Asset.objects.filter(assetbusiness__business_id=busunit_id)
+        elif cate_id:
+            asset_obj = models.Asset.objects.filter(category_id=cate_id)
+        else:
+            asset_obj = models.Asset.objects.all()
+
+        busunit_obj = models.BusinessUnit.objects.all()
+
+        paginator = Paginator(asset_obj, 10)  # Show 10 contacts per page
+
+        page = request.GET.get('page')
+        try:
+            asset_obj = paginator.page(page)
+        except PageNotAnInteger:
+            asset_obj = paginator.page(1)
+        except EmptyPage:
+            asset_obj = paginator.page(paginator.num_pages)
+
+        return render(request, 'asset/busunit.html', locals())
+
+    if request.method == 'POST':
+        print("POST")
+        ret = {"status": "", "re_html": "", "msg": ""}
+
+        # print(request.POST)
+        assetid = request.POST.get("assetid")  # 資產ID
+        ab_id = request.POST.get("ab_id")  # 資產業務線對應表ID
+        busunitid = request.POST.get("busunitid")  # 業務線ID
+        # print(assetid)
+        # print(busunitid)
+
+        asset_obj = models.Asset.objects.get(id=assetid)
+        # print("bsnis_obj")
+        if ab_id:
+            ab_obj = models.AssetBusiness.objects.get(id=ab_id)
+            ab_obj.asset = asset_obj
+            if busunitid:
+                bsnis_obj = models.BusinessUnit.objects.get(id=busunitid)
+                ab_obj.business = bsnis_obj
+            else:
+                ab_obj.business = None
+
+        else:
+            if busunitid:
+                bsnis_obj = models.BusinessUnit.objects.get(id=busunitid)
+                ab_obj = models.AssetBusiness(asset=asset_obj, business=bsnis_obj)
+        # print(ab_obj)
+        ab_obj.save()
+        ret['status'] = 'ok'
+
+        return JsonResponse(ret)
+
+
+# --- 業務線 ---
+
+@login_required
+def busunit(request):
+    '''
+    業務線列表
+    :param request:
+    :return:
+    '''
+    ret = {"status": "", "re_html": "", "msg": ""}
+
+    if request.method == 'GET':
+
+        search_field = {}
+
+
+        dent_obj = models.Department.objects.all()
+
+
+        # 判斷管理用戶
+        admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
+        # admindent = models.Department.objects.filter(asset=
+
+        if request.user.userprofile.dent in admindent:
+            # print('管理用戶')
+            busunit_obj = models.BusinessUnit.objects.all()
+        else:
+            # print('一般用戶')
+            busunit_obj = models.BusinessUnit.objects.filter(dent=request.user.userprofile.dent)
+
+        paginator = Paginator(busunit_obj, 10)  # Show 10 contacts per page
+
+        page = request.GET.get('page')
+        try:
+            busunit_obj = paginator.page(page)
+        except PageNotAnInteger:
+            busunit_obj = paginator.page(1)
+        except EmptyPage:
+            busunit_obj = paginator.page(paginator.num_pages)
+
+        return render(request, 'busunit/index.html', locals())
+
+    if request.method == 'POST':
+
+        form_obj = forms.BusunitForm(data=request.POST)
+        print(request.POST)
+
+
+        if form_obj.is_valid():
+            form_obj.save()
+
+            ret['status'] = 'ok'
+            ret['msg'] = '新增成功'
+
+        else:
+            print(form_obj.errors)
+            ret['status'] = 'error'
+            ret['msg'] = '新增信息輸入不正確!'
+
+        return JsonResponse(ret)
+
+
+    if request.method == 'PUT':
+        print("THIS IS PUT")
+        return HttpResponse("PUT")
+
 # --- 資產維修紀錄 ---
 
 @login_required
@@ -405,19 +562,19 @@ def asset_repair(request):
 
         # 判斷管理用戶
         admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
+        # admindent = models.Department.objects.filter(asset=
 
         if request.user.userprofile.dent in admindent:
             # print('管理用戶')
-            asset_repair_obj = models.AssetRepair.objects.all().order_by('-create_date')
+            asset_repair_obj = models.AssetRepair.objects.all()
             # asset_repair_obj = models.AssetRepair.objects.filter(=)
 
         else:
             # print('一般用戶')
-
             # search_field['dent_id'] = dent_id
             # dent_id = request.user.userprofile.dent_id
             asset_repair_obj = models.AssetRepair.objects.filter(
-                asset_obj__department=request.user.userprofile.dent).order_by('-create_date')
+                asset_obj__department=request.user.userprofile.dent)
 
         # 篩選
         # if status
@@ -432,10 +589,8 @@ def asset_repair(request):
 
         elif name:
             asset_repair_obj = asset_repair_obj.filter(Q(asset_obj__name__contains=name) | Q(title__contains=name))
-
         else:
             pass
-
         #     Question.objects.filter(Q(question_text_Q_contains='you') | Q(question_text__contains='who'))
 
         paginator = Paginator(asset_repair_obj, 10)  # Show 10 contacts per page
@@ -1624,16 +1779,14 @@ def test1(request):
 
 
 def test2(request):
-
-
-
     remote_ip = request.META['REMOTE_ADDR']
     print(remote_ip)
 
     return HttpResponse("")
 
+
 def formatdata(request):
-    from test_script import create01_dent_data,create02_admin,create03_user_data,create04_data,create05_asset_data
+    from test_script import create01_dent_data, create02_admin, create03_user_data, create04_data, create05_asset_data
     create01_dent_data.main()
     create02_admin.main()
     create03_user_data.main()
@@ -1641,7 +1794,6 @@ def formatdata(request):
     create05_asset_data.main()
 
     return HttpResponse("OK")
-
 
 
 @login_required
@@ -1697,7 +1849,7 @@ def user_permission(request):
     # #
     # #
     perms_obj = [Permission.objects.get(content_type__model=model, codename=codename) for model, codename in perms_list]
-    print('perms_obj',perms_obj)
+    print('perms_obj', perms_obj)
     # #
     request.user.user_permissions = perms_obj
 

@@ -165,3 +165,12 @@ def it_fix_user(asset_repair_obj):
         [i['user__code'] for i in asset_repair_detail.filter(user__dent__code='IT').values('user__code')])
 
     return ",".join(fix_users)
+
+
+@register.simple_tag
+def get_busunit(dent):
+
+    busunit_obj = models.BusinessUnit.objects.filter(dent=dent)
+    return busunit_obj
+
+

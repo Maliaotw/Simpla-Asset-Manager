@@ -50,7 +50,7 @@
 {% block content %}
 
     <ol class="breadcrumb">
-        <li><a href="{% url 'asset' %}">資產管理</a></li>
+        <li><a href="{% url 'asset_index' %}">資產列表</a></li>
         <li class="active">{{ asset_obj.name }}</li>
     </ol>
 
@@ -112,6 +112,19 @@
                                 <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
                             </div>
 
+                            <div class="col-md-6 form-group has-feedback">
+                                {{ forms_obj.title.label_tag }}
+                                {{ forms_obj.title }}
+                                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                            </div>
+
+                            <div class="col-md-6 form-group has-feedback">
+                                {{ forms_obj.model.label_tag }}
+                                {{ forms_obj.model }}
+                                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                            </div>
+
+
                             <!-- 管理部門 -->
                             {% verify_permissions request as admin_dent %}
                             {% if admin_dent %}
@@ -139,9 +152,15 @@
                         <div class="row" style="padding-left: 15px">
 
 
-                            <div class="col-md-12 form-group has-feedback">
+                            <div class="col-md-6 form-group has-feedback">
                                 {{ forms_obj.status.label_tag }}
                                 {{ forms_obj.status }}
+                                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                            </div>
+
+                            <div class="col-md-6 form-group has-feedback">
+                                {{ forms_obj.status_date.label_tag }}
+                                {{ forms_obj.status_date }}
                                 <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
                             </div>
 
@@ -155,6 +174,12 @@
                             <div class="col-md-6 form-group has-feedback">
                                 {{ forms_obj.manager.label_tag }}
                                 {{ forms_obj.manager }}
+                                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                            </div>
+
+                            <div class="col-md-12 form-group has-feedback">
+                                {{ forms_obj.remarks.label_tag }}
+                                {{ forms_obj.remarks }}
                                 <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
                             </div>
 
@@ -223,9 +248,7 @@
                                 </span>
                                     </p>
 
-
-                                    <p style="height: 60px">{{ asset_repair.summary }}</p>
-
+                                    <p style="height: 60px">{{ asset_repair.summary|truncatechars:150 }}</p>
 
                                     <ul class="list-inline">
 
@@ -238,7 +261,6 @@
                                         <li>|</li>
 
                                         <li><span><i class="glyphicon glyphicon-wrench"></i>
-                                            <!--- TODO 只篩選資訊部 User Code -->
                                     {% it_fix_user asset_repair %}
                                     </span></li>
 

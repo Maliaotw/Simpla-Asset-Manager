@@ -517,6 +517,15 @@ class Dent_Input_Form(DentForm):
             self.add_error('user', '使用者未輸入')
 
 
+class BusunitForm(ModelForm):
+    '''
+    業務線表單
+    '''
+
+    class Meta:
+        model = models.BusinessUnit
+        fields = '__all__'
+
 # --- 類型 ---
 
 class CaryForm(ModelForm):

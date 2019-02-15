@@ -192,7 +192,7 @@
 
 
     {% url 'category' as category %}
-        {% if category in request.path %}
+    {% if category in request.path %}
         $('#categorySubmenu').collapse();
     {% endif %}
 
@@ -209,16 +209,10 @@
 
 {% block base-js %}
 
-
-
-
-
 {% endblock %}
 
 
 {% block extra-js %}
-
-
 
 {% endblock %}
 

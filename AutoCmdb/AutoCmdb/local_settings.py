@@ -38,7 +38,7 @@ DATABASES = {
 
 
 # 生產
-
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -49,7 +49,19 @@ DATABASES = {
         'PORT': '3306',
     }
 }
+'''
 
+# 在家
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'mydb',
+        'USER': 'root',
+        'PASSWORD': '123456',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+    }
+}
 
 # STATIC_ROOT = 'static'
 # DEBUG = False

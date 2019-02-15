@@ -115,13 +115,13 @@
                     </td>
 
                     <td>
-                        {{ asset_repair.asset_obj.name }}
+                        {{ asset_repair.asset_obj.name|truncatechars:10 }}
                     </td>
                     <td>
                         <span> <b>{{ asset_repair.title }}</b> </span>
                     </td>
                     <td>
-                        {{ asset_repair.summary|default:'' }}
+                        {{ asset_repair.summary|default:''|truncatechars:30 }}
                     </td>
                     <td>
                         {{ asset_repair.creator|default:"" }}

@@ -1,0 +1,479 @@
+{% extends 'busunit/base.html' %}
+{% load asset_tags %}
+
+<!-- 驗證用戶部門  -->
+
+
+
+
+{% block title %}資產管理{% endblock %}
+
+{% block head %}
+    <!-- CSS -->
+    <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
+
+    <!--  JavaScript -->
+    <script src="/static/js/bootstrap-datepicker.js"></script>
+    <script src="/static/js/bootstrap-datepicker.zh-TW.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <link rel="stylesheet" href="/static/css/bootstrap-select.css">
+    <script src="/static/js/bootstrap-select.js"></script>
+
+
+
+{% endblock %}
+
+
+{% block content %}
+
+    <ol class="breadcrumb">
+        <li><a href="#">業務線列表</a></li>
+
+    </ol>
+
+
+    <div class="panel panel-default" style="padding: 20px">
+
+        <div class="row">
+
+
+            <div class="col-md-4">
+
+                <button class="btn btn-primary" data-toggle="modal" data-target="#busunitform_add_Modal">
+                    新增業務線
+                </button>
+
+            </div>
+
+            <!-- 篩選 -->
+            <div class="col-md-8" style="text-align: right">
+
+                <form class="form-inline" method="get">
+
+                    <div class="form-group">
+                        <label for="inputsearch" class="col-form-label">搜尋</label>
+                        <input type="text" class="form-control" name='name' id="search" placeholder=""
+                               value="{{ name }}">
+                    </div>
+
+                    {% verify_permissions request as admin_dent %}
+                    {% if admin_dent %}
+
+                        <div class="form-group">
+                            <label class="col-form-label">部門</label>
+                            <select class="selectpicker" name="dent_id" data-width="fit">
+                                <option value="">-------</option>
+                                {% for dent in dent_obj %}
+                                    <option value="{{ dent.id }}">{{ dent.name }}部({{ dent.code }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                    {% endif %}
+
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success" style="margin-left: 20px">Submit</button>
+                    </div>
+
+                </form>
+
+
+            </div>
+        </div>
+
+
+        <!--- 資產列表-->
+        <table class="table" id="mytable" style="margin-top: 20px">
+            <thead>
+            <tr>
+                <th>排序</th>
+                {% verify_permissions request as admin_dent %}
+                {% if admin_dent %}
+                    <th>部門</th>
+                {% endif %}
+                <th>業務線</th>
+                <th>業務線英文</th>
+                <th>操作</th>
+
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for busunit in busunit_obj %}
+
+                <tr>
+                    <td>
+                        {% if forloop.last and page %}
+                            {{ page }}0
+
+                        {% else %}
+                            {{ page|add:"-1"|default:"" }}{{ forloop.counter }}
+                        {% endif %}
+                    </td>
+
+
+                    <td name="id" style="display: none">
+
+                        <input type="text" class='form-control' value="{{ busunit.id }}"
+                               style="display: none">
+
+                    </td>
+
+                    <td name="dentid" style="display: none">
+                        <input type="text" class='form-control' value="{{ busunit.dent.id }}"
+                               style="display: none">
+                    </td>
+
+
+                    {% verify_permissions request as admin_dent %}
+                    {% if admin_dent %}
+                        <td name="dent">
+                        <span class="form-control-static">
+                            {{ busunit.dent }}
+                        </span>
+
+                        </td>
+
+                    {% endif %}
+
+
+                    <td name="name">
+                        <span class="form-control-static">
+                            {{ busunit.name }}
+                        </span>
+                        <input type="text" class='form-control input' value="{{ busunit.name }}"
+                               style="display: none">
+                    </td>
+
+                    <td name="en">
+                        <span class="form-control-static">
+                            {{ busunit.en|default:'' }}
+                        </span>
+                        <input type="text" class='form-control input' value="{{ busunit.en }}"
+                               style="display: none">
+                    </td>
+
+                    <!-- 操作 -->
+                    <td>
+                        <i class="fas fa-pen"></i>
+                    </td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+
+
+            <tfoot>
+            <th colspan="9">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pull-left">
+                        共{{ paginator.count }}筆
+                    </ul>
+                    <ul class="pagination pull-right">
+                        {% get_pageer busunit_obj search_field %}
+                    </ul>
+                </nav>
+
+            </th>
+
+            </tfoot>
+
+        </table>
+
+    </div>
+
+
+
+    <!--- 新增部門表單-->
+    <div class="modal fade" id="busunitform_add_Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+
+                    <h4 class="modal-title" id="myModalLabel">新增業務線</h4>
+                </div>
+                <div class="modal-body">
+
+
+                    <!-- 錯誤提示-->
+                    <div class="alert alert-danger">
+                        <strong></strong>
+                    </div>
+
+
+                    <form id="busunitform_add">
+
+                        {% verify_permissions request as admin_dent %}
+                        {% if admin_dent %}
+                            <div class="form-group">
+                                <label class="col-form-label">部門</label>
+                                <select id='dent' name="dent" class="form-control">
+                                    <option value="">-------</option>
+                                    {% for dent in dent_obj %}
+                                        <option value="{{ dent.id }}">{{ dent.code }}({{ dent.name }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                        {% else %}
+                            <div class="form-group" style="display: none">
+                                <label class="col-form-label">部門</label>
+                                <input type="text" name="dent" class="form-control" placeholder=""
+                                       value="{{ request.user.userprofile.dent.id }}">
+                            </div>
+
+
+                        {% endif %}
+
+                        <div class="form-group">
+                            <label class="col-form-label">業務線</label>
+                            <input type="text" name="name" class="form-control" placeholder="">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-form-label">業務線英文</label>
+                            <input type="text" name="en" class="form-control" placeholder="">
+                        </div>
+
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="dentform_add_submit" type="button" class="btn btn-primary">新增</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {% csrf_token %}
+
+
+
+
+{% endblock %}
+
+
+{% block extra-js %}
+
+    <script>
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+
+        // 初始 新增類型表單
+        $('#busunitform_add_Modal').on('show.bs.modal', function (event) {
+
+            $("#busunitform_add_Modal .alert-danger").hide();
+
+        });
+
+        $("#dentform_add_submit").on('click', function () {
+
+            $("#busunitform_add").submit();
+
+        });
+
+
+        // 提交 新增資產表單
+        $("#busunitform_add").on("submit", function (e) {
+            //console.log(e);
+            //console.log($(this));
+            var postData = $(this).serializeArray();
+            console.log(postData);
+
+            $.ajax({
+                url: {% url 'busunit' %},
+                type: "POST",
+                data: postData,
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback.status == 'ok') {
+
+                        $('#busunitform_add_Modal').modal('hide');
+                        location.reload();
+
+                    } else {
+                        //新增錯誤
+                        $("#busunitform_add_Modal .alert-danger").show();
+                        $("#busunitform_add_Modal .alert-danger strong").text(callback.msg);
+
+                    }
+
+                },
+                error: function () {
+
+                }
+            });
+            e.preventDefault();
+        });
+
+
+        $(".selectpicker[name='cate_id']").selectpicker('val', {{ cate_id }});
+        $(".selectpicker[name='dent_id']").selectpicker('val', {{ dent_id }});
+        $(".selectpicker[name='busunit_id']").selectpicker('val', {{ busunit_id }});
+
+
+        //編輯 EditData : Change icon
+        $("#mytable").on('click', ".fa-pen", function (ele) {
+            console.log('edit');
+
+            $(this).attr('data-icon', 'file');
+            {#console.log($(this));#}
+            {#console.log($(this).parent());#}
+            tds = $(this).parent().prevAll();
+            tr = $(this).closest("tr");
+            var obj_id = tr.find("[name='id']").text();
+
+            //console.log(obj_id);
+            //console.log(tds);
+
+            $.each(tds, function (i, ele) {
+                var span_tag = $(this).find("span");
+                var input_tag = $(this).find("input");
+
+                //user
+                select_list = [];
+                input_list = ['name', 'en'];
+
+
+                n = $(this).attr("name");
+
+
+                if (select_list.includes(n)) {
+                    console.log(n);
+                    span_tag.hide();
+                    $(this).find('select').show();
+                }
+
+
+                if (input_list.includes(n)) {
+                    span_tag.hide();
+                    //console.log(span_tag);
+                    input_tag.val($.trim(span_tag.text()));
+                    input_tag.show()
+                }
+
+            });
+        });
+
+
+        //SaveData : PUT
+        $("#mytable").on('click', ".fa-file", function (ele) {
+
+            console.log('save');
+            $(this).attr('data-icon', 'pen');
+
+            var tr = $(this).closest('tr');
+            var tds = $(this).parent().prevAll();
+
+            console.log(tr);
+            console.log(tds);
+
+            //取id id
+            //取部門id dentid
+            //取業務線 name
+            //取業務線英文 en
+
+
+            //取assetid跟busunitid
+            {#assetid = $.trim(tr.find('[name="id"]').text());#}
+            var id = tr.find('[name="id"]').find("input").val();
+            var dentid = tr.find('[name="dentid"]').find("input").val();
+            var name = tr.find('[name="name"]').find("input").val();
+            var en = tr.find('[name="en"]').find("input").val();
+
+            data = {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                id: id,
+                dentid: dentid,
+                name: name,
+                en: en,
+
+            };
+            console.log(data);
+
+
+            $.ajax({
+                url: {% url 'busunit' %},
+                data: data,
+                type: 'PUT',
+                async: false,
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback.status == 'ok') {
+                        put_status = true
+
+                    } else {
+                        put_status = false
+                    }
+
+                },
+                error: function () {
+                    put_status = false
+
+                }
+
+            });
+
+            if (put_status) {
+                $(this).attr('data-icon', 'pen');
+                $.each(tds, function (i, ele) {
+
+                    var span_tag = $(this).find("span");
+                    var input_tag = $(this).find("input");
+                    var select_tag = $(this).find('select');
+
+                    //user
+                    select_list = [];
+                    input_list = ['name', 'en'];
+
+
+                    n = $(this).attr("name");
+
+
+                    if (select_list.includes(n)) {
+                        console.log(n);
+                        span_tag.hide();
+                        $(this).find('select').show();
+                    }
+
+
+                    if (input_list.includes(n)) {
+                        span_tag.hide();
+                        //console.log(span_tag);
+                        input_tag.val($.trim(span_tag.text()));
+                        input_tag.show()
+                    }
+
+                })
+
+            }
+
+        });
+
+
+    </script>
+
+{% endblock %}
+
+

@@ -126,8 +126,14 @@ class Asset(models.Model):
     latest_date = models.DateTimeField(verbose_name='更新日期', auto_now=True)
     create_date = models.DateTimeField(verbose_name='創建日期', auto_now_add=True)
 
+    remarks = models.TextField(verbose_name="備註", blank=True, null=True)
+    status_date = models.DateField(verbose_name='使用日期/遺失日期/報廢日期', null=True, blank=True)
+    title = models.CharField(verbose_name="資產名稱", max_length=64, null=True, blank=True)
+    model = models.CharField(verbose_name="品牌/型號", max_length=64, null=True, blank=True)
+
     class Meta:
         verbose_name_plural = "資產信息表"
+        ordering = ('-purchase_date',)
 
         permissions = (
             ("can_view_asset", "Can view asset"),
@@ -189,6 +195,7 @@ class AssetRepair(models.Model):
 
     class Meta:
         verbose_name_plural = "資產維修表"
+        ordering = ('create_date',)
 
     def __str__(self):
         return "%s" % (self.asset_obj)
@@ -225,3 +232,33 @@ class AssetRepairImage(models.Model):
 
     def __str__(self):
         return "%s" % (self.name)
+
+
+class BusinessUnit(models.Model):
+    """
+    業務線
+    """
+    name = models.CharField(verbose_name='業務線', max_length=64)
+    en = models.CharField(verbose_name='英文簡稱',max_length=64,blank=True,null=True)
+    dent = models.ForeignKey(Department, verbose_name='部門')
+
+    class Meta:
+        verbose_name_plural = "業務線"
+
+    def __str__(self):
+        return "%s %s" % (self.dent,self.name)
+
+
+class AssetBusiness(models.Model):
+    '''
+    資產業務線
+    '''
+
+    asset = models.OneToOneField("Asset", verbose_name='資產')
+    business = models.ForeignKey("BusinessUnit", verbose_name='業務線', blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = "資產業務線"
+
+    def __str__(self):
+        return "%s %s" % (self.asset, self.business)

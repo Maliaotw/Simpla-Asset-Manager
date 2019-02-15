@@ -1,0 +1,391 @@
+{% extends 'asset/base.html' %}
+{% load asset_tags %}
+
+<!-- 驗證用戶部門  -->
+
+
+
+
+{% block title %}資產管理{% endblock %}
+
+{% block head %}
+    <!-- CSS -->
+    <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
+
+    <!--  JavaScript -->
+    <script src="/static/js/bootstrap-datepicker.js"></script>
+    <script src="/static/js/bootstrap-datepicker.zh-TW.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <link rel="stylesheet" href="/static/css/bootstrap-select.css">
+    <script src="/static/js/bootstrap-select.js"></script>
+
+
+
+{% endblock %}
+
+
+{% block content %}
+
+    <ol class="breadcrumb">
+        <li><a href="#">資產業務線對應表</a></li>
+
+    </ol>
+
+
+    <div class="panel panel-default" style="padding: 20px">
+
+        <div class="row">
+
+
+            <div class="col-md-4">
+
+
+            </div>
+
+            <!-- 篩選 -->
+            <div class="col-md-8" style="text-align: right">
+
+                <form class="form-inline" method="get">
+
+                    <div class="form-group">
+                        <label for="inputsearch" class="col-form-label">搜尋</label>
+                        <input type="text" class="form-control" name='name' id="search" placeholder=""
+                               value="{{ name }}">
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-form-label">類型</label>
+                        <select class="selectpicker" name='cate_id' data-width="fit">
+                            <option value="">-------</option>
+                            {% for category in category_obj %}
+                                <option value="{{ category.id }}">{{ category.name }}({{ category.code }})</option>
+                            {% endfor %}
+                        </select>
+
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-form-label">業務線</label>
+                        <select class="selectpicker" name='busunit_id' data-width="fit">
+                            <option value="">-------</option>
+                            {% for busunit in busunit_obj %}
+                                <option value="{{ busunit.id }}">{{ busunit.name }}</option>
+                            {% endfor %}
+                        </select>
+
+                    </div>
+
+
+
+                    {% if admin_dent %}
+
+                        <div class="form-group">
+                            <label class="col-form-label">部門</label>
+                            <select class="selectpicker" name="dent_id" data-width="fit">
+                                <option value="">-------</option>
+                                {% for department in department_obj %}
+                                    <option value="{{ department.id }}">{{ department.name }}部({{ department.code }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                    {% endif %}
+
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success" style="margin-left: 20px">Submit</button>
+                    </div>
+
+                </form>
+
+
+            </div>
+        </div>
+
+
+        <!--- 資產列表-->
+        <table class="table" id="mytable" style="margin-top: 20px">
+            <thead>
+            <tr>
+                <th>排序</th>
+                <th>資產編號</th>
+                <th>類型</th>
+                <th>部門</th>
+                <th>業務線</th>
+                <th>操作</th>
+
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for asset in asset_obj %}
+
+                <tr>
+                    <td>
+                        {% if forloop.last and page %}
+                            {{ page }}0
+
+                        {% else %}
+                            {{ page|add:"-1"|default:"" }}{{ forloop.counter }}
+                        {% endif %}
+                    </td>
+
+                    <td name="id" style="display: none">
+                        <input type="text" class="form-control" value="{{ asset.id }}"/>
+                    </td>
+
+                    <td name="ab_id" style="display: none">
+                        <input type="text" class="form-control" value="{{ asset.assetbusiness.id }}"/>
+                    </td>
+
+                    <td name="dent_id" style="display: none">
+                        <input type="text" class="form-control" value="{{ asset.department.id }}"/>
+                    </td>
+
+
+                    <td name="asset">
+                        <span class="form-control-static">
+                            {{ asset.name }}
+                        </span>
+                    </td>
+
+
+                    <td name="ab_asset" style="display: none">
+                        <span class="form-control-static">
+                            {{ asset.assetbusiness.asset }}
+                        </span>
+                    </td>
+
+                    <td name="category">
+                        <span class="form-control-static">
+                            {{ asset.category }}
+                        </span>
+                    </td>
+
+                    <td name="department">
+                        <span class="form-control-static">
+                            {{ asset.department }}
+                        </span>
+                    </td>
+
+                    <!-- 業務線 -->
+                    <td name="ab_business">
+                        <span class="form-control-static">
+                            {{ asset.assetbusiness.business.name|default:"" }}
+                        </span>
+
+                        <select class="form-control" style="display: none">
+                            <option value="">-------</option>
+                            <!-- 依照部門篩選業務線 -->
+                            {% get_busunit asset.department as dent_busunit_obj %}
+                            {% for busunit in dent_busunit_obj %}
+                                {% if asset.assetbusiness.business  ==  busunit %}
+                                    <option selected value="{{ busunit.id }}">
+                                        {{ busunit.name }}
+                                    </option>
+                                {% else %}
+                                    <option value="{{ busunit.id }}">
+                                        {{ busunit.name }}
+                                    </option>
+                                {% endif %}
+
+                            {% endfor %}
+                        </select>
+                    </td>
+
+
+                    <!-- 操作 -->
+                    <td>
+                        <i class="fas fa-pen"></i>
+                    </td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+
+
+            <tfoot>
+            <th colspan="9">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pull-left">
+                        共{{ paginator.count }}筆
+                    </ul>
+                    <ul class="pagination pull-right">
+                        {% get_pageer asset_obj search_field %}
+                    </ul>
+                </nav>
+
+            </th>
+
+            </tfoot>
+
+        </table>
+
+    </div>
+
+
+
+
+
+{% endblock %}
+
+
+{% block extra-js %}
+
+    <script>
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        $(document).ready(function () {
+
+            $(".selectpicker[name='cate_id']").selectpicker('val', {{ cate_id }});
+            $(".selectpicker[name='dent_id']").selectpicker('val', {{ dent_id }});
+            $(".selectpicker[name='busunit_id']").selectpicker('val', {{ busunit_id }});
+
+
+            //編輯 EditData : Change icon
+            $("#mytable").on('click', ".fa-pen", function (ele) {
+                console.log('edit');
+
+                $(this).attr('data-icon', 'file');
+                {#console.log($(this));#}
+                {#console.log($(this).parent());#}
+                tds = $(this).parent().prevAll();
+                tr = $(this).closest("tr");
+                var obj_id = tr.find("[name='id']").text();
+
+                //console.log(obj_id);
+                //console.log(tds);
+
+                $.each(tds, function (i, ele) {
+                    var span_tag = $(this).find("span");
+                    var input_tag = $(this).find("input");
+
+                    //user
+                    select_list = ['ab_business'];
+
+                    n = $(this).attr("name");
+
+
+                    if (select_list.includes(n)) {
+                        console.log(n);
+                        span_tag.hide();
+                        $(this).find('select').show();
+                    }
+
+                });
+            });
+
+
+            //SaveData : PUT
+            $("#mytable").on('click', ".fa-file", function (ele) {
+
+                console.log('save');
+                $(this).attr('data-icon', 'pen');
+
+                var tr = $(this).closest('tr');
+                var tds = $(this).parent().prevAll();
+
+                console.log(tr);
+                console.log(tds);
+
+
+                //取assetid跟busunitid
+                {#assetid = $.trim(tr.find('[name="id"]').text());#}
+                var assetid = tr.find('[name="id"]').find("input").val();
+                var ab_id = tr.find('[name="ab_id"]').find("input").val();
+                var busunitid = tr.find('[name="ab_business"]').find("select").val();
+
+                data = {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    assetid: assetid,
+                    ab_id: ab_id,
+                    busunitid: busunitid,
+
+                };
+                console.log(data);
+
+
+                $.ajax({
+                    headers: {
+                        'X-HTTP-Method-Override': 'PATCH'
+                    },
+                    url: "",
+                    data: data,
+                    type: 'POST',
+                    async: false,
+                    success: function (callback) {
+                        console.log(callback);
+
+                        if (callback.status == 'ok') {
+                            put_status = true
+
+                        } else {
+                            put_status = false
+                        }
+
+                    },
+                    error: function () {
+                        put_status = false
+
+                    }
+
+                });
+
+                if (put_status) {
+                    $(this).attr('data-icon', 'pen');
+                    $.each(tds, function (i, ele) {
+
+                        var span_tag = $(this).find("span");
+                        var input_tag = $(this).find("input");
+                        var select_tag = $(this).find('select');
+
+                        var select_list = ['ab_business'];
+                        var input_list = [];
+
+                        n = $(this).attr("name");
+
+                        if (select_list.includes(n)) {
+
+                            //console.log(select_tag);
+                            var selected_text = $.trim(select_tag.find(":selected").text());
+                            console.log(selected_text);
+                            span_tag.text(selected_text);
+                            select_tag.hide();
+                            span_tag.show();
+
+                        }
+
+                        if (input_list.includes(n)) {
+                            span_tag.show();
+                            span_tag.text($.trim(input_tag.val()));
+                            input_tag.hide()
+                        }
+
+                    })
+
+                }
+
+            });
+
+
+        });
+    </script>
+
+{% endblock %}
+
+

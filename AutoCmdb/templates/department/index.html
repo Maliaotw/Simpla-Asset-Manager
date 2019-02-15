@@ -82,18 +82,17 @@
                 </tbody>
 
 
+                <tfoot>
+                <th colspan="7">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination pull-right">
+                            {% get_pageer dent_obj search_field %}
+                        </ul>
+                    </nav>
 
-            <tfoot>
-            <th colspan="7">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination pull-right">
-                        {% get_pageer dent_obj search_field %}
-                    </ul>
-                </nav>
+                </th>
 
-            </th>
-
-            </tfoot>
+                </tfoot>
 
 
             </table>
@@ -116,7 +115,7 @@
                 <div class="modal-body">
 
 
-                <!-- 錯誤提示-->
+                    <!-- 錯誤提示-->
                     <div class="alert alert-danger">
                         <strong></strong>
                     </div>
@@ -231,8 +230,6 @@
         });
 
 
-
-
         // 提交 新增資產表單
         $("#dentform_add").on("submit", function (e) {
             //console.log(e);
@@ -252,7 +249,7 @@
                         $('#dentform_add_Modal').modal('hide');
                         location.reload();
 
-                    }else{
+                    } else {
                         //新增錯誤
                         $("#dentform_add_Modal .alert-danger").show();
                         $("#dentform_add_Modal .alert-danger strong").text(callback.msg);

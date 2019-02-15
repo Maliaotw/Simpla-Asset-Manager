@@ -102,7 +102,7 @@
 
                 {% verify_permissions request as admin_dent %}
                 {% if admin_dent %}
-                    <a href="{% url 'asset_add' %}" class="btn btn-primary" role="button">新增維修表</a>
+                    <a href="{% url 'asset_repair_add' %}" class="btn btn-primary" role="button">新增維修表</a>
                 {% endif %}
             </div>
 

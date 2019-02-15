@@ -16,15 +16,15 @@
     {% csrf_token %}
 
 
-    {% block breadcrumb  %}
-    <ol class="breadcrumb">
-        <li>
-            <a href="{% url 'asset_repair' %}">資產維修表</a>
-        </li>
-        <li class="active">{{ asset_repair_obj.asset_obj.name }} {{ asset_repair_obj.title }}</li>
+    {% block breadcrumb %}
+        <ol class="breadcrumb">
+            <li>
+                <a href="{% url 'asset_repair' %}">資產維修表</a>
+            </li>
+            <li class="active">{{ asset_repair_obj.asset_obj.name }} {{ asset_repair_obj.title }}</li>
 
-    </ol>
-        {% endblock %}
+        </ol>
+    {% endblock %}
 
 
 
@@ -60,7 +60,7 @@
                                     {% endif %}
                                 {% else %}
 
-                                     {% if asset_repair_obj.status %}
+                                    {% if asset_repair_obj.status %}
                                         <span class="badge alert-success">已處理
                                         </span>
                                     {% else %}
@@ -72,8 +72,6 @@
                                 {% endif %}
 
 
-
-
                             </h3>
 
                             <p class="text-left">
@@ -82,9 +80,7 @@
                                 </span>
                             </p>
 
-
-                            <p style="height: 60px">{{ asset_repair_obj.summary }}</p>
-
+                            <p style="min-height: 60px">{{ asset_repair_obj.summary }}</p>
 
                             <ul class="list-inline">
 
@@ -281,7 +277,7 @@
         function ch_status(ele) {
 
 
-             data = {
+            data = {
                 csrfmiddlewaretoken: '{{ csrf_token }}',
                 ststus: $(ele).attr('data-status'),
                 user: {{ request.user.userprofile.id }},
@@ -301,7 +297,7 @@
                     console.log(callback);
                     console.log(callback.msg);
                     $(ele).text(callback.data.text);
-                    $(ele).attr('data-status',callback.data.status);
+                    $(ele).attr('data-status', callback.data.status);
                     $(ele).toggleClass('alert-danger');
                     $(ele).toggleClass('alert-success');
 
@@ -313,9 +309,6 @@
                 }
 
             });
-
-
-
 
 
         }

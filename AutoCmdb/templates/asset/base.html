@@ -2,10 +2,6 @@
 {% load asset_tags %}
 
 
-
-
-
-
 {% block title %}
     CDMB
 {% endblock %}
@@ -38,6 +34,7 @@
     {% url 'asset' as asset %}
     {% url 'asset_index' as asset_index %}
     {% url 'asset_input' as asset_input %}
+    {% url 'asset_busunit' as asset_busunit %}
 
     {% url 'asset_repair' as asset_repair %}
     {% url 'asset_repair_add' as asset_repair_add %}
@@ -52,6 +49,9 @@
 
     {% url 'department' as department %}
     {% url 'department_input' as department_input %}
+
+    {% url 'busunit' as busunit %}
+
 
 
 
@@ -91,6 +91,10 @@
                             <a href={{ asset_index }}>資產列表</a>
                         </li>
 
+                        <li class="list-group-item  {% if request.path == asset_busunit %}active{% endif %}">
+                            <a href={{ asset_busunit }}>資產業務線對應表</a>
+                        </li>
+
 
                         <li class="list-group-item  {% if request.path == asset_repair %}active{% endif %}">
                             <a href="{{ asset_repair }}">資產維修紀錄表</a>
@@ -104,6 +108,23 @@
 
                         <li class="list-group-item">
                             <a href="{% url 'asset_output' %}" target="_blank">匯出</a>
+                        </li>
+
+                    </ul>
+                </li>
+
+                <!--- 業務線管理 -->
+                <li class="">
+                    <a href="#busunitSubmenu" data-toggle="collapse" aria-expanded="false"
+                       class="list-group-item dropdown-toggle collapsed">
+                        <span><i class="fa fa-th"></i> 業務線管理</span>
+                        <span style="float:right"><i class="fa fa-angle-right"></i></span></a>
+
+                    <ul class="list-unstyled collapse" id="busunitSubmenu" style="">
+
+
+                        <li class="list-group-item  {% if request.path == busunit %}active{% endif %}">
+                            <a href={{ busunit }}>業務線列表</a>
                         </li>
 
                     </ul>
@@ -155,7 +176,7 @@
                         </li>
 
                         <li class="list-group-item">
-                            <a href="{% url 'category_output' %}" target="_blank">匯出</a>
+                            <a href="{% url 'department_output' %}" target="_blank">匯出</a>
                         </li>
 
                     </ul>
@@ -186,12 +207,15 @@
 
                     </ul>
                 </li>
+
+
             </ul>
 
         </ul>
     {% else %}
 
         <!--- nav-sidebar -->
+        <!--- 一般用戶 -->
         <ul class="nav nav-sidebar">
 
             <ul class="list-group">
@@ -210,7 +234,16 @@
                 <span>
                     <i class="fa fa-box"></i> 資產列表
                 </span>
+
+
+
+                <a href="{{ asset_busunit }}"
+                   class="list-group-item {% if request.path == asset_busunit %}active{% endif %}">
+                <span>
+                    <i class="fa fa-box"></i> 資產業務線對應表
+                </span>
                 </a>
+
 
                 <a href="{{ asset_repair }}"
                    class="list-group-item {% if request.path == asset_repair %}active{% endif %}">
@@ -223,6 +256,13 @@
                    class="list-group-item {% if request.path == asset_repair_add %}active{% endif %}">
                 <span>
                     <i class="fa fa-box"></i> 新增資產維修紀錄
+                </span>
+                </a>
+
+                <a href="{{ busunit }}"
+                   class="list-group-item {% if request.path == busunit %}active{% endif %}">
+                <span>
+                    <i class="fa fa-bus"></i> 業務線列表
                 </span>
                 </a>
 
@@ -256,6 +296,13 @@
 
         // 日期
         $('#id_purchase_date').datepicker(
+            {
+                language: 'zh-TW',
+                format: "yyyy-mm-dd",
+                todayHighlight: true,
+
+            });
+        $('#id_status_date').datepicker(
             {
                 language: 'zh-TW',
                 format: "yyyy-mm-dd",
