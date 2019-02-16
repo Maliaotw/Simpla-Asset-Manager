@@ -29,3 +29,5 @@ wcwidth==0.1.7
 wincertstore==0.2
 xlrd==1.1.0
 whitenoise==2.0.6
+django-ckeditor==5.6.1
+django-js-asset==1.2.1

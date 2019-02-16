@@ -1,0 +1,43 @@
+{% extends 'news/base.html' %}
+{% load asset_tags %}
+
+{% block title %}新聞{% endblock %}
+
+
+{% block head %}
+    {% load static %}
+    <!-- CSS -->
+    <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/bootstrap-select.css">
+    <script src="{% static 'ckeditor/ckeditor/plugins/prism/lib/prism/prism_patched.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'plugins/prism.css' %}">
+
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+
+{% endblock %}
+
+
+
+{% block content %}
+
+    {{ forms_obj }}
+
+
+{% endblock %}
+
+
+
+
+{% block extra-js %}
+
+    <script>
+
+
+    </script>
+
+{% endblock %}
+
+

@@ -78,9 +78,8 @@
                     </div>
 
 
-
+                    {% verify_permissions request as admin_dent %}
                     {% if admin_dent %}
-
                         <div class="form-group">
                             <label class="col-form-label">部門</label>
                             <select class="selectpicker" name="dent_id" data-width="fit">
@@ -280,7 +279,6 @@
 
                     n = $(this).attr("name");
 
-
                     if (select_list.includes(n)) {
                         console.log(n);
                         span_tag.hide();
@@ -295,56 +293,52 @@
             $("#mytable").on('click', ".fa-file", function (ele) {
 
                 console.log('save');
-                $(this).attr('data-icon', 'pen');
-
                 var tr = $(this).closest('tr');
                 var tds = $(this).parent().prevAll();
 
                 console.log(tr);
                 console.log(tds);
-
-
                 //取assetid跟busunitid
                 {#assetid = $.trim(tr.find('[name="id"]').text());#}
                 var assetid = tr.find('[name="id"]').find("input").val();
                 var ab_id = tr.find('[name="ab_id"]').find("input").val();
                 var busunitid = tr.find('[name="ab_business"]').find("select").val();
 
-                data = {
-                    csrfmiddlewaretoken: '{{ csrf_token }}',
-                    assetid: assetid,
-                    ab_id: ab_id,
-                    busunitid: busunitid,
+                console.log('ab_id', busunitid);
 
-                };
-                console.log(data);
+                if (busunitid) {
+                    data = {
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        assetid: assetid,
+                        ab_id: ab_id,
+                        busunitid: busunitid,
 
+                    };
+                    console.log(data);
 
-                $.ajax({
-                    headers: {
-                        'X-HTTP-Method-Override': 'PATCH'
-                    },
-                    url: "",
-                    data: data,
-                    type: 'POST',
-                    async: false,
-                    success: function (callback) {
-                        console.log(callback);
+                    $.ajax({
+                        url: "{% url 'asset_busunit' %}",
+                        data: data,
+                        type: 'POST',
+                        async: false,
+                        success: function (callback) {
+                            console.log(callback);
 
-                        if (callback.status == 'ok') {
-                            put_status = true
-
-                        } else {
+                            if (callback.status == 'ok') {
+                                put_status = true
+                            } else {
+                                put_status = false
+                            }
+                        },
+                        error: function () {
                             put_status = false
                         }
 
-                    },
-                    error: function () {
-                        put_status = false
+                    });
+                } else {
+                    put_status = true
 
-                    }
-
-                });
+                }
 
                 if (put_status) {
                     $(this).attr('data-icon', 'pen');
@@ -360,14 +354,12 @@
                         n = $(this).attr("name");
 
                         if (select_list.includes(n)) {
-
                             //console.log(select_tag);
                             var selected_text = $.trim(select_tag.find(":selected").text());
                             console.log(selected_text);
                             span_tag.text(selected_text);
                             select_tag.hide();
                             span_tag.show();
-
                         }
 
                         if (input_list.includes(n)) {
@@ -377,12 +369,8 @@
                         }
 
                     })
-
                 }
-
             });
-
-
         });
     </script>
 

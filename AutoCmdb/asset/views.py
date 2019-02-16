@@ -426,15 +426,53 @@ def asset_busunit(request):
 
         # asset_busunit_obj = models.AssetBusiness.objects.all()
         category_obj = models.Category.objects.all()
+        department_obj = models.Department.objects.all()
 
-        if busunit_id:
-            asset_obj = models.Asset.objects.filter(assetbusiness__business_id=busunit_id)
-        elif cate_id:
-            asset_obj = models.Asset.objects.filter(category_id=cate_id)
-        else:
+        # 判斷管理用戶
+        admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
+        # admindent = models.Department.objects.filter(asset=
+
+        if request.user.userprofile.dent in admindent:
+            # print('管理用戶')
             asset_obj = models.Asset.objects.all()
+            busunit_obj = models.BusinessUnit.objects.all()
 
-        busunit_obj = models.BusinessUnit.objects.all()
+        else:
+            # print('一般用戶')
+            asset_obj = models.Asset.objects.filter(department=request.user.userprofile.dent)
+            busunit_obj = models.BusinessUnit.objects.filter(dent=request.user.userprofile.dent)
+
+        get = {
+            'cate_id': {
+                "category_id": cate_id
+            },
+            'dent_id': {
+                "department_id": dent_id
+            },
+            'busunit_id': {
+                "assetbusiness__business_id": busunit_id
+            }
+        }
+        if request.GET:
+
+            data = request.GET.copy()
+
+            data.pop('name')
+
+            search_key = list(filter(lambda x: data[x] != "", data.keys()))
+            # print(search_key)
+
+            search_dict = {}
+            for key in search_key:
+                search_dict.update(get[key])
+
+            # print(search_dict)
+
+            asset_obj = asset_obj.filter(
+                Q(name__contains=name), **search_dict
+            )
+        else:
+            pass
 
         paginator = Paginator(asset_obj, 10)  # Show 10 contacts per page
 
@@ -496,9 +534,7 @@ def busunit(request):
 
         search_field = {}
 
-
         dent_obj = models.Department.objects.all()
-
 
         # 判斷管理用戶
         admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
@@ -528,7 +564,6 @@ def busunit(request):
         form_obj = forms.BusunitForm(data=request.POST)
         print(request.POST)
 
-
         if form_obj.is_valid():
             form_obj.save()
 
@@ -542,10 +577,39 @@ def busunit(request):
 
         return JsonResponse(ret)
 
-
     if request.method == 'PUT':
         print("THIS IS PUT")
-        return HttpResponse("PUT")
+
+        put = QueryDict(request.body)
+        print(put)
+
+        id = put.get('id')
+        name = put.get('name')
+        en = put.get('en')
+
+        busunit_obj = models.BusinessUnit.objects.get(id=id)
+        busunit_obj.name = name
+        busunit_obj.en = en
+        busunit_obj.save()
+
+        ret['msg'] = '成功'
+        ret['status'] = 'ok'
+
+        return JsonResponse(ret)
+
+    if request.method == "DELETE":
+        print("THIS IS DELETE")
+        put = QueryDict(request.body)
+        print(put)
+        id = put.get('id')
+        dent_obj = models.BusinessUnit.objects.get(id=id)
+        dent_obj.delete()
+
+        ret['msg'] = '成功'
+        ret['status'] = 'ok'
+
+        return JsonResponse(ret)
+
 
 # --- 資產維修紀錄 ---
 
@@ -1656,6 +1720,15 @@ def user_output(request):
 
     return response
 
+
+# --- 新聞---
+
+def news(request):
+
+    forms_obj = forms.NewsForm()
+
+
+    return render(request,'news/index.html',locals())
 
 # --- 登入/登出 ---
 

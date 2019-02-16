@@ -70,6 +70,10 @@ urlpatterns = [
     # --- bus ---
     url(r'^busunit/$', views.busunit, name="busunit"),
 
+    # --- news ---
+    url(r'^news/$', views.news, name="news"),
+
+
 
     # test
 

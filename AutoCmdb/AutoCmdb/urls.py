@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.views.static import serve
 
-from asset.views import acc_login,acc_logout
+from asset.views import acc_login, acc_logout
 from api import views
 
 urlpatterns = [
@@ -32,6 +32,7 @@ urlpatterns = [
                   url(r'^', include('host.urls')),
                   url(r'^api/', include('api.urls')),
                   url(r'^', include('asset.urls')),
-                  url(r'^media/(?P<path>.*)$', serve, {"document_root": settings.MEDIA_ROOT})
+                  url(r'^media/(?P<path>.*)$', serve, {"document_root": settings.MEDIA_ROOT}),
+                  url(r'^ckeditor/', include('ckeditor_uploader.urls')),
 
               ] + static(settings.DEMO_URL, document_root=settings.DEMO_ROOT)

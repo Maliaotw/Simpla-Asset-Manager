@@ -158,6 +158,7 @@
                     <!-- 操作 -->
                     <td>
                         <i class="fas fa-pen"></i>
+                        <i class="fas fa-trash-alt"></i>
                     </td>
                 </tr>
             {% endfor %}
@@ -251,6 +252,29 @@
     </div>
 
 
+
+    <!--- 刪除部門表單 -->
+    <div class="modal fade" id="form_del_Modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">刪除業務線</h4>
+                </div>
+                <div class="modal-body">
+                    <p>您確定要刪除<span style="color: red"></span><input type="number" style="display:none;">嗎</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="form_del_submit" type="button" class="btn btn-primary">確認</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+
     {% csrf_token %}
 
 
@@ -315,7 +339,6 @@
                         //新增錯誤
                         $("#busunitform_add_Modal .alert-danger").show();
                         $("#busunitform_add_Modal .alert-danger strong").text(callback.msg);
-
                     }
 
                 },
@@ -393,7 +416,6 @@
             //取業務線 name
             //取業務線英文 en
 
-
             //取assetid跟busunitid
             {#assetid = $.trim(tr.find('[name="id"]').text());#}
             var id = tr.find('[name="id"]').find("input").val();
@@ -447,27 +469,55 @@
                     select_list = [];
                     input_list = ['name', 'en'];
 
-
                     n = $(this).attr("name");
 
-
-                    if (select_list.includes(n)) {
-                        console.log(n);
-                        span_tag.hide();
-                        $(this).find('select').show();
-                    }
-
-
                     if (input_list.includes(n)) {
-                        span_tag.hide();
+                        span_tag.show();
                         //console.log(span_tag);
-                        input_tag.val($.trim(span_tag.text()));
-                        input_tag.show()
+                        span_tag.text($.trim(input_tag.val()));
+                        input_tag.hide()
                     }
-
                 })
-
             }
+        });
+
+
+        // 刪除 DelData : Del icon
+        $("#mytable").on('click', ".fa-trash-alt", function (ele) {
+
+            console.log('del');
+            tr = $(this).closest("tr");
+            var id = $.trim(tr.find("[name='id'] input").val());
+            var name = $.trim(tr.find("[name='name']").text());
+            //console.log($.trim(id),$.trim(name));
+
+            $('#form_del_Modal .modal-body').find('span').text(name);
+            $('#form_del_Modal .modal-body').find('input').val(id);
+            $('#form_del_Modal').modal('show');
+        });
+
+        // 提交刪除
+        $("#form_del_submit").on('click', function (event) {
+
+            var name = $('#form_del_Modal .modal-body').find('span').text();
+            var id = $('#form_del_Modal .modal-body').find('input').val();
+
+            console.log(name, id);
+            data = {id: id};
+
+            $.ajax({
+                url: {% url 'busunit' %},
+                data: data,
+                type: 'DELETE',
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback.status == 'ok') {
+                        tr.remove();
+                        $('#form_del_Modal').modal('hide');
+                    }
+                }
+            });
 
         });
 

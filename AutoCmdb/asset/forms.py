@@ -3,7 +3,7 @@ from asset import models
 from django import forms
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
-
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
 
 # --- 資產 ---
 
@@ -526,6 +526,20 @@ class BusunitForm(ModelForm):
         model = models.BusinessUnit
         fields = '__all__'
 
+
+
+class NewsForm(ModelForm):
+    '''
+    業務線表單
+    '''
+    content = forms.CharField(widget=CKEditorUploadingWidget())
+
+
+    class Meta:
+        model = models.News
+        fields = '__all__'
+
+
 # --- 類型 ---
 
 class CaryForm(ModelForm):
@@ -764,7 +778,6 @@ class UserProfile_Edit_Form(UserProfileForm):
                     self.fields[k].widget.attrs.update({'readonly': 'ture'})
 
             self.fields[k].widget.attrs['class'] = 'form-control'
-
 
 
 

@@ -1,8 +1,21 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from ckeditor_uploader.fields import RichTextUploadingField
 
 # Create your models here.
+
+class News(models.Model):
+
+    title = models.CharField(max_length=255,verbose_name="標題")
+    content = RichTextUploadingField(verbose_name='正文')
+    creator = models.ForeignKey('UserProfile', verbose_name='創建者', null=True, blank=True, related_name='+')
+    latest_date = models.DateTimeField(verbose_name='更新日期', auto_now=True)
+    create_date = models.DateTimeField(verbose_name='創建日期', auto_now_add=True)
+
+    dent = models.ManyToManyField('Department',verbose_name='部門')
+
+
+
 
 class UserProfile(models.Model):
     '''
