@@ -207,6 +207,12 @@
         $("#busunitSubmenu").collapse();
     {% endif %}
 
+
+    {% url 'news' as news %}
+    {% if news in request.path %}
+        $("#newsSubmenu").collapse();
+    {% endif %}
+
 </script>
 
 

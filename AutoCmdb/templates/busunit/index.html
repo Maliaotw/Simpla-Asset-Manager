@@ -6,7 +6,7 @@
 
 
 
-{% block title %}資產管理{% endblock %}
+{% block title %}業務線列表{% endblock %}
 
 {% block head %}
     <!-- CSS -->
@@ -29,28 +29,21 @@
 
     <ol class="breadcrumb">
         <li><a href="#">業務線列表</a></li>
-
     </ol>
 
 
     <div class="panel panel-default" style="padding: 20px">
 
         <div class="row">
-
-
             <div class="col-md-4">
-
                 <button class="btn btn-primary" data-toggle="modal" data-target="#busunitform_add_Modal">
                     新增業務線
                 </button>
-
             </div>
 
             <!-- 篩選 -->
             <div class="col-md-8" style="text-align: right">
-
                 <form class="form-inline" method="get">
-
                     <div class="form-group">
                         <label for="inputsearch" class="col-form-label">搜尋</label>
                         <input type="text" class="form-control" name='name' id="search" placeholder=""
@@ -59,7 +52,6 @@
 
                     {% verify_permissions request as admin_dent %}
                     {% if admin_dent %}
-
                         <div class="form-group">
                             <label class="col-form-label">部門</label>
                             <select class="selectpicker" name="dent_id" data-width="fit">
@@ -97,7 +89,6 @@
                 <th>業務線英文</th>
                 <th>操作</th>
 
-
             </tr>
             </thead>
             <tbody>
@@ -107,7 +98,6 @@
                     <td>
                         {% if forloop.last and page %}
                             {{ page }}0
-
                         {% else %}
                             {{ page|add:"-1"|default:"" }}{{ forloop.counter }}
                         {% endif %}
@@ -115,10 +105,8 @@
 
 
                     <td name="id" style="display: none">
-
                         <input type="text" class='form-control' value="{{ busunit.id }}"
                                style="display: none">
-
                     </td>
 
                     <td name="dentid" style="display: none">
@@ -130,14 +118,12 @@
                     {% verify_permissions request as admin_dent %}
                     {% if admin_dent %}
                         <td name="dent">
-                        <span class="form-control-static">
-                            {{ busunit.dent }}
-                        </span>
-
+                            <span class="form-control-static">
+                                {{ busunit.dent }}
+                            </span>
                         </td>
 
                     {% endif %}
-
 
                     <td name="name">
                         <span class="form-control-static">
@@ -304,15 +290,11 @@
 
         // 初始 新增類型表單
         $('#busunitform_add_Modal').on('show.bs.modal', function (event) {
-
             $("#busunitform_add_Modal .alert-danger").hide();
-
         });
 
         $("#dentform_add_submit").on('click', function () {
-
             $("#busunitform_add").submit();
-
         });
 
 

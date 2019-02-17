@@ -53,6 +53,9 @@
     {% url 'busunit' as busunit %}
 
 
+    {% url 'news' as news %}
+    {% url 'news_add' as news_add %}
+
 
 
 
@@ -208,6 +211,23 @@
                     </ul>
                 </li>
 
+                <!--- 公告管理 -->
+                <li class="">
+                    <a href="#newsSubmenu" data-toggle="collapse" aria-expanded="false"
+                       class="list-group-item dropdown-toggle collapsed">
+                        <span><i class="fa fa-newspaper"></i> 公告管理</span>
+                        <span style="float:right"><i class="fa fa-angle-right"></i></span></a>
+
+                    <ul class="list-unstyled collapse" id="newsSubmenu" style="">
+
+
+                        <li class="list-group-item  {% if request.path == news %}active{% endif %}">
+                            <a href={{ news }}>公告列表</a>
+                        </li>
+
+                    </ul>
+                </li>
+
 
             </ul>
 
@@ -236,36 +256,48 @@
                 </span>
 
 
-
-                <a href="{{ asset_busunit }}"
-                   class="list-group-item {% if request.path == asset_busunit %}active{% endif %}">
+                    <a href="{{ asset_busunit }}"
+                       class="list-group-item {% if request.path == asset_busunit %}active{% endif %}">
                 <span>
                     <i class="fa fa-box"></i> 資產業務線對應表
                 </span>
-                </a>
+                    </a>
 
 
-                <a href="{{ asset_repair }}"
-                   class="list-group-item {% if request.path == asset_repair %}active{% endif %}">
+                    <a href="{{ asset_repair }}"
+                       class="list-group-item {% if request.path == asset_repair %}active{% endif %}">
                 <span>
                     <i class="fa fa-box"></i> 資產維修紀錄
                 </span>
-                </a>
+                    </a>
 
-                <a href="{{ asset_repair_add }}"
-                   class="list-group-item {% if request.path == asset_repair_add %}active{% endif %}">
+                    <a href="{{ asset_repair_add }}"
+                       class="list-group-item {% if request.path == asset_repair_add %}active{% endif %}">
                 <span>
                     <i class="fa fa-box"></i> 新增資產維修紀錄
                 </span>
-                </a>
+                    </a>
 
-                <a href="{{ busunit }}"
-                   class="list-group-item {% if request.path == busunit %}active{% endif %}">
+                    <a href="{{ busunit }}"
+                       class="list-group-item {% if request.path == busunit %}active{% endif %}">
                 <span>
                     <i class="fa fa-bus"></i> 業務線列表
                 </span>
-                </a>
+                    </a>
 
+                    <a href="{{ news }}"
+                       class="list-group-item {% if request.path == news %}active{% endif %}">
+                <span>
+                    <i class="fa fa-newspaper"></i> 公告列表
+                </span>
+                    </a>
+
+                 <a href="{{ news_add }}"
+                       class="list-group-item {% if request.path == news_add %}active{% endif %}">
+                <span>
+                    <i class="fa fa-newspaper"></i> 新增公告
+                </span>
+                    </a>
 
             </ul>
 

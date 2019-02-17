@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
 
+
 # --- 資產 ---
 
 class AssetForm(ModelForm):
@@ -125,12 +126,10 @@ class Asset_Add_Form(AssetForm):
     number = forms.CharField(
         label="資產號碼",
         widget=forms.NumberInput(
-
         )
     )
 
     name = forms.CharField(
-
         widget=forms.TextInput(
             attrs={"readonly": 'ture'}
         )
@@ -334,8 +333,6 @@ class AssetRepairForm(ModelForm):
 
 
 class AssetRepair_ADD_Form(AssetRepairForm):
-
-
     # asset_obj = forms.ModelChoiceField(queryset='')
     category = forms.ModelChoiceField(
         label='資產類型',
@@ -347,7 +344,6 @@ class AssetRepair_ADD_Form(AssetRepairForm):
     def __init__(self, *args, **kwargs):
         request = kwargs.get('request', None)
         super(AssetRepair_ADD_Form, self).__init__(*args, **kwargs)
-
 
         if not self.verify_permissions(request):
             user_dent = request.user.userprofile.dent
@@ -527,6 +523,7 @@ class BusunitForm(ModelForm):
         fields = '__all__'
 
 
+# --- 公告 ---
 
 class NewsForm(ModelForm):
     '''
@@ -534,6 +531,56 @@ class NewsForm(ModelForm):
     '''
     content = forms.CharField(widget=CKEditorUploadingWidget())
 
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+
+        super(NewsForm, self).__init__(*args, **kwargs)
+
+        admin_readonly_fields = ()
+        user_readonly_fields = ()
+
+        # 對所有字段添加Css屬性
+        for k, v in self.fields.items():
+
+            # 判斷是否為管理部門
+            if self.verify_permissions(self.request):
+                if k in admin_readonly_fields:
+                    self.fields[k].widget.attrs['disabled'] = 'ture'
+
+            else:
+
+                if k in user_readonly_fields:
+                    self.fields[k].widget.attrs['disabled'] = 'ture'
+                    # self.fields[k].widget.attrs['type'] = 'password'
+
+            self.fields[k].widget.attrs['class'] = 'form-control'
+        # self.fields['creator'].queryset = models.UserProfile.objects.filter(user=request.user)
+        # self.fields['dent'].widget.attrs['class'] = 'selectpicker form-control dropdown'
+        self.fields['dent'].widget.attrs.update({'class': 'form-control'})
+        self.fields['dent'].widget.attrs.update({'title': ''})
+
+    def verify_permissions(self, request):
+        # print('verify_permissions')
+        # print(request)
+
+        # 驗證用戶
+        admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
+        # print('admindent', admindent)
+
+        if request.user.userprofile.dent in admindent:
+            # print('管理用戶')
+            return True
+        else:
+            # print('一般用戶')
+            return False
+
+    def save(self, commit=True):
+        news_obj = super(NewsForm, self).save(commit=False)
+        news_obj.creator = self.request.user.userprofile
+        news_obj.save()
+        # news_obj.userprofile.add(self.request.user.userprofile)
+        # news_obj.save()
+        return news_obj
 
     class Meta:
         model = models.News
@@ -759,7 +806,7 @@ class UserProfile_Edit_Form(UserProfileForm):
         super(UserProfileForm, self).__init__(*args, **kwargs)
 
         admin_readonly_fields = ("username",)
-        user_readonly_fields = ("username", "dent", "code",'in_service')
+        user_readonly_fields = ("username", "dent", "code", 'in_service')
 
         # print(self.request)
 
@@ -778,8 +825,6 @@ class UserProfile_Edit_Form(UserProfileForm):
                     self.fields[k].widget.attrs.update({'readonly': 'ture'})
 
             self.fields[k].widget.attrs['class'] = 'form-control'
-
-
 
 
 # --- User ---
@@ -867,7 +912,6 @@ class User_Add_Form(UserForm):
 class User_Edit_Form(UserForm):
     pd_status = forms.BooleanField(
         required=False,
-
     )
 
     def __init__(self, *args, **kwargs):
@@ -877,16 +921,13 @@ class User_Edit_Form(UserForm):
 
         admin_readonly_fields = ("username",)
         user_readonly_fields = ("username",)
-
         # print(self.request)
-
         # 對所有字段添加Css屬性
         for k, v in self.fields.items():
 
             if self.request.user.is_anonymous:
                 if k in user_readonly_fields:
                     self.fields[k].widget.attrs['disabled'] = 'ture'
-
             else:
                 if k in admin_readonly_fields:
                     self.fields[k].widget.attrs['disabled'] = 'ture'

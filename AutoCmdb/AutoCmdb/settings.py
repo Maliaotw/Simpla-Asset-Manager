@@ -51,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
 ]
 
 ROOT_URLCONF = 'AutoCmdb.urls'
@@ -104,9 +105,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
-LANGUAGE_CODE = 'en'
-
-TIME_ZONE = 'Asia/Taipei'
+LANGUAGE_CODE = 'zh-hans'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
@@ -138,19 +138,14 @@ CKEDITOR_UPLOAD_PATH = 'upload/'
 CKEDITOR_IMAGE_BACKEND = 'pillow'
 
 
-
 CKEDITOR_CONFIGS = {
-    # 配置名是default时，django-ckeditor默认使用这个配置
     'default': {
-        # 使用简体中文
         'language':'zh-cn',
-        # 编辑器的宽高请根据你的页面自行设置
-        'width':'730px',
-        'height':'150px',
+        'width':'100%',
+        # 'height':'150px',
         'image_previewText':' ',
         'tabSpaces': 4,
         'toolbar': 'Custom',
-        # 添加按钮在这里
         'toolbar_Custom': [
             ['Bold', 'Italic', 'Underline', 'Format', 'RemoveFormat'],
             ['NumberedList', 'BulletedList'],
@@ -163,15 +158,10 @@ CKEDITOR_CONFIGS = {
     }
 }
 
+
 # SESSION
 # SESSION_COOKIE_AGE = 60 * 30  # 設置session過期時間為30分鐘
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 當瀏覽器被關閉的時候將session失效，但是不能刪除數據庫的session數據
 SESSION_SAVE_EVERY_REQUEST = True  # 每次請求都要保存一下session
-
-
-
-
-
-
 
 from .local_settings import *

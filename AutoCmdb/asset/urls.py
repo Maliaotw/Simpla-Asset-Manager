@@ -71,7 +71,10 @@ urlpatterns = [
     url(r'^busunit/$', views.busunit, name="busunit"),
 
     # --- news ---
-    url(r'^news/$', views.news, name="news"),
+    url(r'^news/index$', views.news, name="news"),
+    url(r'^news/add$', views.news_add, name="news_add"),
+    url(r'^news/edit/(?P<pk>\d+)/$', views.news_edit, name="news_edit"),
+    url(r'^news/(?P<pk>\d+)/$', views.news_info, name="news_info"),
 
 
 

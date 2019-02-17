@@ -14,6 +14,12 @@ class News(models.Model):
 
     dent = models.ManyToManyField('Department',verbose_name='部門')
 
+    userprofile = models.ManyToManyField('UserProfile',verbose_name='用戶',null=True,blank=True)
+
+
+    def __str__(self):
+        return self.title
+
 
 
 

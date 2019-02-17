@@ -21,21 +21,33 @@ from django.contrib.auth.models import User, Group, Permission
 
 @login_required
 def asset(request):
+    '''
+    暫定首頁
+    :param request:
+    :return:
+    '''
     print('Assset')
 
     # 驗證用戶
+    # news_obj = models.News.objects.filter(userprofile__in=request.user.userprofile)
+
+    # print(news_obj)
+
     admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
     if request.user.userprofile.dent in admindent:
         print('管理用戶')
         # category_obj = models.Category.objects.all()
         asset_obj = models.Asset.objects.all()
         asset_repair_obj = models.AssetRepair.objects.filter(status=False)
+        news_obj = models.News.objects.exclude(userprofile__user_id=request.user.id)
         # user_obj = models.UserProfile.objects.all()
 
     else:
         # print('一般用戶')
         # search_field['dent_id'] = dent_id
         # dent_id = request.user.userprofile.dent_id
+        news_obj = models.News.objects.filter(dent=request.user.userprofile.dent).all()
+        news_obj = news_obj.exclude(userprofile__user_id=request.user.id)
         asset_obj = models.Asset.objects.filter(department=request.user.userprofile.dent)
         asset_repair_obj = models.AssetRepair.objects.filter(asset_obj__in=asset_obj, status=False)
 
@@ -789,10 +801,6 @@ def asset_repair_detail(request, pk):
         print(pk)
 
         asset_repair_obj = models.AssetRepair.objects.get(id=pk)
-
-        # ps = asset_repair_obj.photo.all()
-        # for p in ps:
-
         asset_repair_detail = models.AssetRepairDetail.objects.filter(repair=asset_repair_obj)
 
         # 過濾留言為技術部人員
@@ -844,6 +852,8 @@ def asset_repair_detail(request, pk):
             ret['code'] = 200
 
         return JsonResponse(ret)
+
+
 
 
 @login_required
@@ -1724,11 +1734,135 @@ def user_output(request):
 # --- 新聞---
 
 def news(request):
+    ret = {"status": "", "re_html": "", "msg": ""}
 
-    forms_obj = forms.NewsForm()
+    if request.method == "GET":
+
+        ret = {"status": "", "re_html": "", "msg": ""}
+
+        search_field = {}
+
+        name = request.GET.get('name',"")
+        dent_id = request.GET.get('dent_id')
+        status = request.GET.get('status')
 
 
-    return render(request,'news/index.html',locals())
+        dent_obj = models.Department.objects.all()
+
+        # 驗證用戶
+        admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
+        if request.user.userprofile.dent in admindent:
+            print('管理用戶')
+            # category_obj = models.Category.objects.all()
+            news_obj = models.News.objects.all()
+            # user_obj = models.UserProfile.objects.all()
+        else:
+            news_obj = models.News.objects.filter(dent=request.user.userprofile.dent).all()
+
+
+        if dent_id and status:
+            # news_obj = news_obj.filter(dent_id=dent_id).all()
+            get_dent_obj = models.Department.objects.get(id=dent_id)
+            news_obj = news_obj.filter(title__contains=name,creator__dent=get_dent_obj)
+            if status == 'y':
+                news_obj = news_obj.filter(userprofile__user_id=request.user.id)
+            elif status == 'n':
+                news_obj = news_obj.exclude(userprofile__user_id=request.user.id)
+        elif dent_id:
+            get_dent_obj = models.Department.objects.get(id=dent_id)
+            news_obj = news_obj.filter(title__contains=name,creator__dent=get_dent_obj)
+        elif status:
+            if status == 'y':
+                news_obj = news_obj.filter(userprofile__user_id=request.user.id)
+            elif status == 'n':
+                news_obj = news_obj.exclude(userprofile__user_id=request.user.id)
+        else:
+            pass
+
+
+        # 分頁功能
+        paginator = Paginator(news_obj, 10)  # Show 10 contacts per page
+
+        page = request.GET.get('page')
+        try:
+            news_obj = paginator.page(page)
+        except PageNotAnInteger:
+            news_obj = paginator.page(1)
+        except EmptyPage:
+            news_obj = paginator.page(paginator.num_pages)
+
+        return render(request, 'news/index.html', locals())
+
+    if request.method == 'DELETE':
+        print("THIS IS DELETE")
+        put = QueryDict(request.body)
+        print(put)
+        id = put.get('id')
+        news_obj = models.News.objects.get(id=id)
+        news_obj.delete()
+
+        ret['msg'] = '成功'
+        ret['status'] = 'ok'
+
+        return JsonResponse(ret)
+
+def news_add(request):
+    ret = {"status": "", "re_html": "", "msg": ""}
+
+    if request.method == 'GET':
+        forms_obj = forms.NewsForm(request=request)
+        return render(request, 'news/add.html', locals())
+
+    if request.method == 'POST':
+        forms_obj = forms.NewsForm(request=request, data=request.POST)
+        print(request.POST)
+        if forms_obj.is_valid():
+            news_obj = forms_obj.save()
+            dents = forms_obj.cleaned_data.get('dent')
+            for dent_obj in dents:
+                news_obj.dent.add(dent_obj)
+            news_obj.userprofile.add(request.user.userprofile)
+            return redirect("news")
+
+
+def news_edit(request, pk):
+    if request.method == 'GET':
+        news_obj = models.News.objects.get(id=pk)
+
+        # 驗證用戶
+        admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
+        if request.user.userprofile.dent in news_obj.dent.all() or request.user.userprofile.dent in admindent:
+            forms_obj = forms.NewsForm(request=request, instance=news_obj)
+            return render(request, 'news/add.html', locals())
+        else:
+            return redirect("news")
+
+    if request.method == 'POST':
+        news_obj = models.News.objects.get(id=pk)
+
+        forms_obj = forms.NewsForm(request=request, data=request.POST, instance=news_obj)
+        if forms_obj.is_valid():
+            dents = forms_obj.cleaned_data.get('dent')
+            news_obj = forms_obj.save()
+            news_obj.dent.clear()
+            for dent_obj in dents:
+                news_obj.dent.add(dent_obj)
+            return redirect("news")
+
+
+def news_info(request, pk):
+    if request.method == 'GET':
+
+        news_obj = models.News.objects.get(id=pk)
+        # 驗證用戶
+        admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
+        if request.user.userprofile.dent in news_obj.dent.all() or request.user.userprofile.dent in admindent:
+            news_obj.userprofile.add(request.user.userprofile)
+            news_obj.save()
+            return render(request, 'news/info.html', locals())
+        else:
+            return redirect("news")
+
 
 # --- 登入/登出 ---
 
