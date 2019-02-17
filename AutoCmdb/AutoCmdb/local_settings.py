@@ -1,4 +1,3 @@
-
 import socket
 
 try:
@@ -49,7 +48,6 @@ database = {
             'PORT': '3306',
         }
     },
-
 
 }
 
@@ -103,14 +101,14 @@ DATABASES =
 
 
 func = {
-    'PC-073':"TestDB"
+    'PC-073': "TestDB",
+    'ip-172-31-87-103': 'AWS'
 }
 
 hostname = socket.gethostname()
 
-
 DATABASES = database[func[hostname]]
-
+# DATABASES = database[func['ip-172-31-87-103']]
 
 #
 # print(socket.gethostname())
