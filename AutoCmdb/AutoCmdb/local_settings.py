@@ -2,7 +2,6 @@ import socket
 
 try:
     import pymysql
-
     pymysql.install_as_MySQLdb()
 except ImportError:
     pass
@@ -102,7 +101,7 @@ DATABASES =
 
 func = {
     'PC-073': "TestDB",
-    'ip-172-31-87-103': 'AWS'
+    'AWS': 'AWS'
 }
 
 hostname = socket.gethostname()

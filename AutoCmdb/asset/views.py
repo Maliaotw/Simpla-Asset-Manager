@@ -269,20 +269,44 @@ def asset_edit(request, pk):
         # print(asset_record_obj)
         asset_repair_obj = models.AssetRepair.objects.filter(asset_obj=asset_obj)
 
+        # models.
+        relation_assets_obj = models.AssetToAssets.objects.filter(asset_obj=asset_obj)
+        # print(relation_assets_obj)
+
+        # 資產關聯資產表單
+        category_obj = models.Category.objects.all()
+        user_dent = request.user.userprofile.dent
+
+        # 驗證用戶
+        admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
+        if request.user.userprofile.dent in admindent:
+            data = {
+                cate.id: list(
+                    models.Asset.objects.filter(category=cate).values('id', 'name')
+                ) for cate in category_obj
+            }
+        else:
+            data = {
+                cate.id: list(
+                    models.Asset.objects.filter(category=cate, department=user_dent).values('id', 'name')
+                ) for cate in category_obj
+            }
+        # print(data)
+
+        ata_forms_obj = forms.AssetToAssetsForm(request=request)
+
+        return render(request, "asset/asset_edit.html", locals())
+
     if request.method == 'POST':
 
         forms_obj = forms.Asset_Edit_Form(data=request.POST, instance=asset_obj, request=request)
-
         print(forms_obj.errors)
-
         fields = set(list(dict(forms_obj.fields).keys()))
         errors = set(list(forms_obj.errors.keys()))
-
         errors_fields = list(fields & errors)
         success_fields = list(fields - errors)
         print(errors_fields)
         print(success_fields)
-
         if forms_obj.is_valid():
             print("ok")
             ret['status'] = 'ok'
@@ -298,8 +322,6 @@ def asset_edit(request, pk):
             ret['success_fields'] = success_fields
 
         return JsonResponse(ret)
-
-    return render(request, "asset/asset_edit.html", locals())
 
 
 @login_required
@@ -527,6 +549,49 @@ def asset_busunit(request):
         # print(ab_obj)
         ab_obj.save()
         ret['status'] = 'ok'
+
+        return JsonResponse(ret)
+
+
+# 資產關聯資產
+@login_required
+def ara(request):
+    ret = {"status": "", "re_html": "", "msg": ""}
+
+    if request.method == 'POST':
+
+        print(request.POST)
+        id = request.POST.get("asset_obj")
+        form_obj = forms.AssetToAssetsForm(data=request.POST, request=request)
+
+        if form_obj.is_valid():
+            print("ok")
+            form_obj.save()
+            ret['status'] = 'ok'
+            ret['msg'] = '新增成功'
+            # return "%s%s" % (redirect("asset_edit"),'#tab_assets')
+            # print("redirect('asset_edit', pk=id)",redirect('asset_edit', pk=id))
+            # url = redirect('asset_edit', pk=id)
+            # return redirect("%s#tab_assets" % url)
+            return JsonResponse(ret)
+
+    if request.method == 'PUT':
+        put = QueryDict(request.body)
+        print("put", put)
+        id = put.get('id')
+
+        ara_obj = models.AssetToAssets.objects.get(id=id)
+        froms_obj = forms.AssetToAssetsForm(request=request, data=put, instance=ara_obj)
+        print(froms_obj.errors)
+        if froms_obj.is_valid():
+            print("ok")
+            ret['status'] = 'ok'
+            ret['msg'] = '修改成功'
+
+
+        return JsonResponse(ret)
+
+    if request.method == 'DELETE':
 
         return JsonResponse(ret)
 
@@ -852,8 +917,6 @@ def asset_repair_detail(request, pk):
             ret['code'] = 200
 
         return JsonResponse(ret)
-
-
 
 
 @login_required
@@ -1742,10 +1805,9 @@ def news(request):
 
         search_field = {}
 
-        name = request.GET.get('name',"")
+        name = request.GET.get('name', "")
         dent_id = request.GET.get('dent_id')
         status = request.GET.get('status')
-
 
         dent_obj = models.Department.objects.all()
 
@@ -1759,18 +1821,17 @@ def news(request):
         else:
             news_obj = models.News.objects.filter(dent=request.user.userprofile.dent).all()
 
-
         if dent_id and status:
             # news_obj = news_obj.filter(dent_id=dent_id).all()
             get_dent_obj = models.Department.objects.get(id=dent_id)
-            news_obj = news_obj.filter(title__contains=name,creator__dent=get_dent_obj)
+            news_obj = news_obj.filter(title__contains=name, creator__dent=get_dent_obj)
             if status == 'y':
                 news_obj = news_obj.filter(userprofile__user_id=request.user.id)
             elif status == 'n':
                 news_obj = news_obj.exclude(userprofile__user_id=request.user.id)
         elif dent_id:
             get_dent_obj = models.Department.objects.get(id=dent_id)
-            news_obj = news_obj.filter(title__contains=name,creator__dent=get_dent_obj)
+            news_obj = news_obj.filter(title__contains=name, creator__dent=get_dent_obj)
         elif status:
             if status == 'y':
                 news_obj = news_obj.filter(userprofile__user_id=request.user.id)
@@ -1778,7 +1839,6 @@ def news(request):
                 news_obj = news_obj.exclude(userprofile__user_id=request.user.id)
         else:
             pass
-
 
         # 分頁功能
         paginator = Paginator(news_obj, 10)  # Show 10 contacts per page
@@ -1805,6 +1865,7 @@ def news(request):
         ret['status'] = 'ok'
 
         return JsonResponse(ret)
+
 
 def news_add(request):
     ret = {"status": "", "re_html": "", "msg": ""}

@@ -46,6 +46,11 @@ urlpatterns = [
     url(r'^asset_repair_detail/edit/$', views.asset_repair_detail_edit, name="asset_repair_detail_edit"),
     url(r'^asset_repair_detail/del/$', views.asset_repair_detail_del, name="asset_repair_detail_del"),
 
+    # --- Asset_relation_Assets
+
+    url(r'^asset/ara$', views.ara, name="ara_index"),
+
+
     # --- department ---
     url(r'^department/$', views.department, name="department"),
     url(r'^department/input', views.department_input, name="department_input"),
@@ -75,6 +80,9 @@ urlpatterns = [
     url(r'^news/add$', views.news_add, name="news_add"),
     url(r'^news/edit/(?P<pk>\d+)/$', views.news_edit, name="news_edit"),
     url(r'^news/(?P<pk>\d+)/$', views.news_info, name="news_info"),
+
+
+
 
 
 

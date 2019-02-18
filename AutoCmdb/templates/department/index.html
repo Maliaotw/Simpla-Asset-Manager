@@ -154,8 +154,6 @@
                                 {% endfor %}
                             </select>
                         </div>
-
-
                     </form>
 
                 </div>
@@ -172,7 +170,6 @@
 
 
     <!--- 刪除部門表單 -->
-
     <div class="modal fade" id="dentform_del_Modal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -290,16 +287,12 @@
 
                 //user
                 select_list = ['user'];
-
                 n = $(this).attr("name");
-
-
                 if (select_list.includes(n)) {
                     console.log(n);
                     span_tag.hide();
                     $(this).find('select').show();
                 }
-
             });
 
 
@@ -352,9 +345,7 @@
                 },
                 error: function () {
                     put_status = false
-
                 }
-
             });
 
 
@@ -379,7 +370,6 @@
                         span_tag.text(selected_text);
                         select_tag.hide();
                         span_tag.show();
-
                     }
 
                     if (input_list.includes(n)) {
@@ -387,11 +377,8 @@
                         span_tag.text($.trim(input_tag.val()));
                         input_tag.hide()
                     }
-
                 })
-
             }
-
 
         });
 
@@ -400,7 +387,6 @@
         $("#mytable").on('click', ".fa-trash-alt", function (ele) {
 
             console.log('del');
-
             tr = $(this).closest("tr");
 
             var id = $.trim(tr.find("[name='id']").text());
@@ -423,7 +409,6 @@
             var id = $('#dentform_del_Modal .modal-body').find('input').val();
 
             console.log(name, id);
-
             data = {id: id};
 
             $.ajax({
@@ -434,15 +419,11 @@
                     console.log(callback);
 
                     if (callback.status == 'ok') {
-
                         tr.remove();
                         $('#dentform_del_Modal').modal('hide');
-
-
                     }
                 }
             });
-
 
         });
 

@@ -63,21 +63,16 @@
 
             <div class="row">
                 <div class="col-lg-12">
-
                     <label for="id_summary">上傳圖片:</label>
-
                     <input id="input-id" type="file" class="file" name="img" multiple=true data-preview-file-type="any">
-
                 </div>
             </div>
 
 
             <div class="row" style="padding: 15px">
-
                 <div class="col-lg-12 form-group">
                     <button id="submit" type="submit" class="btn btn-success center-block">提交表單</button>
                 </div>
-
             </div>
 
 
@@ -121,12 +116,8 @@
                     value: item.id,
                     text: item.name,
                 }));
-
             });
-
             $("#id_asset_obj").removeAttr('disabled');
-
-
         }
 
 
@@ -145,7 +136,6 @@
 
         }).on("fileuploaded", function (event, data) {//上传成功之后的一些处理
             console.log(data);
-
             console.log(data.response);
 
             $('#form').append('<input type="hidden" name="photo" value=' + data.response.id + '>')
@@ -166,12 +156,10 @@
 
             // 提交 新增表單
             $("#form").on("submit", function (e) {
-
                 console.log('form');
-
                 {#var postData = $(this).serializeArray();#}
-
             });
+
 
 
         });

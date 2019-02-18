@@ -355,6 +355,52 @@ class AssetRepair_ADD_Form(AssetRepairForm):
         exclude = ('status', 'finish_date', 'repairer')
 
 
+class AssetToAssetsForm(ModelForm):
+    category = forms.ModelChoiceField(
+        label='資產類型',
+        queryset=models.Category.objects.all(),
+        widget=forms.Select(attrs={"onchange": "foo(this)"}),
+        required=False,
+    )
+
+    def __init__(self, *args, **kwargs):
+        request = kwargs.pop('request', None)
+        super(AssetToAssetsForm, self).__init__(*args, **kwargs)
+
+        if not self.verify_permissions(request):
+            user_dent = request.user.userprofile.dent
+            self.fields['assets'].queryset = models.Asset.objects.filter(department=user_dent).order_by('name')
+
+        self.fields['assets'].widget.attrs['disabled'] = 'ture'
+
+        # 對所有字段添加Css屬性
+        for k, v in self.fields.items():
+            self.fields[k].widget.attrs['class'] = 'form-control'
+
+
+
+
+    def verify_permissions(self, request):
+        # print('verify_permissions')
+        # print(request)
+
+        # 驗證用戶
+        admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
+        # print('admindent', admindent)
+
+        if request.user.userprofile.dent in admindent:
+            # print('管理用戶')
+            return True
+        else:
+            # print('一般用戶')
+            return False
+
+
+    class Meta:
+        model = models.AssetToAssets
+        fields = '__all__'
+
+
 # --- 資產維修詳細記錄表 ---
 
 class AssetRepairDetailForm(ModelForm):

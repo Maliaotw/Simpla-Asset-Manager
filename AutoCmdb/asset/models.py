@@ -16,7 +16,6 @@ class News(models.Model):
 
     userprofile = models.ManyToManyField('UserProfile',verbose_name='用戶',null=True,blank=True)
 
-
     def __str__(self):
         return self.title
 
@@ -130,7 +129,7 @@ class Asset(models.Model):
     price = models.IntegerField(verbose_name='價格', null=True, blank=True)
     category = models.ForeignKey("category", verbose_name='類型')
     department = models.ForeignKey('Department', verbose_name='部門', null=True, blank=True)
-    manager = models.ForeignKey("UserProfile", verbose_name='負責人', null=True, blank=True)
+    manager = models.ForeignKey("UserProfile", verbose_name='負責人', null=True, blank=True,related_name='+')
     purchase_date = models.DateField(verbose_name='購買日期', null=True, blank=True)
 
     status_choice = (
@@ -141,14 +140,14 @@ class Asset(models.Model):
     )
 
     status = models.CharField(verbose_name='狀態', max_length=16, choices=status_choice, default='未使用')
-
     latest_date = models.DateTimeField(verbose_name='更新日期', auto_now=True)
     create_date = models.DateTimeField(verbose_name='創建日期', auto_now_add=True)
-
     remarks = models.TextField(verbose_name="備註", blank=True, null=True)
     status_date = models.DateField(verbose_name='使用日期/遺失日期/報廢日期', null=True, blank=True)
     title = models.CharField(verbose_name="資產名稱", max_length=64, null=True, blank=True)
     model = models.CharField(verbose_name="品牌/型號", max_length=64, null=True, blank=True)
+    latest_user = models.ForeignKey("UserProfile", verbose_name='更新者', blank=True, null=True,related_name='+')
+
 
     class Meta:
         verbose_name_plural = "資產信息表"
@@ -161,6 +160,18 @@ class Asset(models.Model):
     def __str__(self):
         return "%s" % (self.name)
 
+
+
+class AssetToAssets(models.Model):
+    '''
+    資產關聯資產
+    '''
+    asset_obj = models.ForeignKey('Asset',verbose_name="資產編號",related_name='+')
+    assets = models.ForeignKey("Asset",verbose_name='關聯資產',related_name='+')
+    remarks = models.CharField(verbose_name="備註",max_length=64, blank=True, null=True)
+
+    def __str__(self):
+        return "%s %s" % (self.asset_obj,self.assets)
 
 class AssetRecord(models.Model):
     """
@@ -179,7 +190,6 @@ class AssetRecord(models.Model):
     )
 
     type = models.IntegerField(choices=type_choice, default=0)
-
     create_date = models.DateTimeField(auto_now_add=True, verbose_name='創建日期')
 
     class Meta:

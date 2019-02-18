@@ -159,11 +159,10 @@
 
                     <td name="department">
                         <span class="form-control-static">
-                            {{ asset.department }}
+                            {{ asset.department|default:"" }}
                         </span>
 
                         <select class="form-control" onchange="put_dent_user(this)" style="display: none">
-
 
                             {% for department in department_obj %}
                                 {% if  asset.department  ==  department %}
@@ -194,28 +193,21 @@
 
                     {% if admin_dent %}
                         <td name="purchase_date" id="datebox">
-
                             <span class="form-control-static">{{ asset.purchase_date|date:"Y-m-d" }}</span>
                             <input type="text" class="form-control match-content" style="display:none;">
 
                         </td>
                         <td name="price">
                         <span class="form-control-static">
-                            {{ asset.price }}
+                            {{ asset.price|default:"" }}
                         </span>
-
                             <input type='number' class='form-control match-content' value="" style="display: none">
                         </td>
-
                     {% endif %}
 
                     <td name="status">
                         {{ asset.get_status_display }}
                     </td>
-
-{#                    <td name="asset">#}
-{#                        {{ asset.assetbusiness.business.name }}#}
-{#                    </td>#}
 
                     <td>
                         <a href="{% url 'asset_edit' asset.id %}"><i class="fas fa-pen"></i></a>
@@ -594,7 +586,6 @@
 
                     if (callback.status == 'ok') {
                         put_status = true
-
                     } else {
                         put_status = false
                     }
@@ -629,7 +620,6 @@
                         span_tag.text(selected_text);
                         select_tag.hide();
                         span_tag.show();
-
                     }
 
                     if (input_list.includes(n)) {
@@ -638,12 +628,8 @@
                         input_tag.hide()
 
                     }
-
-
                 })
-
             }
-
 
         });
 
