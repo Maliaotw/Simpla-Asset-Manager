@@ -269,12 +269,19 @@
                                         <li>|</li>
 
                                         <span>
-                                    <i class="glyphicon glyphicon-comment "></i> {% comment_count asset_repair %}留言
+                                    <i class="glyphicon glyphicon-comment "></i> {% comment_count asset_repair %}留言 <a
+                                                href="#" onclick="msg(this)" data-show="false"
+                                                data-id="{{ asset_repair.id }}">展開</a>
                                 </span>
 
                                     </ul>
 
                                 </div>
+
+
+                                <!-- 留言 -->
+
+
                             </div>
                         </div>
 
@@ -366,14 +373,17 @@
                                         </td>
 
                                         <td>
-                                            <a href="#"><i class="fas fa-pen"></i></a>
+                                            <a href="#" onclick="pen(this)"><i class="fas fa-pen"></i></a>
+                                            <a href="#" onclick="file(this)"><i class="fas fa-file"
+                                                                                style="display: none"></i></a>
+                                            <a href="#" onclick="trash(this)"><i class="fas fa-trash-alt"></i></a>
                                         </td>
 
                                     </tr>
                                 {% endfor %}
 
                                 <tr>
-                                    <td name="ids" style="display: none">
+                                    <td name="id" style="display: none">
                                         <input name="id" value="{{ asset_obj.id }}">
                                     </td>
 
@@ -390,7 +400,7 @@
                                     </td>
 
                                     <td>
-                                        <a href="#tab_assets"><i class="fas fa-plus"></i></a>
+                                        <a href="#tab_assets" onclick="plus(this)"><i class="fas fa-plus"></i></a>
                                     </td>
                                 </tr>
                                 </tbody>
@@ -401,13 +411,125 @@
 
                     <div class="form-group">
                         <label> 被關聯資產</label>
+
+                        <div class="row" style="padding-left: 15px">
+
+
+                            <div class="col-md-12 form-group">
+
+                                <table class="table" id="mytable" style="margin-top: 20px">
+                                    <thead>
+                                    <tr>
+                                        <th>類型</th>
+                                        <th>資產編號</th>
+                                        <th>備註</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+
+                                    <tbody>
+                                    {% for relation_assets in on_rel_assets_obj %}
+
+                                        <tr>
+                                            <td name="id" style="display: none">
+                                                <input type="text" name="id" class="form-control"
+                                                       value="{{ relation_assets.id }}"/>
+                                            </td>
+
+                                            <td name="assets" style="display: none">
+                                                <input type="text" name="assets" class="form-control"
+                                                       value="{{ asset_obj.id }}"/>
+                                            </td>
+
+
+                                            <td name="category">
+                                            <span>
+                                                {{ relation_assets.asset_obj.category }}
+                                            </span>
+                                                <select name="category" onchange="foo(this)" class="form-control"
+                                                        id="id_category" style="display: none">
+
+                                                    <option value="">-----</option>
+
+                                                    {% for category in category_obj %}
+                                                        {% if relation_assets.asset_obj.category  ==  category %}
+                                                            <option selected
+                                                                    value="{{ category.id }}">{{ category }}
+                                                            </option>
+                                                        {% else %}
+                                                            <option value="{{ category.id }}">{{ category }}</option>
+                                                        {% endif %}
+
+                                                    {% endfor %}
+
+                                                </select>
+
+                                            </td>
+
+                                            <td name="name">
+                                            <span>
+                                                {{ relation_assets.asset_obj.name }}
+                                            </span>
+
+                                                <select name="asset_obj" class="form-control" required="" id="id_assets"
+                                                        style="display:none;">
+                                                    <option value="{{ relation_assets.asset_obj.id }}">{{ relation_assets.asset_obj.assets }}</option>
+                                                </select>
+                                            </td>
+
+
+                                            <td name="remarks">
+                                            <span>
+                                                {{ relation_assets.remarks|default:"" }}
+                                            </span>
+                                                <input type="text" name="remarks" maxlength="64" class="form-control"
+                                                       id="id_remarks" style="display: none">
+                                            </td>
+
+                                            <td>
+                                                <a href="#" onclick="pen(this)"><i class="fas fa-pen"></i></a>
+                                                <a href="#" onclick="file(this)"><i class="fas fa-file"
+                                                                                    style="display: none"></i></a>
+                                                <a href="#" onclick="trash(this)"><i class="fas fa-trash-alt"></i></a>
+                                            </td>
+
+                                        </tr>
+                                    {% endfor %}
+
+                                    <tr>
+                                        <td name="assets" style="display: none">
+                                            <input name="id" value="{{ asset_obj.id }}">
+                                        </td>
+
+                                        <td name="category">
+                                            {{ ata_forms_obj.category }}
+                                        </td>
+
+                                        <td name="asset_obj">
+                                            {{ ata_forms_obj.assets }}
+                                        </td>
+
+                                        <td name="remarks">
+                                            {{ ata_forms_obj.remarks }}
+                                        </td>
+
+                                        <td>
+                                            <a href="#tab_assets" onclick="relplus(this)"><i
+                                                    class="fas fa-plus"></i></a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+
+                                </table>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
 
             </div>
         </div>
     </div>
-
 
 
     <!--- 新增完成 表單-->
@@ -436,6 +558,29 @@
         </div>
     </div>
 
+
+    <!--- 刪除關聯資產表單 -->
+    <div class="modal fade" id="form_del_Modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">刪除關聯資產</h4>
+                </div>
+                <div class="modal-body">
+                    <p>您確定要刪除
+                        <span style="color: red"></span>
+                        <input type="number" style="display:none;">
+                        嗎</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="form_del_submit" type="button" class="btn btn-primary">確認</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 
 
 
@@ -549,6 +694,51 @@
         });
 
 
+        // 維修紀錄 留言 顯示/隱藏
+
+        function msg(ele) {
+
+            console.log("msg");
+
+
+            var id = $(ele).data('id');
+            var post_div = $(ele).closest('#post');
+            var show = $(ele).data('show');
+
+            console.log(id);
+            console.log(show);
+
+            if (show == false) {
+
+                $.ajax({
+                    url: "{% url 'ardtohtml' %}",
+                    type: 'GET',
+                    data: {id: id},
+
+                    success: function (callback) {
+                        console.log(callback);
+                        post_div.append(callback.data);
+
+
+                    },
+                    error: function () {
+
+                    }
+                });
+                $(ele).data('show',true);
+                $(ele).text('顯示');
+            }else {
+                $("#reply").remove();
+                $(ele).data('show',false);
+                $(ele).text('隱藏');
+            }
+
+
+        };
+
+
+        // 關聯資產標籤頁
+
         var data = {{ data|safe }};
 
         function foo(e) {
@@ -586,12 +776,109 @@
             }
         });
 
-        //編輯 EditData : Change icon
-        $("#mytable").on('click', ".fa-pen", function (ele) {
+
+        //新增 AddData : ADD icon
+        function plus(ele) {
+            console.log('plus');
+
+            tds = $(ele).closest("tr").find('td');
+            {#console.log(tds);#}
+
+            var id = tds.find('[name="id"]').val();
+            var category = tds.find('[name="category"]').val();
+            var assets = tds.find('[name="assets"]').val();
+            var remarks = tds.find('[name="remarks"]').val();
+
+
+            var postdata = {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                asset_obj: id,
+                category: category,
+                assets: assets,
+                remarks: remarks
+            };
+
+            resurl = document.location.origin + "{% url 'asset_edit' asset_obj.id %}#tab_assets";
+
+            $.ajax({
+                url: "{% url 'ara_index' %}",
+                data: postdata,
+                type: 'POST',
+                async: false,
+
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback.status == 'ok') {
+                        put_status = true;
+                    }
+                },
+                error: function () {
+                    put_status = false
+
+                }
+            });
+            if (put_status) {
+                console.log("OK");
+                location.reload()
+            }
+
+        };
+
+        function relplus(ele) {
+            console.log('plus');
+
+            tds = $(ele).closest("tr").find('td');
+            {#console.log(tds);#}
+
+            var id = tds.find('[name="assets"]').val();
+            var category = tds.find('[name="category"]').val();
+            var assets = tds.find('[name="id"]').val();
+            var remarks = tds.find('[name="remarks"]').val();
+
+
+            var postdata = {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                asset_obj: id,
+                category: category,
+                assets: assets,
+                remarks: remarks
+            };
+
+            resurl = document.location.origin + "{% url 'asset_edit' asset_obj.id %}#tab_assets";
+
+            $.ajax({
+                url: "{% url 'ara_index' %}",
+                data: postdata,
+                type: 'POST',
+                async: false,
+
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback.status == 'ok') {
+                        put_status = true;
+                    }
+                },
+                error: function () {
+                    put_status = false
+
+                }
+            });
+            if (put_status) {
+                console.log("OK");
+                location.reload()
+            }
+
+        };
+
+
+        //點擊編輯按鈕
+        function pen(ele) {
 
             console.log("pen");
 
-            tr = $(this).closest("tr");
+            tr = $(ele).closest("tr");
             tds = tr.find('td');
             var category = tds.find('[name="category"]').val();
             var assetsid = tds.find('[name="assets"]').val();
@@ -619,90 +906,46 @@
 
 
             $.each(tds, function (i, ele) {
-                var span_tag = $(this).find("span");
-                var input_tag = $(this).find("input");
-                var select_tag = $(this).find("select");
+                var span_tag = $(ele).find("span");
+                var input_tag = $(ele).find("input");
+                var select_tag = $(ele).find("select");
 
                 //user
-                select_list = ['category', 'name'];
+                select_list = ['category', 'name', 'asset_obj'];
                 input_list = ['remarks'];
-                n = $(this).attr("name");
-                console.log($(this));
+                n = $(ele).attr("name");
+                console.log($(ele));
                 console.log(n);
                 if (select_list.includes(n)) {
                     //console.log(n);
                     span_tag.hide();
-                    $(this).find('select').show();
+                    $(ele).find('select').show();
                 }
                 if (input_list.includes(n)) {
                     //console.log(n);
                     span_tag.hide();
-                    $(this).find('input').show();
+                    $(ele).find('input').show();
                 }
 
             });
 
-            $(this).attr('data-icon', 'file');
+            //$(ele).attr('data-icon', 'file');
+            tr.find('.fa-file').show();
+            tr.find('.fa-pen').hide();
 
-        });
+            {#fileicon.closest('tr').find('.fa')#}
+            {#console.log(fileicon)#}
 
-
-        //新增 AddData : ADD icon
-        $("#mytable").on('click', ".fa-plus", function (ele) {
-            console.log('plus');
-
-
-            tds = $(this).closest("tr").find('td');
-            tr = $(this).closest("tr");
-
-            var id = tds.find('[name="id"]').val();
-            var category = tds.find('[name="category"]').val();
-            var assets = tds.find('[name="assets"]').val();
-            var remarks = tds.find('[name="remarks"]').val();
+        };
 
 
-            data = {
-                csrfmiddlewaretoken: '{{ csrf_token }}',
-                asset_obj: id,
-                category: category,
-                assets: assets,
-                remarks: remarks
-            };
-
-            resurl = document.location.origin + "{% url 'asset_edit' asset_obj.id %}#tab_assets";
-
-            $.ajax({
-                url: "{% url 'ara_index' %}",
-                data: data,
-                type: 'POST',
-                async: false,
-
-                success: function (callback) {
-                    console.log(callback);
-
-                    if (callback.status == 'ok') {
-                        put_status = true;
-                    }
-                },
-                error: function () {
-                    put_status = false
-
-                }
-            });
-            if (put_status) {
-                console.log("OK");
-                location.reload()
-            }
-
-        });
-
-        $("#mytable").on('click', ".fa-file", function (ele) {
+        //修改儲存
+        function file(ele) {
 
             console.log('save');
-            $(this).attr('data-icon', 'pen');
 
 
-            tr = $(this).closest('tr');
+            tr = $(ele).closest('tr');
             tds = tr.find('td');
 
             var id = tds.find('[name="id"]').val();
@@ -710,6 +953,7 @@
             var assets = tds.find('[name="assets"]').val();
             var remarks = tds.find('[name="remarks"]').val();
             var asset_obj = tds.find('[name="asset_obj"]').val();
+
 
             var postData = {
                 csrfmiddlewaretoken: '{{ csrf_token }}',
@@ -719,6 +963,8 @@
                 assets: assets,
                 remarks: remarks
             };
+
+
             console.log(postData);
 
             $.ajax({
@@ -742,10 +988,84 @@
             if (put_status) {
                 console.log("OK");
 
+
+                $.each(tds, function (i, ele) {
+                    var span_tag = $(ele).find("span");
+                    var input_tag = $(ele).find("input");
+                    var select_tag = $(ele).find("select");
+                    span_tag.show();
+                    console.log($(ele));
+
+                    //user
+                    select_list = ['category', 'name'];
+                    input_list = ['remarks'];
+                    n = $(ele).attr("name");
+                    //console.log($(this));
+                    //console.log(n);
+                    if (select_list.includes(n)) {
+                        selected_text = $.trim(select_tag.find(":selected").text());
+                        console.log(selected_text);
+                        span_tag.text(selected_text);
+                        select_tag.hide();
+                        span_tag.show();
+                    }
+                    if (input_list.includes(n)) {
+                        //console.log(n);
+                        span_tag.show();
+                        span_tag.text($.trim(input_tag.text()));
+                        input_tag.hide()
+                    }
+
+                });
+
+                tr.find('.fa-file').hide();
+                tr.find('.fa-pen').show();
+
             }
 
+        }
+        ;
 
-        })
+        // 點擊刪除
+        function trash(ele) {
+
+            console.log('del');
+            tr_del = $(ele).closest("tr");
+            var id = tr_del.find("[name='id'] input").val();
+            var name = tr_del.find("[name='name'] span").text();
+            //console.log($.trim(id),$.trim(name));
+            $('#form_del_Modal .modal-body').find('span').text(name);
+            $('#form_del_Modal .modal-body').find('input').val(id);
+            $('#form_del_Modal').modal('show')
+
+
+        };
+
+
+        // 提交刪除
+        $("#form_del_submit").on('click', function (event) {
+
+            var name = $('#form_del_Modal .modal-body').find('span').text();
+            var id = $('#form_del_Modal .modal-body').find('input').val();
+
+            console.log(name, id);
+            var postdata = {id: id};
+
+            $.ajax({
+                url: '{% url 'ara_index' %}',
+                data: postdata,
+                type: 'DELETE',
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback.status == 'ok') {
+                        tr_del.remove();
+                        $('#form_del_Modal').modal('hide');
+                    }
+                }
+            });
+
+        });
 
     </script>
 

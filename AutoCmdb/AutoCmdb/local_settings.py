@@ -101,10 +101,12 @@ DATABASES =
 
 func = {
     'PC-073': "TestDB",
-    'AWS': 'AWS'
+    'AWS': 'AWS',
+    'MBP.local':'MAC'
 }
 
 hostname = socket.gethostname()
+# print(hostname)
 
 DATABASES = database[func[hostname]]
 # DATABASES = database[func['ip-172-31-87-103']]

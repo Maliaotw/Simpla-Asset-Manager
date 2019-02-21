@@ -14,6 +14,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.models import User, Group, Permission
+from django.conf import settings
 
 
 # --- 資產 ---
@@ -58,16 +59,18 @@ def asset(request):
 @permission_required('asset.can_view_asset')
 def asset_index(request):
     print('Asset_index')
+    ret = {"status": "", "re_html": "", "msg": ""}
 
     if request.method == "GET":
 
         search_field = {}
-        contacts = 10
+        # contacts = 10
 
         # GET 字段
         name = request.GET.get("name", '')
         cate_id = request.GET.get("cate_id", '')
         dent_id = request.GET.get("dent_id", '')
+        contacts = request.GET.get('contacts', 10)
 
         # print(request.user)
         category_obj = models.Category.objects.all()
@@ -108,7 +111,6 @@ def asset_index(request):
             asset_obj = models.Asset.objects.filter(
                 Q(name__contains=name, category_id=cate_id) | Q(manager__code__contains=name, category_id=cate_id)
             )
-            contacts = asset_obj.count()
         elif dent_id:
             asset_obj = models.Asset.objects.filter(
                 Q(name__contains=name, department_id=dent_id) | Q(manager__code__contains=name, department_id=dent_id)
@@ -123,9 +125,10 @@ def asset_index(request):
         # print('asset_obj', asset_obj)
         # 分頁功能
 
+        search_field['contacts'] = contacts
         paginator = Paginator(asset_obj, contacts)  # Show 10 contacts per page
 
-        page = request.GET.get('page')
+        page = request.GET.get('page', 1)
         try:
             asset_obj = paginator.page(page)
         except PageNotAnInteger:
@@ -175,7 +178,7 @@ def asset_index(request):
 
     if request.method == 'PUT':
         print("This is PUT")
-        ret = {"status": "", "re_html": "", "msg": ""}
+
 
         put = QueryDict(request.body)
         print(put)
@@ -205,6 +208,22 @@ def asset_index(request):
             ret['status'] = 'error'
 
         return JsonResponse(ret)
+
+    if request.method == 'DELETE':
+        print("THIS IS DELETE")
+        put = QueryDict(request.body)
+        print(put)
+        id = put.get('id')
+        news_obj = models.Asset.objects.get(id=id)
+        news_obj.delete()
+
+        ret['msg'] = '成功'
+        ret['status'] = 'ok'
+
+        return JsonResponse(ret)
+
+
+
 
 
 @login_required
@@ -269,7 +288,7 @@ def asset_edit(request, pk):
         # print(asset_record_obj)
         asset_repair_obj = models.AssetRepair.objects.filter(asset_obj=asset_obj)
 
-        # models.
+        # 關聯資產
         relation_assets_obj = models.AssetToAssets.objects.filter(asset_obj=asset_obj)
         # print(relation_assets_obj)
 
@@ -292,6 +311,10 @@ def asset_edit(request, pk):
                 ) for cate in category_obj
             }
         # print(data)
+
+        # 被關聯資產
+        on_rel_assets_obj = models.AssetToAssets.objects.filter(assets=asset_obj)
+        print(on_rel_assets_obj)
 
         ata_forms_obj = forms.AssetToAssetsForm(request=request)
 
@@ -457,6 +480,7 @@ def asset_busunit(request):
         cate_id = request.GET.get("cate_id", '')
         dent_id = request.GET.get("dent_id", '')
         busunit_id = request.GET.get("busunit_id", '')
+        contacts = request.GET.get('contacts', 10)
 
         # asset_busunit_obj = models.AssetBusiness.objects.all()
         category_obj = models.Category.objects.all()
@@ -491,7 +515,9 @@ def asset_busunit(request):
 
             data = request.GET.copy()
 
-            data.pop('name')
+            for i in ['name', 'page', 'contacts']:
+                if i in data:
+                    data.pop(i)
 
             search_key = list(filter(lambda x: data[x] != "", data.keys()))
             # print(search_key)
@@ -499,18 +525,16 @@ def asset_busunit(request):
             search_dict = {}
             for key in search_key:
                 search_dict.update(get[key])
-
             # print(search_dict)
 
             asset_obj = asset_obj.filter(
                 Q(name__contains=name), **search_dict
             )
-        else:
-            pass
 
-        paginator = Paginator(asset_obj, 10)  # Show 10 contacts per page
+        page = request.GET.get('page', 1)
+        search_field['contacts'] = contacts
+        paginator = Paginator(asset_obj, contacts)  # Show 10 contacts per page
 
-        page = request.GET.get('page')
         try:
             asset_obj = paginator.page(page)
         except PageNotAnInteger:
@@ -585,13 +609,22 @@ def ara(request):
         print(froms_obj.errors)
         if froms_obj.is_valid():
             print("ok")
+            froms_obj.save()
             ret['status'] = 'ok'
             ret['msg'] = '修改成功'
-
 
         return JsonResponse(ret)
 
     if request.method == 'DELETE':
+        print("THIS IS DELETE")
+        put = QueryDict(request.body)
+        print(put)
+        id = put.get('id')
+        ara_obj = models.AssetToAssets.objects.get(id=id)
+        ara_obj.delete()
+
+        ret['msg'] = '成功'
+        ret['status'] = 'ok'
 
         return JsonResponse(ret)
 
@@ -643,7 +676,6 @@ def busunit(request):
 
         if form_obj.is_valid():
             form_obj.save()
-
             ret['status'] = 'ok'
             ret['msg'] = '新增成功'
 
@@ -700,6 +732,7 @@ def asset_repair(request):
         # Get字段
         name = request.GET.get("name", '')
         status = request.GET.get("status", '')
+        contacts = request.GET.get('contacts', 10)
 
         # 判斷管理用戶
         admindent = models.Department.objects.filter(code__in=['OM', 'HR'])
@@ -733,10 +766,11 @@ def asset_repair(request):
         else:
             pass
         #     Question.objects.filter(Q(question_text_Q_contains='you') | Q(question_text__contains='who'))
+        search_field['contacts'] = contacts
+        paginator = Paginator(asset_repair_obj, contacts)  # Show 10 contacts per page
 
-        paginator = Paginator(asset_repair_obj, 10)  # Show 10 contacts per page
+        page = request.GET.get('page', 1)
 
-        page = request.GET.get('page')
         try:
             asset_repair_obj = paginator.page(page)
         except PageNotAnInteger:
@@ -946,6 +980,8 @@ def asset_repair_detail_add(request):
             date = ARD_obj.create_date
             # print(date)
             # print(date.strftime("%Y/%m/%d %H:%M"))
+            import pytz
+            Shanghai = pytz.timezone(settings.TIME_ZONE)
 
             datetime.datetime.now()
             data = {
@@ -954,7 +990,7 @@ def asset_repair_detail_add(request):
                     {
                         'content': content,
                         'user': user.code,
-                        'date': date.strftime("%Y/%m/%d %H:%M")
+                        'date': date.astimezone(Shanghai).strftime("%Y/%m/%d %H:%M")
                     },
 
             }
@@ -1445,11 +1481,14 @@ def user(request):
     # user forms表單
     form_obj = forms.User_Add_Form()
 
-    if request.GET:
+    if request.method == 'GET':
         # GET 字段
+
+        print("GET")
         name = request.GET.get("name", '')
         sex = request.GET.get("sex", '')
         dent_id = request.GET.get("dent_id", '')
+        contacts = request.GET.get('contacts', 10)
 
         search_field['name'] = name
         search_field['sex'] = sex
@@ -1478,17 +1517,20 @@ def user(request):
                 Q(name__contains=name) | Q(code__contains=name) | Q(user__username__contains=name)
             )
 
-    # 分頁功能
+        # 分頁功能
 
-    paginator = Paginator(user_obj, 10)  # Show 10 contacts per page
+        search_field['contacts'] = contacts
+        paginator = Paginator(user_obj, contacts)  # Show 10 contacts per page
 
-    page = request.GET.get('page')
-    try:
-        user_obj = paginator.page(page)
-    except PageNotAnInteger:
-        user_obj = paginator.page(1)
-    except EmptyPage:
-        user_obj = paginator.page(paginator.num_pages)
+        page = request.GET.get('page', 1)
+        try:
+            user_obj = paginator.page(page)
+        except PageNotAnInteger:
+            user_obj = paginator.page(1)
+        except EmptyPage:
+            user_obj = paginator.page(paginator.num_pages)
+
+        return render(request, 'user/index.html', locals())
 
     # 增
     if request.method == 'POST':
@@ -1552,8 +1594,6 @@ def user(request):
     # 刪
     if request.method == 'DELETE':
         return JsonResponse(ret)
-
-    return render(request, 'user/index.html', locals())
 
 
 @login_required

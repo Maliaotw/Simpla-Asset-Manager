@@ -49,6 +49,12 @@
 
                 <form class="form-inline" method="get">
 
+
+                    <div class="form-group" style="display: none">
+                        <input type="text" class="form-control" name='contacts' id="search" placeholder=""
+                               value="{{ contacts }}">
+                    </div>
+
                     <div class="form-group">
                         <label for="inputsearch" class="col-form-label">搜尋</label>
                         <input type="text" class="form-control" name='name' id="search" placeholder=""
@@ -116,12 +122,8 @@
 
                 <tr>
                     <td>
-                        {% if forloop.last and page %}
-                            {{ page }}0
+                        {% pagenumber forloop.counter contacts page %}
 
-                        {% else %}
-                            {{ page|add:"-1"|default:"" }}{{ forloop.counter }}
-                        {% endif %}
                     </td>
 
                     <td name="id" style="display: none">
@@ -211,6 +213,7 @@
 
                     <td>
                         <a href="{% url 'asset_edit' asset.id %}"><i class="fas fa-pen"></i></a>
+                        <a href="#"><i class="fas fa-trash-alt"></i></a>
                     </td>
                 </tr>
             {% endfor %}
@@ -223,7 +226,16 @@
                 <nav aria-label="Page navigation">
                     <ul class="pagination pull-left">
                         共{{ paginator.count }}筆
+                        <label style="padding-left: 20px">顯示</label>
+                        <select class="selectpicker" name='contacts' data-width="fit" id='contacts'>
+                            <option value=10>10</option>
+                            <option value=20>20</option>
+                            <option value=50>50</option>
+                            <option value=100>100</option>
+                        </select>筆
                     </ul>
+
+
                     <ul class="pagination pull-right">
                         {% get_pageer asset_obj search_field %}
                     </ul>
@@ -316,6 +328,28 @@
 
 
 
+    <!--- 刪除資產表單 -->
+    <div class="modal fade" id="form_del_Modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">刪除資產</h4>
+                </div>
+                <div class="modal-body">
+                    <p>您確定要刪除<span style="color: red"></span><input type="number" style="display:none;">嗎</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="form_del_submit" type="button" class="btn btn-primary">確認</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+    {% csrf_token %}
 
 {% endblock %}
 
@@ -340,6 +374,7 @@
             }
         });
 
+        var contacts = document.getElementById('contacts');
         $(document).ready(function () {
             //$('.dropdown-toggle').dropdown();
             $('#datebox input').datepicker(
@@ -352,6 +387,13 @@
 
             $(".selectpicker[name='cate_id']").selectpicker('val', {{ cate_id }});
             $(".selectpicker[name='dent_id']").selectpicker('val', {{ dent_id }});
+            $(".selectpicker[name='contacts']").selectpicker('val', {{ contacts }});
+
+            contacts.onchange = function () {
+                console.log(this)
+                console.log($(this).val())
+                location.href = location.origin + location.pathname + "?contacts=" + $(this).val() + ""
+            };
 
         })
         ;
@@ -634,13 +676,44 @@
         });
 
 
-        //DeleteData : Delete icon
+        // 刪除 DelData : Del icon
         $("#mytable").on('click', ".fa-trash-alt", function (ele) {
-            //console.log('Delete');
 
+            console.log('del');
+            tr = $(this).closest("tr");
+            var id = $.trim(tr.find("[name='id'] input").val());
+            var name = $.trim(tr.find("[name='name']").text());
+            //console.log($.trim(id),$.trim(name));
 
+            $('#form_del_Modal .modal-body').find('span').text(name);
+            $('#form_del_Modal .modal-body').find('input').val(id);
+            $('#form_del_Modal').modal('show');
         });
 
+        // 提交刪除
+        $("#form_del_submit").on('click', function (event) {
+
+            var name = $('#form_del_Modal .modal-body').find('span').text();
+            var id = $('#form_del_Modal .modal-body').find('input').val();
+
+            console.log(name, id);
+            data = {id: id};
+
+            $.ajax({
+                url: '{% url 'asset_index' %}',
+                data: data,
+                type: 'DELETE',
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback.status == 'ok') {
+                        tr.remove();
+                        $('#form_del_Modal').modal('hide');
+                    }
+                }
+            });
+
+        });
 
     </script>
 

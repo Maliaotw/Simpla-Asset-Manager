@@ -94,7 +94,7 @@ def get_pageer(data, search_field):
             # <li class="page-item active"><a class="page-link" href="#">2 <span class="sr-only">(current)</span></a></li>
             # txt += '<a class="active item" href="?page=%s%s">%s</a>' % (page_number, search_str, page_number)
             txt += '<li class="page-item active"><a class="page-link" href="?page=%s%s">%s<span class="sr-only">(current)</span></a></li>' % (
-            page_number, search_str, page_number)
+                page_number, search_str, page_number)
         else:
             # <li class="page-item"><a class="page-link" href="#">1</a></li>
             # txt += '<a class="item" href="?page=%s%s">%s</a>' % (page_number, search_str, page_number)
@@ -106,7 +106,7 @@ def get_pageer(data, search_field):
         # <li><a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
         # txt += '<a class="icon item" href="?page=%s%s"><i class="right chevron icon"></i></a>' % (data.paginator.num_pages, search_str)
         txt += '<li><a href="?page=%s%s" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>' % (
-        data.paginator.num_pages, search_str)
+            data.paginator.num_pages, search_str)
 
     return mark_safe(txt)
 
@@ -169,8 +169,35 @@ def it_fix_user(asset_repair_obj):
 
 @register.simple_tag
 def get_busunit(dent):
-
     busunit_obj = models.BusinessUnit.objects.filter(dent=dent)
     return busunit_obj
 
 
+@register.simple_tag
+def pagenumber(item, conunt, page):
+    '''
+    計算分頁項次第幾項
+    :param item:當前項次
+    :param conunt:顯示個數
+    :param page:當前頁數
+    :return:
+    '''
+
+    item = int(item)
+    conunt = int(conunt)
+    page = int(page)
+    # page = int(0)
+    # print("item", item)
+    # print("conunt", conunt)
+    # print("page", page)
+    ret = ""
+    if page == 1:
+        ret = item
+    else:
+        if item == conunt:
+            ret = conunt * page
+        else:
+            page = page - 1
+            ret = item + (conunt * page)
+    # print(ret)
+    return ret

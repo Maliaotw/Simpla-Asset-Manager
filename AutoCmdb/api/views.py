@@ -4,8 +4,11 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 import json
 import hashlib
 import time
-from asset.models import Category, Asset, Department, UserProfile
+from asset.models import Category, Asset, Department, UserProfile, AssetRepairDetail
 from host.models import Host, Memory, Disk, NIC, HostRecord
+from django.conf import settings
+import pytz
+
 
 # Create your views here.
 
@@ -563,4 +566,50 @@ def host(request):
 
         ret['data'] = asset_list
 
+        return JsonResponse(ret)
+
+
+def ardtohtml(request):
+    '''
+    資產報修詳細
+    asset_repair_detail
+    :param request:
+    :return:
+    '''
+
+    ret = {'status': '', 'code': '', 'msg': '', 'data': {}}
+
+    if request.method == 'GET':
+
+        id = request.GET.get('id')
+
+        ard_objs = AssetRepairDetail.objects.filter(repair_id=id)
+
+        print(ard_objs)
+
+        html = '<div id="reply">'
+
+        Shanghai = pytz.timezone(settings.TIME_ZONE)
+
+        for ard in ard_objs:
+            t = ard.create_date.astimezone(Shanghai)
+            html += '<div class="panel panel-primary">'
+            html += '<div class="panel-heading">'
+            html += '<strong><i class="far fa-user"></i>%s</strong></div>' % ard.user.code
+            html += '<div class="panel-body">'
+            html += '<span>%s</span>' % ard.content
+            html += '<p class="text-right">%s</p>' % t.strftime("%Y/%m/%d %H:%M")
+            html += '</div></div>'
+        html += "</div>"
+
+        ret['status'] = 'ok'
+        ret['code'] = 200
+        ret['msg'] = '返回hrml'
+        ret['data'] = html
+
+        return JsonResponse(ret)
+
+
+
+    else:
         return JsonResponse(ret)
