@@ -7,7 +7,7 @@ Simpla Asset Manager
 
 # 目錄結構
 
-目錄結構分二個部分，[AutoCmdb]()負責資產管理網頁，[client]()負責採集主機硬件資訊到資料庫。
+目錄結構分二個部分，[app](/app)負責資產管理網頁，[client](/client)負責採集主機硬件資訊到資料庫。
 
 # Demo
 
