@@ -54,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.locale.LocaleMiddleware',
 ]
 
-ROOT_URLCONF = 'AutoCmdb.urls'
+ROOT_URLCONF = 'app.urls'
 
 TEMPLATES = [
     {
@@ -72,7 +72,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'AutoCmdb.wsgi.application'
+WSGI_APPLICATION = 'app.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
@@ -164,4 +164,4 @@ CKEDITOR_CONFIGS = {
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 當瀏覽器被關閉的時候將session失效，但是不能刪除數據庫的session數據
 SESSION_SAVE_EVERY_REQUEST = True  # 每次請求都要保存一下session
 
-from .local_settings import *
+# from .local_settings import *
