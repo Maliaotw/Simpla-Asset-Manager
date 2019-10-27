@@ -1,4 +1,4 @@
-CMDB
+Simpla Asset Manager
 ===
 
 # 說明
