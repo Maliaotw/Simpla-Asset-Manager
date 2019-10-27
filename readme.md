@@ -1,4 +1,4 @@
-Simpla Asset Manager
+Simple Asset Manager
 ===
 
 # 說明
