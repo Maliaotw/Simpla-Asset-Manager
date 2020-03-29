@@ -1,0 +1,277 @@
+{% extends 'asset_repair/index.html' %}
+{% load asset_tags %}
+
+
+{% block navbar_left %}
+
+    <li class=""><a href="{% url 'asset' %}">部門資產</a></li>
+    <li class="active"><a href="{% url 'host' %}">IT運維</a></li>
+
+
+{% endblock %}
+
+
+{% block sideber_menu %}
+
+
+    {% url 'host' as host %}
+
+
+    {% url 'host_index' as host_index %}
+    {% url 'host_repair' as host_repair %}
+
+    {% url 'host_input' as host_input %}
+    {% url 'host_output' as host_output %}
+
+    {% url 'location' as location %}
+
+    {% url 'asset' as asset %}
+
+
+    <ul class="nav nav-sidebar">
+
+        <ul class="list-group">
+
+            <a href="{{ host }}"
+               class="list-group-item {% if request.path == host %}active{% endif %}">
+                <span>
+                    <i class="fa fa-box"></i> 運維首頁
+                </span>
+            </a>
+
+            <li class="">
+                <a href="#hostSubmenu" data-toggle="collapse" aria-expanded="false"
+                   class="list-group-item dropdown-toggle collapsed"><span> <i
+                        class="fa fa-box"></i> 主機管理</span><span style="float:right"><i
+                        class="fa fa-angle-right"></i></span></a>
+
+                <ul class="list-unstyled collapse" id="hostSubmenu" style="">
+
+
+                    <li class="list-group-item  {% if request.path == host_index %}active{% endif %}">
+                        <a href={{ host_index }}>主機列表</a>
+                    </li>
+
+
+                    <li class="list-group-item  {% if host_repair in request.path %}active{% endif %}">
+                        <a href="{{ host_repair }}">電腦維修紀錄表</a>
+                    </li>
+
+                    <li class="list-group-item  {% if request.path == host_input %}active{% endif %}">
+                        <a href="{{ host_input }}">匯入</a>
+                    </li>
+
+                    <li class="list-group-item">
+                        <a href="{% url 'host_output' %}" target="_blank">匯出</a>
+                    </li>
+
+                </ul>
+
+            </li>
+
+
+            <a href="{{ location }}"
+               class="list-group-item {% if request.path == location %}active{% endif %}">
+                <span>
+                    <i class="fa fa-box"></i> 位置列表
+                </span>
+            </a>
+
+        </ul>
+
+
+    </ul>
+
+
+{% endblock %}
+
+
+{% block content %}
+
+
+    <ol class="breadcrumb">
+        <li><a href="#">維修記錄表</a></li>
+
+    </ol>
+
+    <div class="panel panel-default" style="padding: 20px">
+
+        <div class="row">
+
+            <div class="col-md-4">
+
+                {% verify_permissions request as admin_dent %}
+                {% if admin_dent %}
+                    <a href="{% url 'asset_repair_add' %}" class="btn btn-primary" role="button">新增維修表</a>
+                {% endif %}
+            </div>
+
+            <!-- 篩選 -->
+            <div class="col-md-8" style="text-align: right">
+
+                <form class="form-inline" method="get">
+
+                    <div class="form-group">
+                        <label for="inputsearch" class="col-form-label">搜尋</label>
+                        <input type="text" class="form-control" name='name' id="search" placeholder=""
+                               value="{{ name }}">
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-form-label">狀態</label>
+                        <select class="selectpicker" name='status' data-width="fit">
+                            <option value="">-------</option>
+
+                            <option value=0>跟進中</option>
+                            <option value=1>已處理</option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success" style="margin-left: 20px">Submit</button>
+                    </div>
+
+                </form>
+            </div>
+
+
+        </div>
+
+        <!--- 資產列表-->
+        <table class="table" id="mytable" style="margin-top: 20px">
+
+            <thead>
+            <tr>
+                <th>排序</th>
+                <th>資產編號</th>
+                <th>標題</th>
+                <th>內文</th>
+                <th>紀錄者</th>
+                <th>狀態</th>
+                <th>建立日期</th>
+                <th>完修時間</th>
+                <th>完修者</th>
+                <th>操作</th>
+
+            </tr>
+            </thead>
+
+
+            <tbody>
+            {% for asset_repair in asset_repair_obj %}
+                <tr>
+                    <td>
+                        {{ forloop.counter }}
+                    </td>
+
+                    <td>
+                        {{ asset_repair.asset_obj.name }}
+                    </td>
+                    <td>
+                        <span> <b>{{ asset_repair.title }}</b> </span>
+                    </td>
+                    <td>
+                        {{ asset_repair.summary|default:'' }}
+                    </td>
+                    <td>
+                        {{ asset_repair.creator|default:"" }}
+                    </td>
+                    <td>
+                        {% if asset_repair.status %}
+                            <span style="color: green">已處理</span>
+                        {% else %}
+                            <span style="color: red">跟進中</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {{ asset_repair.create_date|date:'Y/m/d H:i' }}
+                    </td>
+
+                    <td>
+                        {{ asset_repair.finish_date|date:'Y/m/d H:i' }}
+                    </td>
+
+                    <td>
+                        {{ asset_repair.repairer|default:"" }}
+
+                    </td>
+
+                    <td>
+                        <a href="{% url 'host_repair_detail' asset_repair.id %}">詳細</a>
+
+                        {% verify_permissions request as admin_dent %}
+                        {% if request.user.userprofile == asset_repair.creator or admin_dent %}
+                            <a href="#" style="cursor:pointer" data-id="{{ asset_repair.id }}"
+                               data-name="{{ asset_repair }} {{ asset_repair.title }}"
+                               onclick="record_del(this)"> 刪除</a>
+                            {#                            <a href="{% url 'asset_repair_detail' asset_repair.id %}">刪除</a>#}
+                        {% endif %}
+
+
+                    </td>
+
+
+                </tr>
+            {% endfor %}
+            </tbody>
+
+            <tfoot>
+
+
+            <th colspan="10">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pull-right">
+                        {% get_pageer asset_repair_obj search_field %}
+                    </ul>
+                </nav>
+            </th>
+
+
+            </tfoot>
+        </table>
+
+    </div>
+
+
+
+
+
+    <!--- 刪除維修紀錄 -->
+
+    <div class="modal fade" id="del_Modal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">刪除維修紀錄</h4>
+                </div>
+
+
+                <div class="modal-body">
+                    <p>您確定要刪除<span style="color: red"></span><input type="number" style="display:none;">嗎</p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="del_submit" type="button" class="btn btn-primary">確認</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+
+    {% csrf_token %}
+
+
+
+{% endblock %}
+
+
+
+

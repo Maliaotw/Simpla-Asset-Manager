@@ -1,0 +1,172 @@
+{% extends 'user/base.html' %}
+{% load asset_tags %}
+
+{% block title %}匯入用戶{% endblock %}
+
+{% block head %}
+    <!-- CSS -->
+    <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/bootstrap-select.css">
+
+    <!--  JavaScript -->
+    <script src="/static/js/bootstrap-datepicker.js"></script>
+    <script src="/static/js/bootstrap-datepicker.zh-TW.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="/static/js/bootstrap-select.js"></script>
+
+
+    <link rel="stylesheet" href="/static/css/bootstrap-fileinput.css">
+
+    <script src="/static/js/bootstrap-fileinput.js"></script>
+    <script src="/static/js/bootstrap-fileinput_zh-TW.js"></script>
+
+
+
+    <style>
+
+        .modal-dialog {
+
+            width: 600px;
+            left: 50%;
+            top: 40%;
+            margin-top: -134.5px;
+            margin-left: -250px;
+
+        }
+
+        .modal-body {
+            position: relative;
+            padding: 15px;
+            max-height: 350px;
+            overflow: auto;
+        }
+
+    </style>
+
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+    <ol class="breadcrumb">
+        <li class="active">用戶匯入</li>
+
+    </ol>
+
+
+
+
+    <div class="panel panel-default" style="padding: 20px">
+
+        你可以在這裡下載<a href="/demo/用戶/DEMO_用戶.xlsx">範例檔案</a>, 或是直接上傳檔案進行匯入。
+
+        <input id="input-b2" name="file" type="file" class="file" data-show-preview="false">
+
+        {% csrf_token %}
+    </div>
+
+
+
+    <!--- 新增完成 表單-->
+    <div class="modal fade" id="Modal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title"></h4>
+
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <a href="{% url 'user' %}" class="btn btn-primary" role="button">返回列表</a>
+                    <a href="{% url 'user_input' %}" class="btn btn-success" role="button">繼續上傳</a>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}
+
+
+
+
+
+{% block extra-js %}
+
+    <script>
+
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+
+        $("#input-b2").fileinput({
+            language: "zh-TW",
+            allowedFileExtensions: ["xlsx"],
+            mainClass: "input-group-lg", //文件输入框为大型号
+            uploadUrl: "{% url 'user_input' %}", //上传图片的服务器地址
+            uploadExtraData: {
+                "csrfmiddlewaretoken": csrftoken //帶上CSRF参数
+            },
+
+        });
+
+
+        // 上傳成功
+        $("#input-b2").on('fileuploaded', function (event, data, previewId, index) {
+            //console.log("asset_input fileuploaded");
+            //console.log(data);
+            $('#Modal').modal({backdrop: 'static', keyboard: false});
+            if (data.response.status == 'ok') {
+                console.log("response ok");
+
+                $("#Modal").modal("show");
+                $(".modal-title").text("匯入成功");
+                $(".modal-body").text("你可以繼續上傳或返回列表。");
+            } else {
+
+                $("#Modal").modal("show");
+                $(".modal-title").html("<i class='fa fa-exclamation-triangle'></i>匯入失敗");
+                $(".modal-title").css({'color': 'red'});
+
+                msg = "<p>請再次嘗試上傳或返回列表</p>";
+                msg += "<p><b>錯誤訊息 : </b></p>";
+
+                $.each(data.response.errordict, function (key, data) {
+                    msg += "第 " + key + "筆 錯誤 : ";
+                    msg += "<ul>";
+                    $.each(data, function (key, val) {
+                        msg += "<li>" + val.name + " " + val.content + " " + val.message + "</li>";
+                    });
+                    msg += "</ul>"
+                });
+
+                $(".modal-body").html(msg);
+            }
+
+        })
+        ;
+
+    </script>
+
+{% endblock %}
+
+
+
+
+
+
+

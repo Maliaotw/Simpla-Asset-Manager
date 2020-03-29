@@ -1,0 +1,176 @@
+{% extends 'host/base.html' %}
+{% load asset_tags %}
+
+<!-- 驗證用戶部門  -->
+{% verify_permissions request as admin_dent %}
+
+
+
+{% block title %}維修記錄表{% endblock %}
+
+{% block head %}
+
+
+
+
+{% endblock %}
+
+
+{% block content %}
+
+
+    <ol class="breadcrumb">
+        <li><a href="#">維修記錄表</a></li>
+
+    </ol>
+
+    <div class="panel panel-default" style="padding: 20px">
+
+        <div class="row">
+
+            <div class="col-md-4">
+
+                {% verify_permissions request as admin_dent %}
+                {% if admin_dent %}
+                    <a href="{% url 'asset_add' %}" class="btn btn-primary" role="button">新增維修表</a>
+                {% endif %}
+            </div>
+
+            <!-- 篩選 -->
+            <div class="col-md-8" style="text-align: right">
+
+                <form class="form-inline" method="get">
+
+                    <div class="form-group">
+                        <label for="inputsearch" class="col-form-label">搜尋</label>
+                        <input type="text" class="form-control" name='name' id="search" placeholder=""
+                               value="{{ name }}">
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-form-label">狀態</label>
+                        <select class="selectpicker" name='status' data-width="fit">
+                            <option value="">-------</option>
+
+                            <option value=0>跟進中</option>
+                            <option value=1>已處理</option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success" style="margin-left: 20px">Submit</button>
+                    </div>
+
+                </form>
+            </div>
+
+
+        </div>
+
+        <!--- 資產列表-->
+        <table class="table" id="mytable" style="margin-top: 20px">
+
+            <thead>
+            <tr>
+                <th>排序</th>
+                <th>資產編號</th>
+                <th>標題</th>
+                <th>內文</th>
+                <th>紀錄者</th>
+                <th>狀態</th>
+                <th>建立日期</th>
+                <th>完修時間</th>
+                <th>完修者</th>
+                <th>操作</th>
+
+            </tr>
+            </thead>
+
+
+            <tbody>
+            {% for asset_repair in asset_repair_obj %}
+                <tr>
+                    <td>
+                        {{ forloop.counter }}
+                    </td>
+
+                    <td>
+                        {{ asset_repair.asset_obj.name }}
+                    </td>
+                    <td>
+                        <span> <b>{{ asset_repair.title }}</b> </span>
+                    </td>
+                    <td>
+                        {{ asset_repair.summary|default:'' }}
+                    </td>
+                    <td>
+                        {{ asset_repair.creator|default:"" }}
+                    </td>
+                    <td>
+                        {% if asset_repair.status %}
+                            <span style="color: green">已處理</span>
+                        {% else %}
+                            <span style="color: red">跟進中</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {{ asset_repair.create_date|date:'Y/m/d H:i' }}
+                    </td>
+
+                    <td>
+                        {{ asset_repair.finish_date|date:'Y/m/d H:i' }}
+                    </td>
+
+                    <td>
+                        {{ asset_repair.repairer|default:"" }}
+                    </td>
+
+                    <td>
+                        <a href="{% url 'host_repair_detail' asset_repair.id %}">詳細</a>
+                    </td>
+
+
+                </tr>
+            {% endfor %}
+            </tbody>
+
+            <tfoot>
+
+
+            <th colspan="8">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pull-right">
+                        {% get_pageer asset_repair_obj search_field %}
+                    </ul>
+                </nav>
+
+            </th>
+
+
+            </tfoot>
+        </table>
+
+    </div>
+
+
+
+
+
+{% endblock %}
+
+
+{% block extra-js %}
+
+    <script>
+
+
+    </script>
+
+{% endblock %}
+
+

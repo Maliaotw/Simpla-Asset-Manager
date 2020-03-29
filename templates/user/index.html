@@ -1,0 +1,361 @@
+{% extends 'user/base.html' %}
+{% load asset_tags %}
+
+{% block title %}用戶管理{% endblock %}
+
+
+{% block head %}
+
+    <!-- CSS -->
+    <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/bootstrap-select.css">
+
+    <!--  JavaScript -->
+    <script src="/static/js/bootstrap-datepicker.js"></script>
+    <script src="/static/js/bootstrap-datepicker.zh-TW.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="/static/js/bootstrap-select.js"></script>
+
+{% endblock %}
+
+
+
+{% block content %}
+
+
+    <ol class="breadcrumb">
+        <li><a href="#">用戶管理</a></li>
+
+    </ol>
+
+
+    <div class="panel panel-default" style="padding: 20px">
+
+
+        <div class="row">
+
+            <div class="col-md-4">
+
+                <a class="btn btn-primary" href="{% url 'user_add' %}" role="button"> 新增用戶</a>
+            </div>
+
+
+            <!-- 篩選 -->
+            <div class="col-md-8" style="text-align: right">
+
+
+                <form class="form-inline" method="get">
+
+
+                    <div class="form-group" style="display: none">
+                        <input type="text" class="form-control" name='contacts' id="search" placeholder=""
+                               value="{{ contacts }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputsearch" class="col-form-label">搜尋</label>
+                        <input type="" class="form-control" name='name' id="search" placeholder="" value="{{ name }}">
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-form-label">性別</label>
+                        <select class="selectpicker" name='sex' data-width="fit">
+                            <option value="">-------</option>
+                            {% for sex in sex_obj %}
+                                <option value="{{ sex.0 }}">{{ sex.1 }}</option>
+                            {% endfor %}
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-form-label">部門</label>
+                        <select class="selectpicker" name="dent_id" data-width="fit">
+                            <option value="">-------</option>
+                            {% for department in dent_obj %}
+                                <option value="{{ department.id }}">{{ department.name }}部({{ department.code }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success" style="margin-left: 20px">Submit</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table" id="mytable" style="margin-top: 20px">
+                <thead>
+                <tr>
+                    <th>排序</th>
+                    <th>編號</th>
+                    <th>名稱</th>
+                    <th>英文名</th>
+                    <th>性別</th>
+                    <th>部門</th>
+                    <th>操作</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                {% for user in user_obj %}
+
+                    <tr>
+                        <td>
+                            {% pagenumber forloop.counter contacts page %}
+
+                        </td>
+                        <td>{{ user.code }}</td>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.user.username }}</td>
+                        <td>{{ user.sex }}</td>
+                        <td>{{ user.dent }}</td>
+                        <td>
+                            <a href="{% url 'user_edit' user.id %}"><i class="fas fa-pen"></i></a>
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+
+                <tfoot>
+                <th colspan="7">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination pull-left">
+                            共{{ paginator.count }}筆
+                            <label style="padding-left: 20px">顯示</label>
+                            <select class="selectpicker" name='contacts' data-width="fit" id='contacts'>
+                                <option value=10>10</option>
+                                <option value=20>20</option>
+                                <option value=50>50</option>
+                                <option value=100>100</option>
+                            </select>筆
+                        </ul>
+                        <ul class="pagination pull-right">
+                            {% get_pageer user_obj search_field %}
+                        </ul>
+                    </nav>
+                </th>
+                </tfoot>
+
+            </table>
+        </div>
+    </div>
+
+
+    <!--- 新增用戶表單-->
+    <div class="modal fade" id="userform_add_Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+
+                    <h4 class="modal-title" id="myModalLabel">新增用戶</h4>
+
+                </div>
+                <div class="modal-body">
+
+
+                    <!-- 錯誤提示-->
+                    <div class="alert alert-danger">
+                        <strong></strong>
+                    </div>
+
+
+                    <form method="post" id="userform_add">
+                        {% csrf_token %}
+
+                        {% for form in form_obj %}
+                            <div class="form-group has-feedback">
+                                <label for="">{{ form.label }}</label>
+                                {{ form }}
+                                <span class="glyphicon form-control-feedback"></span>
+                            </div>
+                        {% endfor %}
+
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="userform_submit" type="button" class="btn btn-primary">新增</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+
+
+
+{% block extra-js %}
+
+    <script>
+
+
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        $(document).ready(function () {
+            console.log('{{ sex }}');
+            $(".selectpicker[name='sex']").selectpicker('val', '{{ sex }}');
+            $(".selectpicker[name='dent_id']").selectpicker('val', {{ dent_id }});
+
+            $(".selectpicker[name='contacts']").selectpicker('val', {{ contacts }});
+
+            contacts.onchange = function () {
+                //console.log(this)
+                //console.log($(this).val())
+                location.href = location.origin + location.pathname + "?contacts=" + $(this).val() + ""
+            };
+
+
+        });
+
+
+        // 初始 新增用戶表單
+        $('#userform_add_Modal').on('show.bs.modal', function (e) {
+
+            $("#userform_add").trigger('reset');
+            $("#userform_add_Modal .alert-danger").hide();
+            $("#userform_add_Modal [name='code']").attr("disabled", "disabled");
+
+
+            $("#userform_add").find(".form-group").removeClass("has-error");
+            $("#userform_add .form-group span").removeClass("glyphicon-remove");
+
+
+        });
+
+
+        // 選擇部門後請求該用戶編號
+        function get_user_number(e) {
+            console.log(e.value);
+
+            $.ajax({
+                url: "/api/add_user_number",
+                type: "GET",
+                data: {'id': e.value},
+
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback.status == 'ok') {
+                        $("#userform_add [name='code']").val(callback.data);
+                        $("#userform_add [name='code']").removeAttr("disabled");
+                    } else {
+                        console.log("請求錯誤");
+                        $("#userform_add [name='code']").val("");
+                        $("#userform_add [name='code']").attr("disabled", "disabled");
+                    }
+
+
+                },
+                error: function () {
+                    console.log("請求錯誤");
+                    $("#userform_add [name='code']").val("");
+                    $("#userform_add [name='code']").attr("disabled", "disabled");
+                }
+            });
+        };
+
+
+        // 提交 新增資產表單
+        $("#userform_add").on("submit", function (e) {
+
+
+            var postData = $(this).serializeArray();
+            console.log(postData);
+
+            $.ajax({
+                url: "",
+                type: "POST",
+                data: postData,
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback.status == 'ok') {
+                        $("#userform_add_Modal .alert-danger strong").text("");
+                        $('#userform_add_Modal').modal('hide');
+                        location.reload();
+
+                    } else {
+                        $("#userform_add_Modal .alert-danger").show();
+                        $("#userform_add_Modal .alert-danger strong").text(callback.msg);
+
+                        console.log(callback.errors_fields);
+                        console.log(callback.success_fields);
+
+                        $.each(callback.errors_fields, function (i, val) {
+
+                            input_tag = $("#userform_add [name='" + val + "']");
+
+                            div_tag = input_tag.closest("div");
+                            div_tag.removeClass("has-success").addClass("has-error");
+                            div_tag.find("span").removeClass("glyphicon-ok").addClass("glyphicon-remove");
+
+
+                        });
+
+                        $.each(callback.success_fields, function (i, val) {
+
+                            input_tag = $("#userform_add [name='" + val + "']");
+                            div_tag = input_tag.closest("div");
+                            div_tag.removeClass("has-error").addClass("has-success");
+                            div_tag.find("span").removeClass("glyphicon-remove").addClass("glyphicon-ok");
+
+                        });
+
+
+                    }
+
+                },
+                error: function () {
+
+                }
+            });
+            e.preventDefault();
+        });
+
+
+        $("#userform_submit").on('click', function () {
+
+            $("#userform_add").submit();
+
+        });
+
+
+        //編輯 EditData : Change icon
+        $("#mytable").on('click', ".fa-pen", function (ele) {
+            console.log('edit');
+        });
+
+
+    </script>
+
+{% endblock %}
+
+

@@ -1,0 +1,722 @@
+{% extends 'asset/base.html' %}
+{% load asset_tags %}
+
+<!-- 驗證用戶部門  -->
+
+
+
+
+{% block title %}資產管理{% endblock %}
+
+{% block head %}
+    <!-- CSS -->
+    <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
+
+
+    <!--  JavaScript -->
+    <script src="/static/js/bootstrap-datepicker.js"></script>
+    <script src="/static/js/bootstrap-datepicker.zh-TW.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <link rel="stylesheet" href="/static/css/bootstrap-select.css">
+    <script src="/static/js/bootstrap-select.js"></script>
+
+
+{% endblock %}
+
+
+{% block content %}
+
+    <ol class="breadcrumb">
+        <li><a href="#">資產列表</a></li>
+
+    </ol>
+
+
+    <div class="panel panel-default" style="padding: 20px">
+
+        <div class="row">
+
+            <div class="col-md-4">
+                {% verify_permissions request as admin_dent %}
+                {% if admin_dent %}
+                    <a href="{% url 'asset_add' %}" class="btn btn-primary" role="button">新增資產</a>
+                {% endif %}
+            </div>
+
+            <!-- 篩選 -->
+            <div class="col-md-8" style="text-align: right">
+
+                <form class="form-inline" method="get">
+
+
+                    <div class="form-group" style="display: none">
+                        <input type="text" class="form-control" name='contacts' id="search" placeholder=""
+                               value="{{ contacts }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputsearch" class="col-form-label">搜尋</label>
+                        <input type="text" class="form-control" name='name' id="search" placeholder=""
+                               value="{{ name }}">
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-form-label">類型</label>
+                        <select class="selectpicker" name='cate_id' data-width="fit">
+                            <option value="">-------</option>
+                            {% for category in category_obj %}
+                                <option value="{{ category.id }}">{{ category.name }}({{ category.code }})</option>
+                            {% endfor %}
+                        </select>
+
+                    </div>
+
+
+                    {% if admin_dent %}
+
+                        <div class="form-group">
+                            <label class="col-form-label">部門</label>
+                            <select class="selectpicker" name="dent_id" data-width="fit">
+                                <option value="">-------</option>
+                                {% for department in department_obj %}
+                                    <option value="{{ department.id }}">{{ department.name }}部({{ department.code }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                    {% endif %}
+
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success" style="margin-left: 20px">Submit</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+
+        <!--- 資產列表-->
+        <table class="table" id="mytable" style="margin-top: 20px">
+            <thead>
+            <tr>
+                <th>排序</th>
+                <th>資產編號</th>
+                <th>類型</th>
+                <th>部門</th>
+                <th>負責人</th>
+                {% if admin_dent %}
+                    <th>購買日期</th>
+                    <th>價格</th>
+                {% endif %}
+                <th>狀態</th>
+                <th>操作</th>
+
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for asset in asset_obj %}
+
+                <tr>
+                    <td>
+                        {% pagenumber forloop.counter contacts page %}
+
+                    </td>
+
+                    <td name="id" style="display: none">
+                        <input type="text" class="form-control" value="{{ asset.id }}"/>
+                    </td>
+
+
+                    <td name="name">
+                        <span class="form-control-static">
+                            {{ asset.name }}
+                        </span>
+                    </td>
+
+
+                    <td name="category">
+
+                        <span class="form-control-static">
+                            {{ asset.category }}
+                        </span>
+                        <select class="form-control" style="display: none">
+
+                            {% for category in category_obj %}
+                                {% if asset.category  ==  category %}
+                                    <option selected
+                                            value="{{ category.id }}">{{ category.name }}({{ category.code }})
+                                    </option>
+                                {% else %}
+                                    <option value="{{ category.id }}">{{ category.name }}({{ category.code }})</option>
+                                {% endif %}
+
+                            {% endfor %}
+                        </select>
+                    </td>
+
+
+                    <td name="department">
+                        <span class="form-control-static">
+                            {{ asset.department|default:"" }}
+                        </span>
+
+                        <select class="form-control" onchange="put_dent_user(this)" style="display: none">
+
+                            {% for department in department_obj %}
+                                {% if  asset.department  ==  department %}
+                                    <option selected
+                                            value="{{ department.id }}">{{ department.name }}部({{ department.code }})
+                                    </option>
+                                {% else %}
+                                    <option value="{{ department.id }}">{{ department.name }}部({{ department.code }})</option>
+                                {% endif %}
+
+                            {% endfor %}
+                        </select>
+                    </td>
+
+
+                    <td name="manager">
+                        <span class="form-control-static">
+                            {{ asset.manager|default:"" }}
+                        </span>
+
+                        <select id='user_put' class="form-control" style="display: none">
+                            <option value="">------</option>
+                            {% get_dent_user_column asset request %}
+                        </select>
+
+
+                    </td>
+
+                    {% if admin_dent %}
+                        <td name="purchase_date" id="datebox">
+                            <span class="form-control-static">{{ asset.purchase_date|date:"Y-m-d" }}</span>
+                            <input type="text" class="form-control match-content" style="display:none;">
+
+                        </td>
+                        <td name="price">
+                        <span class="form-control-static">
+                            {{ asset.price|default:"" }}
+                        </span>
+                            <input type='number' class='form-control match-content' value="" style="display: none">
+                        </td>
+                    {% endif %}
+
+                    <td name="status">
+                        {{ asset.get_status_display }}
+                    </td>
+
+                    <td>
+                        <a href="{% url 'asset_edit' asset.id %}"><i class="fas fa-pen"></i></a>
+                        <a href="#"><i class="fas fa-trash-alt"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+
+
+            <tfoot>
+            <th colspan="9">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pull-left">
+                        共{{ paginator.count }}筆
+                        <label style="padding-left: 20px">顯示</label>
+                        <select class="selectpicker" name='contacts' data-width="fit" id='contacts'>
+                            <option value=10>10</option>
+                            <option value=20>20</option>
+                            <option value=50>50</option>
+                            <option value=100>100</option>
+                        </select>筆
+                    </ul>
+
+
+                    <ul class="pagination pull-right">
+                        {% get_pageer asset_obj search_field %}
+                    </ul>
+                </nav>
+
+            </th>
+
+            </tfoot>
+
+        </table>
+
+    </div>
+
+
+
+
+    <!--- 新增資產表單-->
+    <div class="modal fade" id="assetform_add_Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+
+                    <h4 class="modal-title" id="myModalLabel">新增資產</h4>
+                </div>
+                <div class="modal-body">
+
+
+                    <!-- 錯誤提示-->
+                    <div class="alert alert-danger">
+                        <strong></strong>
+                    </div>
+
+
+                    <form method="post" id="assetform_add">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="">類型</label>
+                            <select name="category" onchange="get_category(this)" class="form-control">
+                                <option value="">-------</option>
+                                {% for category in category_obj %}
+                                    <option
+                                            value="{{ category.id }}">{{ category.name }}({{ category.code }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="">資產編號</label>
+                            <input type="text" name="name" class="form-control" placeholder="">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-form-label">部門</label>
+                            <select name="department" onchange="add_assetform_user(this)" class="form-control">
+                                <option value="">-------</option>
+                                {% for department in department_obj %}
+                                    <option name="department"
+                                            value="{{ department.id }}">{{ department.name }}部({{ department.code }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-form-label">資產負責人</label>
+                            <select id='user_add' name="manager" class="form-control">
+                                <option value="">-------</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-form-label">價格</label>
+                            <input name="price" type="number" class="form-control">
+                        </div>
+
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="assetform_submit" type="button" class="btn btn-primary">新增</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <!--- 刪除資產表單 -->
+    <div class="modal fade" id="form_del_Modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">刪除資產</h4>
+                </div>
+                <div class="modal-body">
+                    <p>您確定要刪除<span style="color: red"></span><input type="number" style="display:none;">嗎</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="form_del_submit" type="button" class="btn btn-primary">確認</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+    {% csrf_token %}
+
+{% endblock %}
+
+
+{% block extra-js %}
+
+    <script>
+
+
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        var contacts = document.getElementById('contacts');
+        $(document).ready(function () {
+            //$('.dropdown-toggle').dropdown();
+            $('#datebox input').datepicker(
+                {
+                    language: 'zh-TW',
+                    format: "yyyy-mm-dd",
+                    todayHighlight: true,
+
+                });
+
+            $(".selectpicker[name='cate_id']").selectpicker('val', {{ cate_id }});
+            $(".selectpicker[name='dent_id']").selectpicker('val', {{ dent_id }});
+            $(".selectpicker[name='contacts']").selectpicker('val', {{ contacts }});
+
+            contacts.onchange = function () {
+                console.log(this)
+                console.log($(this).val())
+                location.href = location.origin + location.pathname + "?contacts=" + $(this).val() + ""
+            };
+
+        })
+        ;
+
+        $('#myModal').on('hidden.bs.modal', function (e) {
+            // do something...
+
+        });
+
+        // 初始 新增資產表單
+        $('#assetform_add_Modal').on('show.bs.modal', function (e) {
+
+            $("#assetform_add").trigger('reset');
+            $("#assetform_add_Modal .alert-danger").hide();
+            $("#assetform_add_Modal #user_add").attr("disabled", "disabled");
+
+        });
+
+
+        // 選擇類型後請求該分類數量
+        function get_category(e) {
+            //console.log(e);
+            //console.log($(this));
+            //console.log(e.value);
+
+            $.ajax({
+                url: "/api/category",
+                type: "GET",
+                data: {'cate': e.value},
+
+                success: function (callback) {
+                    //console.log(callback);
+                    $('#assetform_add_Modal').find("[name='sn']").val(callback.number)
+                },
+                error: function () {
+                }
+            });
+        };
+
+        // 選擇部門後請求關聯使用資料
+        function get_dent_user(e) {
+            //console.log(e);
+            //console.log($(this));
+            //console.log(e.value);
+
+            $.ajax({
+                url: "/api/dent_user",
+                type: "GET",
+                data: {'dent': e.value},
+                async: false,
+
+                success: function (callback) {
+                    window.dent_user = {
+                        'status': 'ok',
+                        'data': callback
+                    };
+                    console.log(window.dent_user);
+                },
+                error: function () {
+
+                }
+            });
+        };
+
+        // 新增資產 關聯用戶
+        function add_assetform_user(e) {
+            get_dent_user(e);
+            dent_user = window.dent_user;
+            //console.log(dent_user);
+            if (dent_user.status == 'ok') {
+                // 解開#user_add select選項 disabled
+                $("#assetform_add_Modal #user_add").removeAttr("disabled");
+
+                console.log('add_assetform_user');
+                document.getElementById("user_add").options.length = 1;
+                users = dent_user.data.users;
+                owner = dent_user.data.owner;
+                $.each(users, function (i, item) {
+                        //console.log(item);
+                        //console.log(item.code);
+                        //console.log(owner.code);
+
+                        if (item.code == owner.code) {
+                            //console.log(item.code);
+                            //console.log(owner.code);
+
+                            $('#user_add').append($('<option>', {
+                                value: item.id,
+                                text: item.user + "(" + item.code + ")",
+                                selected: true,
+                            }));
+                        } else {
+
+                            $('#user_add').append($('<option>', {
+                                value: item.id,
+                                text: item.user + "(" + item.code + ")"
+                            }));
+                        }
+                    }
+                );
+            }
+
+        }
+
+
+        // 選擇類型後請求該分類數量
+        function put_dent_user(ele) {
+            get_dent_user(ele);
+            dent_user = window.dent_user;
+
+            // 跳到上上層tr
+            tr = $(ele).closest("tr");
+
+            // 先找td name='manager' 再找 select id='user_put'
+            user_put = tr.find('[name="manager"]').find("select");
+
+            // 對 user_put append
+            if (dent_user.status == 'ok') {
+                user_put.prop('options').length = 1;
+                users = dent_user.data.users;
+                owner = dent_user.data.owner;
+                $.each(users, function (i, item) {
+                        //console.log(item);
+                        //console.log(item.code);
+                        //console.log(owner.code);
+
+                        if (item.code == owner.code) {
+                            //console.log(item.code);
+                            //console.log(owner.code);
+
+                            user_put.append($('<option>', {
+                                value: item.id,
+                                text: item.user + "(" + item.code + ")",
+                                selected: true,
+                            }));
+                        } else {
+
+                            user_put.append($('<option>', {
+                                value: item.id,
+                                text: item.user + "(" + item.code + ")"
+                            }));
+                        }
+                    }
+                );
+
+
+            }
+        };
+
+
+        // 提交 新增資產表單
+        $("#assetform_add").on("submit", function (e) {
+            //console.log(e);
+            //console.log($(this));
+            var postData = $(this).serializeArray();
+            console.log(postData);
+
+            $.ajax({
+                url: "",
+                type: "POST",
+                data: postData,
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback.status == 'ok') {
+
+                        $("#assetform_add_Modal .alert-danger strong").text("");
+                        $('#assetform_add_Modal').modal('hide');
+
+                    } else {
+
+                        $("#assetform_add_Modal .alert-danger").show();
+                        $("#assetform_add_Modal .alert-danger strong").text(callback.msg);
+
+                    }
+
+                },
+                error: function () {
+
+                }
+            });
+            e.preventDefault();
+        });
+
+        $("#assetform_submit").on('click', function () {
+
+            $("#assetform_add").submit();
+
+        });
+
+
+        //SaveData : PUT
+        $("#mytable").on('click', ".fa-file", function (ele) {
+            console.log('save');
+
+            tr = $(this).closest('tr');
+            //console.log(tr);
+            tds = $(this).parent().prevAll();
+            //console.log(tr);
+
+            id = tr.find('[name="id"]').find("input").val();
+            sn = tr.find('[name="sn"]').find("input").val();
+            category = tr.find('[name="category"]').find("select").val();
+            department = tr.find('[name="department"]').find("select").val();
+            manager = tr.find('[name="manager"]').find("select").val();
+            price = tr.find('[name="price"]').find("input").val();
+            purchase_date = tr.find('[name="purchase_date"]').find("input").val();
+
+            data = {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                id: id,
+                sn: sn,
+                category: category,
+                department: department,
+                manager: manager,
+                price: price,
+                purchase_date: purchase_date
+            };
+
+            //console.log(data);
+
+            $.ajax({
+                headers: {
+                    'X-HTTP-Method-Override': 'PATCH'
+                },
+                url: "",
+                data: data,
+                type: 'PUT',
+                async: false,
+                success: function (callback) {
+                    //console.log(callback);
+
+                    if (callback.status == 'ok') {
+                        put_status = true
+                    } else {
+                        put_status = false
+                    }
+
+                },
+                error: function () {
+                    put_status = false
+
+                }
+
+            });
+
+            if (put_status) {
+                $(this).attr('data-icon', 'pen');
+                $.each(tds, function (i, ele) {
+
+                    var span_tag = $(this).find("span");
+                    var input_tag = $(this).find("input");
+                    var select_tag = $(this).find('select');
+
+
+                    select_list = ['department', 'manager'];
+                    input_list = ['price', 'purchase_date'];
+
+                    n = $(this).attr("name");
+
+                    if (select_list.includes(n)) {
+
+                        //console.log(select_tag);
+                        selected_text = $.trim(select_tag.find(":selected").text());
+                        console.log(selected_text);
+                        span_tag.text(selected_text);
+                        select_tag.hide();
+                        span_tag.show();
+                    }
+
+                    if (input_list.includes(n)) {
+                        span_tag.show();
+                        span_tag.text($.trim(input_tag.val()));
+                        input_tag.hide()
+
+                    }
+                })
+            }
+
+        });
+
+
+        // 刪除 DelData : Del icon
+        $("#mytable").on('click', ".fa-trash-alt", function (ele) {
+
+            console.log('del');
+            tr = $(this).closest("tr");
+            var id = $.trim(tr.find("[name='id'] input").val());
+            var name = $.trim(tr.find("[name='name']").text());
+            //console.log($.trim(id),$.trim(name));
+
+            $('#form_del_Modal .modal-body').find('span').text(name);
+            $('#form_del_Modal .modal-body').find('input').val(id);
+            $('#form_del_Modal').modal('show');
+        });
+
+        // 提交刪除
+        $("#form_del_submit").on('click', function (event) {
+
+            var name = $('#form_del_Modal .modal-body').find('span').text();
+            var id = $('#form_del_Modal .modal-body').find('input').val();
+
+            console.log(name, id);
+            data = {id: id};
+
+            $.ajax({
+                url: '{% url 'asset_index' %}',
+                data: data,
+                type: 'DELETE',
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback.status == 'ok') {
+                        tr.remove();
+                        $('#form_del_Modal').modal('hide');
+                    }
+                }
+            });
+
+        });
+
+    </script>
+
+{% endblock %}
+
+

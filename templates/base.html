@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{% load static %}
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+
+    <title>{% block title %}SAM{% endblock %}</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/dashboard.css" rel="stylesheet">
+    {#    <link href="/static/css/all.css" rel="stylesheet">#}
+    <link href="/static/css/font-awesome.min.css" rel="stylesheet">
+
+
+    <!-- Bootstrap core JavaScript
+================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/static/js/jquery-3.3.1.js"></script>
+    <script src="/static/js/bootstrap.js"></script>
+    <script src="/static/js/all.js"></script>
+
+
+    <link href="/static/css/custom.css" rel="stylesheet">
+
+
+    <link rel="stylesheet" href="{% static 'plugins/sweetalert/css/sweetalert.css' %}">
+    <script src="{% static 'plugins/sweetalert/js/sweetalert.min.js' %}"></script>
+
+    <link rel="stylesheet" href="{% static 'plugins/toastr/css/toastr.min.css' %}">
+    <script src="{% static "plugins/toastr/js/toastr.min.js" %}"></script>
+
+
+    <link rel="stylesheet" type="text/css" href="{% static 'plugins/DataTables/datatables.css' %}"/>
+    <script type="text/javascript" src="{% static 'plugins/DataTables/datatables.min.js' %}"></script>
+
+
+    <style>
+        .list-group-item.active > a {
+
+            color: white;
+        }
+    </style>
+
+    {% block head %}
+    {% endblock %}
+
+
+</head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+
+
+    <div class="container-fluid">
+
+
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#"><span style="color: white">CMDB</span></a>
+        </div>
+
+
+        <div id="navbar" class="navbar-collapse collapse">
+
+            <ul class="nav navbar-nav navbar-lfet">
+
+                {% block navbar_left %}
+
+                    <li class=""><a href="{% url 'asset' %}">部門資產</a></li>
+                    <li><a href="{% url 'host' %}">IT運維</a></li>
+
+                {% endblock %}
+
+            </ul>
+
+
+            <ul class="nav navbar-nav navbar-right">
+                <!--<li><a href="#"><i class="far fa-bell"></i></a>-->
+                <!--<li><a href="#"><i class="far fa-envelope"></i></a>-->
+
+                <!-- 取消訪客判斷與span顯示
+                <li>
+                    {% if request.user == 'AnonymousUser' %}
+                        <a href="#">
+                    {% else %}
+
+                        <a href="#"><span style="color: #ffffff">{{ request.user }}</span>
+                    {% endif %}
+
+                    <i class="far fa-user"></i></a>
+                </li>
+
+                -->
+
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"><span
+                            style="color: #ffffff">{{ request.user.userprofile.dent.name }}部 {{ request.user }}</span>
+                        <i
+                                class="far fa-user"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'userprofile' %}">個人中心</a></li>
+                        <li><a href="{% url 'logout' %}">登出</a></li>
+                    </ul>
+                </li>
+
+            </ul>
+
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-2 col-md-2 col-lg-2 sidebar bg-info">
+
+            {% block sideber_menu %}
+
+                <ul class="nav nav-sidebar">
+
+                    <li><i class="fas fa-bell"></i></li>
+                    <li><a href="#">Reports</a></li>
+                    <li><a href="#">Analytics</a></li>
+                    <li><a href="#">Export</a></li>
+                </ul>
+
+
+            {% endblock %}
+        </div>
+
+
+        <div class="col-sm-10 col-sm-offset-2 col-md-10 col-lg-10 col-md-offset-2 main">
+
+            {% block content %}
+                <h1 class="page-header">Dashboard</h1>
+
+                <h2 class="sub-header">Section title</h2>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Header</th>
+                            <th>Header</th>
+                            <th>Header</th>
+                            <th>Header</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>1,001</td>
+                            <td>Lorem</td>
+                            <td>ipsum</td>
+                            <td>dolor</td>
+                            <td>sit</td>
+                        </tr>
+                        <tr>
+                            <td>1,002</td>
+                            <td>amet</td>
+                            <td>consectetur</td>
+                            <td>adipiscing</td>
+                            <td>elit</td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            {% endblock %}
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    {% url 'host' as host %}
+    {% if host in request.path %}
+        $('#hostSubmenu').collapse();
+    {% endif %}
+
+
+    {% url 'asset' as asset %}
+    {% if asset in request.path %}
+        $('#assetSubmenu').collapse();
+    {% endif %}
+
+    {% url 'user' as user %}
+    {% if user in request.path %}
+        $('#userSubmenu').collapse();
+    {% endif %}
+
+
+    {% url 'category' as category %}
+    {% if category in request.path %}
+        $('#categorySubmenu').collapse();
+    {% endif %}
+
+    {% url 'department' as department %}
+    {% if department in request.path %}
+        $('#dentSubmenu').collapse();
+    {% endif %}
+
+
+    {% url 'busunit' as busunit %}
+    {% if busunit in request.path %}
+        $("#busunitSubmenu").collapse();
+    {% endif %}
+
+
+    {% url 'news' as news %}
+    {% if news in request.path %}
+        $("#newsSubmenu").collapse();
+    {% endif %}
+
+</script>
+
+
+
+
+
+{% block base-js %}
+
+{% endblock %}
+
+
+{% block extra-js %}
+
+{% endblock %}
+
+
+</body>
+</html>

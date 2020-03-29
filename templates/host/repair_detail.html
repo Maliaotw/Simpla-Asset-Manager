@@ -1,0 +1,96 @@
+
+
+{% extends 'asset_repair/detail.html' %}
+
+
+{% block sideber_menu %}
+
+
+    {% url 'host' as host %}
+
+
+    {% url 'host_index' as host_index %}
+    {% url 'host_repair' as host_repair %}
+
+    {% url 'host_input' as host_input %}
+    {% url 'host_output' as host_output %}
+
+    {% url 'location' as location %}
+
+    {% url 'asset' as asset %}
+
+
+
+
+
+    <ul class="nav nav-sidebar">
+
+        <ul class="list-group">
+
+            <a href="{{ host }}"
+               class="list-group-item {% if request.path == host %}active{% endif %}">
+                <span>
+                    <i class="fa fa-box"></i> 運維首頁
+                </span>
+            </a>
+
+            <li class="">
+                <a href="#hostSubmenu" data-toggle="collapse" aria-expanded="false"
+                   class="list-group-item dropdown-toggle collapsed"><span> <i
+                        class="fa fa-box"></i> 主機管理</span><span style="float:right"><i
+                        class="fa fa-angle-right"></i></span></a>
+
+                <ul class="list-unstyled collapse" id="hostSubmenu" style="">
+
+
+                    <li class="list-group-item  {% if request.path == host_index %}active{% endif %}">
+                        <a href={{ host_index }}>主機列表</a>
+                    </li>
+
+
+                    <li class="list-group-item  {% if host_repair in request.path %}active{% endif %}">
+                        <a href="{{ host_repair }}">電腦維修紀錄表</a>
+                    </li>
+
+                    <li class="list-group-item  {% if request.path == host_input %}active{% endif %}">
+                        <a href="{{ host_input }}">匯入</a>
+                    </li>
+
+                    <li class="list-group-item">
+                        <a href="{% url 'host_output' %}" target="_blank">匯出</a>
+                    </li>
+
+                </ul>
+
+            </li>
+
+
+            <a href="{{ location }}"
+               class="list-group-item {% if request.path == location %}active{% endif %}">
+                <span>
+                    <i class="fa fa-box"></i> 位置列表
+                </span>
+            </a>
+
+        </ul>
+
+
+    </ul>
+
+
+{% endblock %}
+
+
+
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li>
+            <a href="{% url 'host_repair' %}">電腦維修表</a>
+        </li>
+        <li class="active">{{ asset_repair_obj.asset_obj.name }} {{ asset_repair_obj.title }}</li>
+
+    </ol>
+{% endblock %}
+
+

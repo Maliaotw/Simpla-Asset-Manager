@@ -1,0 +1,380 @@
+{% extends 'host/base.html' %}
+
+{% block title %}位置管理{% endblock %}
+
+
+
+
+{% block content %}
+
+    <ol class="breadcrumb">
+        <li><a href="#">位置</a></li>
+    </ol>
+
+
+    <div class="panel panel-default" style="padding: 20px">
+
+        <div class="row">
+
+            <div class="col-md-4">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#localform_add_Modal">
+                    新增位置
+                </button>
+            </div>
+        </div>
+
+        <div class="alert alert-danger" style="margin-top: 20px;display: none">
+            <strong></strong>
+        </div>
+
+
+        <div class="table-responsive">
+            <table class="table" id="mytable" style="margin-top: 20px">
+                <thead>
+                <tr>
+                    <th>排序</th>
+                    <th>名稱</th>
+                    <th>操作</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                {% for local in local_obj %}
+
+
+                    <tr>
+                        <td>
+                            {{ forloop.counter }}
+                        </td>
+
+                        <td name="id" style="display: none">
+
+
+                            <input type="text" class='form-control match-content' value="{{ local.id }}">
+
+                        </td>
+
+                        <td name="name">
+                            <span>
+                            {{ local.name }}
+                            </span>
+                            <input type="text" class='form-control match-content' value="{{ local.name }}"
+                                   style="display: none">
+                        </td>
+
+
+                        <td>
+                            <i class="fas fa-pen"></i>
+                            <i class="fas fa-trash-alt"></i>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+
+                <!-- 分頁 -->
+
+                <tfoot>
+                <th colspan="3">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination pull-right">
+                            {#                            {% get_pageer cary_obj search_field %}#}
+                        </ul>
+                    </nav>
+
+                </th>
+                </tfoot>
+
+
+            </table>
+        </div>
+    </div>
+
+
+
+    <!--- 新增位置表單 --->
+    <div class="modal fade" id="localform_add_Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+
+                    <h4 class="modal-title" id="myModalLabel">新增位置</h4>
+                </div>
+                <div class="modal-body">
+                    <!-- 錯誤提示-->
+                    <div style="display: none" class="alert alert-danger">
+                        <strong></strong>
+                    </div>
+                    <form method="post" id="localform_add">
+                        {% csrf_token %}
+
+                        <div class="form-group">
+                            <label class="col-form-label">名稱</label>
+                            <input type="text" name="name" class="form-control" placeholder="">
+                        </div>
+
+
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="localform_add_submit" type="button" class="btn btn-primary">新增</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!--- 刪除類型表單 --->
+
+    <div class="modal fade" id="localform_del_Modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">刪除位置</h4>
+                </div>
+                <div class="modal-body">
+                    <p>您確定要刪除<span style="color: red"></span><input type="number" style="display:none;">嗎</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="localform_del_submit" type="button" class="btn btn-primary">確認</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+{% endblock %}
+
+{% block extra-js %}
+
+    <script>
+
+
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        // 初始 新增類型表單
+        $('#localform_add_Modal').on('show.bs.modal', function (event) {
+
+            $("#localform_add_Modal .alert-danger").hide();
+
+
+        });
+
+        // 確認 新增類型表單
+        $("#localform_add_submit").on('click', function () {
+
+            $("#localform_add").submit();
+
+        });
+
+        // 提交 新增類型表單
+        $("#localform_add").on("submit", function (e) {
+            //console.log(e);
+            //console.log($(this));
+            var postData = $(this).serializeArray();
+            console.log(postData);
+
+            $.ajax({
+                url: "",
+                type: "POST",
+                data: postData,
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback.status == 'ok') {
+
+                        $('#localform_add_Modal').modal('hide');
+                        location.reload();
+
+                    } else {
+                        //請輸入資料
+                        $("#localform_add_Modal .alert-danger").show();
+                        $("#localform_add_Modal .alert-danger strong").text(callback.msg);
+
+
+                    }
+
+
+                },
+                error: function () {
+
+                }
+            });
+            e.preventDefault();
+        });
+
+
+        //編輯 EditData : Change icon
+        $("#mytable").on('click', ".fa-pen", function (ele) {
+            console.log('edit');
+            $(this).attr('data-icon', 'file');
+            tds = $(this).parent().prevAll();
+            tr = $(this).closest("tr");
+            var obj_id = tr.find("[name='id']").text();
+            //console.log(obj_id);
+
+            $.each(tds, function (i, ele) {
+                var span_tag = $(this).find("span");
+                var input_tag = $(this).find("input");
+
+                select_list = [];
+                input_list = ['name'];
+
+
+                n = $(this).attr("name");
+
+                if (select_list.includes(n)) {
+
+                    //console.log(n);
+                    span_tag.hide();
+                    $(this).find('select').show();
+
+                }
+
+
+                if (input_list.includes(n)) {
+                    span_tag.hide();
+                    //console.log(span_tag);
+                    input_tag.val($.trim(span_tag.text()));
+                    input_tag.show()
+                }
+
+            });
+
+        });
+
+        //SaveData : PUT
+        $("#mytable").on('click', ".fa-file", function (ele) {
+            console.log('save');
+
+            tr = $(this).closest('tr');
+            //console.log(tr);
+            tds = $(this).parent().prevAll();
+            //console.log(tr);
+
+            var id = tr.find('[name="id"]').find("input").val();
+            var name = tr.find('[name="name"]').find("input").val();
+
+            data = {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                id: id,
+                name: name,
+            };
+
+            console.log(data);
+
+            $.ajax({
+
+                url: "",
+                data: data,
+                type: 'PUT',
+                async: false,
+                success: function (callback) {
+                    //console.log(callback);
+
+                    if (callback.status == 'ok') {
+                        put_status = true;
+                        put_msg = callback.msg;
+
+                    } else {
+                        put_status = false;
+                        put_msg = callback.msg;
+                    }
+
+                },
+                error: function () {
+                    put_status = false;
+                    put_msg = callback.msg;
+
+                }
+
+            });
+
+            if (put_status) {
+                // 修改完成
+                $(this).attr('data-icon', 'pen');
+                $(".panel-default .alert-danger strong").text("");
+                $(".panel-default .alert-danger").hide();
+                $.each(tds, function (i, ele) {
+
+                    var span_tag = $(this).find("span");
+                    var input_tag = $(this).find("input");
+                    var select_tag = $(this).find('select');
+
+                    select_list = [];
+                    input_list = ['name'];
+
+                    n = $(this).attr("name");
+
+                    if (select_list.includes(n)) {
+
+                        //console.log(select_tag);
+                        selected_text = $.trim(select_tag.find(":selected").text());
+                        console.log(selected_text);
+                        span_tag.text(selected_text);
+                        select_tag.hide();
+                        span_tag.show();
+
+                    }
+
+                    if (input_list.includes(n)) {
+                        span_tag.show();
+                        span_tag.text($.trim(input_tag.val()));
+                        input_tag.hide()
+
+                    }
+
+
+                })
+
+            } else {
+
+                $(".panel-default .alert-danger strong").text(put_msg);
+                $(".panel-default .alert-danger").show()
+
+
+            }
+
+
+        });
+
+        // 刪除 DelData : Del icon
+        $("#mytable").on('click', ".fa-trash-alt", function (ele) {
+            console.log('del');
+            tr = $(this).closest("tr");
+            var id = $.trim(tr.find("[name='id'] input").val());
+            var name = $.trim(tr.find("[name='name']").text());
+            console.log($.trim(id),$.trim(name));
+
+            $('#localform_del_Modal .modal-body').find('span').text(name);
+            $('#localform_del_Modal .modal-body').find('input').val(id);
+            $('#localform_del_Modal').modal('show');
+
+        });
+
+
+
+
+    </script>
+
+{% endblock %}

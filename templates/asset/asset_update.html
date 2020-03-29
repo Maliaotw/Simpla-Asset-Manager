@@ -1,0 +1,892 @@
+{% extends 'asset/base.html' %}
+{% load asset_tags %}
+<!-- 驗證用戶部門  -->
+
+
+
+
+{% block title %}更改資產{% endblock %}
+
+{% block head %}
+    <!-- CSS -->
+    <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/css/bootstrap-select.css">
+
+    <!--  JavaScript -->
+    <script src="/static/js/bootstrap-datepicker.js"></script>
+    <script src="/static/js/bootstrap-datepicker.zh-TW.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="/static/js/bootstrap-select.js"></script>
+
+    <style>
+        .col-md-2.col-form-label, .col-md-6.form-group, .col-md-10.form-control-static {
+            padding-left: 15px;
+        }
+
+        .form-control-static {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .modal-dialog {
+
+            width: 600px;
+            left: 50%;
+            top: 50%;
+            margin-top: -134.5px;
+            margin-left: -250px;
+
+        }
+    </style>
+
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+    <ol class="breadcrumb">
+        <li><a href="{% url 'asset_list' %}">資產列表</a></li>
+        <li class="active">{{ object.name }}</li>
+    </ol>
+
+    <ul id="myTab" class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_info" data-toggle="tab">
+                資產信息
+            </a>
+        </li>
+
+        <li>
+            <a href="#tab_repair" data-toggle="tab">
+                維修紀錄
+            </a>
+        </li>
+
+        <li>
+            <a href="#tab_assets" data-toggle="tab">
+                關聯資產
+            </a>
+        </li>
+
+
+    </ul>
+
+
+    <div class="" style="padding: 0px">
+
+
+        <div id="myTabContent" class="tab-content">
+
+            <div class="tab-pane fade in active" id="tab_info">
+
+                <div class="panel panel-default" style="padding: 20px">
+                    <form role="form" method="post" id="form">
+                        {% csrf_token %}
+
+
+                        <!-- 錯誤提示-->
+                        <div class="alert" style="display: none">
+                            <strong></strong>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label> 基本信息</label>
+                        </div>
+
+                        <div class="row" style="padding-left: 15px">
+
+                        <div class="col-md-12 form-group has-feedback" style="display: none">
+                                {{ form.name.label_tag }}
+                                {{ form.name }}
+                                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+                            </div>
+
+                            <div class="col-md-6 form-group has-feedback">
+                                {{ form.category.label_tag }}
+                                {{ form.category }}
+                                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+                            </div>
+
+                            <div class="col-md-6 form-group has-feedback">
+                                {{ form.number.label_tag }}
+                                {{ form.number }}
+                                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                            </div>`
+
+                            <div class="col-md-6 form-group has-feedback">
+                                {{ form.title.label_tag }}
+                                {{ form.title }}
+                                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                            </div>
+
+                            <div class="col-md-6 form-group has-feedback">
+                                {{ form.model.label_tag }}
+                                {{ form.model }}
+                                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                            </div>
+
+
+                            <!-- 管理部門 -->
+                            {% verify_permissions request as admin_dent %}
+                            {% if admin_dent %}
+                                <div class="col-md-6 form-group has-feedback">
+                                    {{ form.purchase_date.label_tag }}
+                                    {{ form.purchase_date }}
+                                    <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                                </div>
+
+                                <div class="col-md-6 form-group has-feedback">
+                                    {{ form.price.label_tag }}
+                                    {{ form.price }}
+                                    <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="form-group">
+                            <label> 使用狀態</label>
+                        </div>
+
+
+                        <div class="row" style="padding-left: 15px">
+
+
+                            <div class="col-md-6 form-group has-feedback">
+                                {{ form.status.label_tag }}
+                                {{ form.status }}
+                                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                            </div>
+
+                            <div class="col-md-6 form-group has-feedback">
+                                {{ form.status_date.label_tag }}
+                                {{ form.status_date }}
+                                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                            </div>
+
+                            <div class="col-md-6 form-group has-feedback">
+                                {{ form.department.label_tag }}
+                                {{ form.department }}
+                                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                            </div>
+
+
+                            <div class="col-md-6 form-group has-feedback">
+                                {{ form.manager.label_tag }}
+                                {{ form.manager }}
+                                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                            </div>
+
+                            <div class="col-md-12 form-group has-feedback">
+                                {{ form.remarks.label_tag }}
+                                {{ form.remarks }}
+                                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+                            </div>
+
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="form-group">
+                                <button id="submit" type="button" class="btn btn-primary center-block">更改</button>
+                            </div>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+
+            <div class="tab-pane fade" id="tab_repair">
+
+                {% for asset_repair in asset_repair_obj %}
+
+                    <div class="well">
+                        <div class="media">
+
+                            <div id="post">
+
+                                <div class="media-body" style="margin-bottom: 20px;height: 150px">
+                                    <h3 class="media-heading">
+                                        <a href="{% url 'asset_repair_detail' asset_repair.id %}">{{ asset_repair.asset_obj.name }} {{ asset_repair.title }}</a>
+
+
+                                        {% verify_dent request 'IT' as user_dent %}
+                                        {% if user_dent %}
+
+                                            {% if asset_repair.status %}
+                                                <button class="badge alert-success" onclick="ch_status(this)"
+                                                        data-status="{{ asset_repair.status }}">已處理
+                                                </button>
+                                            {% else %}
+
+                                                <button class="badge alert-danger" onclick="ch_status(this)"
+                                                        data-status="{{ asset_repair.status }}">跟進中
+                                                </button>
+                                            {% endif %}
+                                        {% else %}
+
+                                            {% if asset_repair.status %}
+                                                <span class="badge alert-success">已處理
+                                        </span>
+                                            {% else %}
+
+                                                <span class="badge alert-danger">跟進中
+                                        </span>
+                                            {% endif %}
+
+                                        {% endif %}
+
+
+                                    </h3>
+
+                                    <p class="text-left">
+                                <span>
+                                    <i style="color: black" class="far fa-user"></i> {{ asset_repair.creator.code }}
+                                </span>
+                                    </p>
+
+                                    <p style="height: 60px">{{ asset_repair.summary|truncatechars:150 }}</p>
+
+                                    <ul class="list-inline">
+
+                                        <li>
+                                    <span>
+                                        <i class="glyphicon glyphicon-calendar"></i> {{ asset_repair.create_date |date:"Y/m/d" }}
+                                    </span>
+                                        </li>
+
+                                        <li>|</li>
+
+                                        <li><span><i class="glyphicon glyphicon-wrench"></i>
+                                    {% it_fix_user asset_repair %}
+                                    </span></li>
+
+                                        <li>|</li>
+
+                                        <span>
+                                    <i class="glyphicon glyphicon-comment "></i> {% comment_count asset_repair %}留言 <a
+                                                href="#" onclick="msg(this)" data-show="false"
+                                                data-id="{{ asset_repair.id }}">展開</a>
+                                </span>
+
+                                    </ul>
+
+                                </div>
+
+
+                                <!-- 留言 -->
+
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+            </div>
+
+
+            <div class="tab-pane fade" id="tab_assets">
+
+                <div class="panel panel-default" style="padding: 20px">
+
+                    <div class="form-group">
+                        <label> 關聯資產</label>
+                    </div>
+
+                    <div class="row" style="padding-left: 15px">
+
+
+                        <div class="col-md-12 form-group">
+
+                            <table class="table" id="mytable" style="margin-top: 20px">
+                                <thead>
+                                <tr>
+                                    <th>類型</th>
+                                    <th>資產編號</th>
+                                    <th>備註</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                {% for relation_assets in relation_assets_obj %}
+
+                                    <tr>
+                                        <td name="id" style="display: none">
+                                            <input type="text" name="id" class="form-control"
+                                                   value="{{ relation_assets.id }}"/>
+                                        </td>
+
+                                        <td name="asset_obj" style="display: none">
+                                            <input type="text" name="asset_obj" class="form-control"
+                                                   value="{{ relation_assets.asset_obj.id }}"/>
+                                        </td>
+
+
+                                        <td name="category">
+                                            <span>
+                                                {{ relation_assets.assets.category }}
+                                            </span>
+                                            <select name="category" onchange="foo(this)" class="form-control"
+                                                    id="id_category" style="display: none">
+
+                                                <option value="">-----</option>
+
+                                                {% for category in category_obj %}
+                                                    {% if relation_assets.assets.category  ==  category %}
+                                                        <option selected
+                                                                value="{{ category.id }}">{{ category }}
+                                                        </option>
+                                                    {% else %}
+                                                        <option value="{{ category.id }}">{{ category }}</option>
+                                                    {% endif %}
+
+                                                {% endfor %}
+
+                                            </select>
+
+                                        </td>
+
+                                        <td name="name">
+                                            <span>
+                                                {{ relation_assets.assets }}
+                                            </span>
+
+                                            <select name="assets" class="form-control" required="" id="id_assets"
+                                                    style="display:none;">
+                                                <option value="{{ relation_assets.assets.id }}">{{ relation_assets.assets }}</option>
+                                            </select>
+                                        </td>
+
+                                        <td name="remarks">
+                                            <span>
+                                                {{ relation_assets.remarks|default:"" }}
+                                            </span>
+                                            <input type="text" name="remarks" maxlength="64" class="form-control"
+                                                   id="id_remarks" style="display: none">
+                                        </td>
+
+                                        <td>
+                                            <a href="#" onclick="pen(this)"><i class="fas fa-pen"></i></a>
+                                            <a href="#" onclick="file(this)"><i class="fas fa-file"
+                                                                                style="display: none"></i></a>
+                                            <a href="#" onclick="trash(this)"><i class="fas fa-trash-alt"></i></a>
+                                        </td>
+
+                                    </tr>
+                                {% endfor %}
+
+                                <tr>
+                                    <td name="id" style="display: none">
+                                        <input name="id" value="{{ asset_obj.id }}">
+                                    </td>
+
+                                    <td name="category">
+                                        {{ ata_form.category }}
+                                    </td>
+
+                                    <td name="asset_obj">
+                                        {{ ata_form.assets }}
+                                    </td>
+
+                                    <td name="remarks">
+                                        {{ ata_form.remarks }}
+                                    </td>
+
+                                    <td>
+                                        <a href="#tab_assets" onclick="plus(this)"><i class="fas fa-plus"></i></a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label> 被關聯資產</label>
+
+                        <div class="row" style="padding-left: 15px">
+
+
+                            <div class="col-md-12 form-group">
+
+                                <table class="table" id="mytable" style="margin-top: 20px">
+                                    <thead>
+                                    <tr>
+                                        <th>類型</th>
+                                        <th>資產編號</th>
+                                        <th>備註</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+
+                                    <tbody>
+                                    {% for relation_assets in on_rel_assets_obj %}
+
+                                        <tr>
+                                            <td name="id" style="display: none">
+                                                <input type="text" name="id" class="form-control"
+                                                       value="{{ relation_assets.id }}"/>
+                                            </td>
+
+                                            <td name="assets" style="display: none">
+                                                <input type="text" name="assets" class="form-control"
+                                                       value="{{ asset_obj.id }}"/>
+                                            </td>
+
+
+                                            <td name="category">
+                                            <span>
+                                                {{ relation_assets.asset_obj.category }}
+                                            </span>
+                                                <select name="category" onchange="foo(this)" class="form-control"
+                                                        id="id_category" style="display: none">
+
+                                                    <option value="">-----</option>
+
+                                                    {% for category in category_obj %}
+                                                        {% if relation_assets.asset_obj.category  ==  category %}
+                                                            <option selected
+                                                                    value="{{ category.id }}">{{ category }}
+                                                            </option>
+                                                        {% else %}
+                                                            <option value="{{ category.id }}">{{ category }}</option>
+                                                        {% endif %}
+
+                                                    {% endfor %}
+
+                                                </select>
+
+                                            </td>
+
+                                            <td name="name">
+                                            <span>
+                                                {{ relation_assets.asset_obj.name }}
+                                            </span>
+
+                                                <select name="asset_obj" class="form-control" required="" id="id_assets"
+                                                        style="display:none;">
+                                                    <option value="{{ relation_assets.asset_obj.id }}">{{ relation_assets.asset_obj.assets }}</option>
+                                                </select>
+                                            </td>
+
+
+                                            <td name="remarks">
+                                            <span>
+                                                {{ relation_assets.remarks|default:"" }}
+                                            </span>
+                                                <input type="text" name="remarks" maxlength="64" class="form-control"
+                                                       id="id_remarks" style="display: none">
+                                            </td>
+
+                                            <td>
+                                                <a href="#" onclick="pen(this)"><i class="fas fa-pen"></i></a>
+                                                <a href="#" onclick="file(this)"><i class="fas fa-file"
+                                                                                    style="display: none"></i></a>
+                                                <a href="#" onclick="trash(this)"><i class="fas fa-trash-alt"></i></a>
+                                            </td>
+
+                                        </tr>
+                                    {% endfor %}
+
+                                    <tr>
+                                        <td name="assets" style="display: none">
+                                            <input name="id" value="{{ asset_obj.id }}">
+                                        </td>
+
+                                        <td name="category">
+                                            {{ ata_form.category }}
+                                        </td>
+
+                                        <td name="asset_obj">
+                                            {{ ata_form.assets }}
+                                        </td>
+
+                                        <td name="remarks">
+                                            {{ ata_form.remarks }}
+                                        </td>
+
+                                        <td>
+                                            <a href="#tab_assets" onclick="relplus(this)"><i
+                                                    class="fas fa-plus"></i></a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!--- 新增完成 表單-->
+    <div class="modal fade" id="Modal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">修改成功</h4>
+
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    是否還需要繼續修改資料
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <a href="{% url 'asset_list' %}" class="btn btn-primary" role="button">返回列表</a>
+                    <a href="{% url 'asset_update' asset.id %}" class="btn btn-success" role="button">繼續修改</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!--- 刪除關聯資產表單 -->
+    <div class="modal fade" id="form_del_Modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">刪除關聯資產</h4>
+                </div>
+                <div class="modal-body">
+                    <p>您確定要刪除
+                        <span style="color: red"></span>
+                        <input type="number" style="display:none;">
+                        嗎</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="form_del_submit" type="button" class="btn btn-primary">確認</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+
+
+
+
+{% endblock %}
+
+
+
+
+
+{% block extra-js %}
+
+    <script>
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        // 提交之後 將所有disabled刪除
+        function BeforeFormSubmit(e) {
+            $(":disabled").removeAttr("disabled");
+        }
+
+
+        // bind button
+        $("#submit").on("click", function (e) {
+            BeforeFormSubmit(this);
+            $("#form").submit();
+        });
+
+        // 提交 新增資產表單
+        $("#form").on("submit", function (e) {
+
+            var postData = $(this).serializeArray();
+            console.log(postData);
+
+            {#const url = {% url 'asset_update' 0 %}#}
+            $.ajax({
+                url: '',
+                type: "POST",
+                data: postData,
+                success: function (callback) {
+                    console.log(callback);
+                    $('#Modal').modal({backdrop: 'static', keyboard: false});
+
+                    if (callback.status === 'ok') {
+                        console.log("ok");
+                        $(".alert").show();
+                        $(".alert strong").text(callback.msg);
+                        $(".alert").addClass("alert-success").removeClass("alert-danger");
+
+
+                        $.each(callback.success_fields, function (i, val) {
+
+                            input_tag = $("[name='" + val + "']");
+                            div_tag = input_tag.closest("div");
+                            div_tag.removeClass("has-error").addClass("has-success");
+                            div_tag.find("span").removeClass("glyphicon-remove").addClass("glyphicon-ok");
+
+                        });
+
+                        $("#Modal").modal('show')
+
+
+                    } else {
+                        console.log("error");
+                        $(".alert").show();
+                        $(".alert").addClass("alert-danger");
+                        $(".alert strong").text(callback.msg);
+
+
+                        console.log(callback.errors_fields);
+                        console.log(callback.success_fields);
+
+                        $.each(callback.errors_fields, function (i, val) {
+
+                            input_tag = $("[name='" + val + "']");
+                            div_tag = input_tag.closest("div");
+                            div_tag.removeClass("has-success").addClass("has-error");
+                            div_tag.find("span").removeClass("glyphicon-ok").addClass("glyphicon-remove");
+
+
+                        });
+
+                        $.each(callback.success_fields, function (i, val) {
+
+                            input_tag = $("[name='" + val + "']");
+                            div_tag = input_tag.closest("div");
+                            div_tag.removeClass("has-error").addClass("has-success");
+                            div_tag.find("span").removeClass("glyphicon-remove").addClass("glyphicon-ok");
+
+                        });
+
+
+                    }
+                }
+
+            });
+
+        });
+
+
+        // 維修紀錄 留言 顯示/隱藏
+
+        function msg(ele) {
+
+            console.log("msg");
+
+
+            var id = $(ele).data('id');
+            var post_div = $(ele).closest('#post');
+            var show = $(ele).data('show');
+
+            console.log(id);
+            console.log(show);
+
+            if (show == false) {
+
+                $.ajax({
+                    url: "{% url 'ardtohtml' %}",
+                    type: 'GET',
+                    data: {id: id},
+
+                    success: function (callback) {
+                        console.log(callback);
+                        post_div.append(callback.data);
+
+
+                    },
+                    error: function () {
+
+                    }
+                });
+                $(ele).data('show',true);
+                $(ele).text('顯示');
+            }else {
+                $("#reply").remove();
+                $(ele).data('show',false);
+                $(ele).text('隱藏');
+            }
+
+
+        };
+
+
+        // 關聯資產標籤頁
+
+        var data = {{ data|safe }};
+
+        function foo(e) {
+            console.log('foo');
+            console.log(e.value);
+            {#document.getElementById("id_assets").options.length = 1;#}
+
+            ths = $(this);
+            ele = e;
+
+            id_assets = $(e).closest("tr").find("#id_assets");
+
+            id_assets.find('option')
+                .remove()
+                .end()
+                .append('<option value="">--------</option>')
+                .val('')
+            ;
+
+
+            $.each(data[e.value], function (i, item) {
+                id_assets.append($('<option>', {
+                    value: item.id,
+                    text: item.name,
+                }));
+            });
+            id_assets.removeAttr('disabled');
+        }
+
+
+        $(document).ready(function () {
+
+            if (window.location.hash != "") {
+                $('.nav-tabs a[href="' + window.location.hash + '"]').tab('show')
+            }
+        });
+
+
+        //新增 AddData : ADD icon
+        function plus(ele) {
+            console.log('plus');
+
+            tds = $(ele).closest("tr").find('td');
+            {#console.log(tds);#}
+
+            var id = tds.find('[name="id"]').val();
+            var category = tds.find('[name="category"]').val();
+            var assets = tds.find('[name="assets"]').val();
+            var remarks = tds.find('[name="remarks"]').val();
+
+
+            var postdata = {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                asset_obj: id,
+                category: category,
+                assets: assets,
+                remarks: remarks
+            };
+
+            {#resurl = document.location.origin + "{% url 'asset_update' asset_obj.id %}#tab_assets";#}
+
+
+        };
+
+
+
+        //點擊編輯按鈕
+        function pen(ele) {
+
+            console.log("pen");
+
+            tr = $(ele).closest("tr");
+            tds = tr.find('td');
+            var category = tds.find('[name="category"]').val();
+            var assetsid = tds.find('[name="assets"]').val();
+            console.log('foo');
+            console.log(category);
+            console.log(assetsid);
+            {#document.getElementById("id_assets").options.length = 1;#}
+            var id_assets = tr.find("#id_assets");
+            id_assets.find('option')
+                .remove()
+                .end()
+                .append('<option value="">--------</option>')
+                .val('')
+            ;
+
+            $.each(data[category], function (i, item) {
+                id_assets.append($('<option>', {
+                    value: item.id,
+                    text: item.name,
+                }));
+            });
+
+            id_assets.val(assetsid);
+            id_assets.removeAttr('disabled');
+
+
+            $.each(tds, function (i, ele) {
+                var span_tag = $(ele).find("span");
+                var input_tag = $(ele).find("input");
+                var select_tag = $(ele).find("select");
+
+                //user
+                select_list = ['category', 'name', 'asset_obj'];
+                input_list = ['remarks'];
+                n = $(ele).attr("name");
+                console.log($(ele));
+                console.log(n);
+                if (select_list.includes(n)) {
+                    //console.log(n);
+                    span_tag.hide();
+                    $(ele).find('select').show();
+                }
+                if (input_list.includes(n)) {
+                    //console.log(n);
+                    span_tag.hide();
+                    $(ele).find('input').show();
+                }
+
+            });
+
+            //$(ele).attr('data-icon', 'file');
+            tr.find('.fa-file').show();
+            tr.find('.fa-pen').hide();
+
+            {#fileicon.closest('tr').find('.fa')#}
+            {#console.log(fileicon)#}
+
+        };
+
+
+
+    </script>
+
+{% endblock %}
+
+
+
+
+
+
+

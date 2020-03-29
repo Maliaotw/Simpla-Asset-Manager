@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登陆</title>
+
+    <link rel="icon" type="image/x-icon" href="">
+    <link rel="shortcut icon" type="image/x-icon" href="">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/site.css">
+    <script src="/static/js/jquery-3.3.1.js"></script>
+    <style id="holderjs-style" type="text/css"></style>
+</head>
+<body class=" __plain_text_READY__">
+
+<div class="body-content">
+    <link rel="stylesheet" href="/static/css/animate.css" type="text/css">
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="/static/css/simple-line-icons.css" type="text/css">
+    <link rel="stylesheet" href="/static/css/app.css">
+    <link rel="stylesheet" href="/static/css/slideCode.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <div class="ie-note ie-note-wrapper">
+        <div class="ie-note-content">
+            <p>当前IE浏览器版本太低，请升级至最高版本，或使用谷歌浏览器等。</p>
+            <div>
+                <ul>
+                    <li>
+                        <img src="/static/img/IFXMC/ie.png">
+                        <p>IE11及以上</p>
+                    </li>
+                    <li>
+                        <img src="/static/img/IFXMC/chrome.png">
+                        <p>chrome</p>
+                    </li>
+                    <li>
+                        <img src="/static/img/IFXMC/360.png">
+                        <p>360浏览器</p>
+                    </li>
+                </ul>
+            </div>
+            <a class="ie-note-close">
+                <span>关闭</span>
+                <img src="/static/img/IFXMC/close.png">
+            </a>
+        </div>
+    </div>
+
+
+    <div class="loginBoxBg">
+        <div class="login-page container">
+
+            <div class="alert alert-danger" id="error-content">
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-sm-offset-3 m-t-lg">
+                    <div class="panel loginBox" style="padding-bottom: 0;">
+                        <div class="panel-heading login_head">
+                            <span class="loginTitle" style="color: black;padding-right: 10px;padding-left: 20px">SAM</span>
+                            <span class="loginTitle"><i class="visible-lg-block"></i>用户中心</span>
+                        </div>
+                        <div class="panel-body m-t clearfix login_body" style="padding-bottom: 0;">
+                            <form id="loginForm" method="post" novalidate="novalidate">
+
+                                {% csrf_token %}
+                                <fieldset class="col-sm-12">
+                                    <div class="form-group loginGroup">
+                                        <input class="form-control" placeholder="会员账户" autocomplete="off"
+                                               name="username" autofocus="" style="height: 50px; " value="Tony" maxlength="20">
+                                        <span class="loginIcon-user"></span>
+                                    </div>
+                                    <div class="form-group m-t-md loginGroup">
+                                        <input type="password" class="form-control" placeholder="密码" value="12345678" name="password"
+                                               autocomplete="off" style="height: 50px; ">
+                                        <span class="loginIcon-psw"></span>
+                                    </div>
+                                    <div class="form-group clearfix">
+                                        <button class="btn btn-brownRed col-md-4 col-xs-12 m-b login_loginBtn"
+                                                type="submit" style="margin-right:2%;height:40px;"><span
+                                                style="margin-right:12px;">登</span>录
+                                        </button>
+                                        <a href="javascript:void(0)"
+                                           class="btn btn-gold col-md-4 col-md-offset-1 col-xs-12 m-b login_clearBtn"
+                                           onclick="formReset()" style="height:40px;line-height:28px;"><span
+                                                style="margin-right:12px;">清</span>除</a>
+                                    </div>
+                                </fieldset>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="page-footer clearfix loginFooter">
+            <div class="container text-center m-t-lg">
+
+                <p style="color:#666;font-size:12px;">
+                    Copyright <span style="font-family:Arial">©</span><span class="copyRightYear">2019</span>XXX公司版权所有不得转载
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+
+        function formReset() {
+            $("input[name='username']").val('');
+            $("input[name='password']").val('');
+
+        }
+
+    </script>
+
+
+</div>
+
+<script src="/static/js/bootstrap.js"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,467 @@
+{% extends 'host/base.html' %}
+{% load asset_tags %}
+
+
+{% block title %}主機列表{% endblock %}
+
+{% block head %}
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+
+
+    <ol class="breadcrumb">
+        <li><a href="{% url 'host_index' %}">主機列表 </a></li>
+        <li class="active">{{ host_obj.name }}</li>
+
+    </ol>
+
+    <ul id="myTab" class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_host" data-toggle="tab">
+                硬件信息
+            </a>
+        </li>
+
+        <li>
+            <a href="#tab_record" data-toggle="tab">
+                變更紀錄
+            </a>
+        </li>
+
+        <li>
+            <a href="#tab_repair" data-toggle="tab">
+                維修紀錄
+            </a>
+        </li>
+
+
+    </ul>
+
+
+
+    <div class="" style="padding: 20px">
+
+
+        <div id="myTabContent" class="tab-content">
+
+
+            <!-- /硬件信息 Tab -->
+            <div class="tab-pane fade in active" id="tab_host">
+
+                <div class="form-group">
+                    <label>主機信息&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus" data-toggle="collapse"
+                                                          data-target="#host"></i>
+                    </label>
+                </div>
+
+                <div id="host" class="row collapse" style="padding-left: 15px">
+
+
+                    <div class="col-md-6 form-group">
+                        {{ host_form_obj.asset.label_tag }}
+                        {{ host_form_obj.asset }}
+                    </div>
+
+
+                    <div class="col-md-6 form-group">
+                        {{ host_form_obj.sn.label_tag }}
+                        {{ host_form_obj.sn }}
+                    </div>
+
+
+                    <div class="col-md-6 form-group">
+                        {{ host_form_obj.manage_ip.label_tag }}
+                        {{ host_form_obj.manage_ip }}
+                    </div>
+
+                    <div class="col-md-6 form-group">
+                        {{ host_form_obj.location.label_tag }}
+                        {{ host_form_obj.location }}
+                    </div>
+
+                    <div class="col-md-6 form-group">
+                        {{ host_form_obj.manufacturer.label_tag }}
+                        {{ host_form_obj.manufacturer }}
+                    </div>
+                    <div class="col-md-6 form-group">
+                        {{ host_form_obj.model.label_tag }}
+                        {{ host_form_obj.model }}
+                    </div>
+
+
+                    <div class="col-md-6 form-group">
+                        {{ host_form_obj.os_platform.label_tag }}
+                        {{ host_form_obj.os_platform }}
+                    </div>
+                    <div class="col-md-6 form-group">
+                        {{ host_form_obj.os_version.label_tag }}
+                        {{ host_form_obj.os_version }}
+                    </div>
+
+
+                    <div class="col-md-4 form-group">
+                        {{ host_form_obj.cpu_count.label_tag }}
+                        {{ host_form_obj.cpu_count }}
+                    </div>
+                    <div class="col-md-4 form-group">
+                        {{ host_form_obj.cpu_physical_count.label_tag }}
+                        {{ host_form_obj.cpu_physical_count }}
+                    </div>
+                    <div class="col-md-4 form-group">
+                        {{ host_form_obj.cpu_model.label_tag }}
+                        {{ host_form_obj.cpu_model }}
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+                    <label> 網卡信息&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus" data-toggle="collapse"
+                                                           data-target="#nic"></i></label>
+                </div>
+
+                <div id="nic" class="row collapse" style="padding-left: 15px">
+
+
+                    {% for nicform in nic_forms_obj %}
+                        <div class="col-md-3 form-group">
+                            {{ nicform.model.label_tag }}
+                            {{ nicform.model }}
+                        </div>
+
+                        <div class="col-md-3 form-group">
+                            {{ nicform.ipaddress.label_tag }}
+                            {{ nicform.ipaddress }}
+                        </div>
+
+
+                        <div class="col-md-3 form-group">
+                            {{ nicform.macaddress.label_tag }}
+                            {{ nicform.macaddress }}
+                        </div>
+
+                        <div class="col-md-3 form-group">
+                            {{ nicform.netmask.label_tag }}
+                            {{ nicform.netmask }}
+                        </div>
+
+
+
+                    {% endfor %}
+
+                </div>
+
+
+                <div class="form-group">
+                    <label> 硬盤信息&nbsp;&nbsp;&nbsp;&nbsp;<i id='i_disk' class="fa fa-plus" data-toggle="collapse"
+                                                           data-target="#disk"></i></label>
+                </div>
+
+                <div id="disk" class="row collapse" style="padding-left: 15px">
+
+                    {% for dickform in disk_forms_obj %}
+
+                        <div class="col-md-3 form-group">
+                            {{ dickform.sn.label_tag }}
+                            {{ dickform.sn }}
+                        </div>
+
+                        <div class="col-md-3 form-group">
+                            {{ dickform.model.label_tag }}
+                            {{ dickform.model }}
+                        </div>
+
+                        <div class="col-md-3 form-group">
+                            {{ dickform.capacity.label_tag }}
+                            {{ dickform.capacity }}
+
+                        </div>
+
+                        <div class="col-md-3 form-group">
+                            {{ dickform.slot.label_tag }}
+                            {{ dickform.slot }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <div class="form-group">
+                    <label> 內存信息&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus" data-toggle="collapse"
+                                                           data-target="#mem"></i></label>
+                </div>
+                <div id="mem" class="row collapse" style="padding-left: 15px">
+
+                    {% for memform in mem_forms_obj %}
+
+                        <div class="col-md-3 form-group">
+                            {{ memform.sn.label_tag }}
+                            {{ memform.sn }}
+                        </div>
+
+                        <div class="col-md-3 form-group">
+                            {{ memform.model.label_tag }}
+                            {{ memform.model }}
+                        </div>
+
+                        <div class="col-md-3 form-group">
+                            {{ memform.capacity.label_tag }}
+                            {{ memform.capacity }}
+
+                        </div>
+
+                        <div class="col-md-3 form-group">
+                            {{ memform.slot.label_tag }}
+                            {{ memform.slot }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+            </div>
+
+
+            <!-- /更变纪录 Tab -->
+            <div class="tab-pane" id="tab_record">
+
+
+                {% for host_record in host_record_obj %}
+
+                    <div class="well">
+                        <div class="media">
+                            <a class="pull-left" href="#">
+
+                            </a>
+                            <div class="media-body">
+                                <h4 class="media-heading">{{ host_record.create_date|date:'Y/m/d' }}</h4>
+                                <p class="text-right">{{ host_record.get_assetrecord_type_id_display }}</p>
+                                <p>{{ host_record.summary }}</p>
+
+                            </div>
+                        </div>
+                    </div>
+
+                {% endfor %}
+
+
+            </div>
+
+
+            <!-- /維修紀錄 Tab -->
+            <div class="tab-pane" id="tab_repair">
+
+
+                {% for asset_repair in asset_repair_obj %}
+                    <div class="well">
+                        <div class="media">
+
+                            <div id="post">
+
+                                <div class="media-body" style="margin-bottom: 20px;height: 150px">
+                                    <h3 class="media-heading">
+                                        <a href="{% url 'host_repair_detail' asset_repair.id %}">{{ asset_repair.asset_obj.name }} {{ asset_repair.title }}</a>
+
+
+                                        {% verify_dent request 'IT' as user_dent %}
+                                        {% if user_dent %}
+
+                                            {% if asset_repair.status %}
+                                                <button class="badge alert-success" onclick="ch_status(this)"
+                                                        data-status="{{ asset_repair.status }}">已處理
+                                                </button>
+                                            {% else %}
+
+                                                <button class="badge alert-danger" onclick="ch_status(this)"
+                                                        data-status="{{ asset_repair.status }}">跟進中
+                                                </button>
+                                            {% endif %}
+                                        {% else %}
+
+                                            {% if asset_repair.status %}
+                                                <span class="badge alert-success">已處理
+                                        </span>
+                                            {% else %}
+
+                                                <span class="badge alert-danger">跟進中
+                                        </span>
+                                            {% endif %}
+
+                                        {% endif %}
+
+
+                                    </h3>
+
+                                    <p class="text-left">
+                                <span>
+                                    <i style="color: black" class="far fa-user"></i> {{ asset_repair.creator.code }}
+                                </span>
+                                    </p>
+
+
+                                    <p style="height: 60px">{{ asset_repair.summary|truncatechars:150 }}</p>
+
+
+                                    <ul class="list-inline">
+
+                                        <li>
+                                    <span>
+                                        <i class="glyphicon glyphicon-calendar"></i> {{ asset_repair.create_date |date:"Y/m/d" }}
+                                    </span>
+                                        </li>
+
+                                        <li>|</li>
+
+                                        <li><span><i class="glyphicon glyphicon-wrench"></i>
+                                            <!--- TODO 只篩選資訊部 User Code -->
+                                    {% it_fix_user asset_repair %}
+                                    </span></li>
+
+                                        <li>|</li>
+
+                                        <span>
+                                    <i class="glyphicon glyphicon-comment "></i> {% comment_count asset_repair %}留言
+                                </span>
+
+                                    </ul>
+
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+                {% endfor %}
+
+
+            </div>
+
+        </div>
+    </div>
+
+
+{% endblock %}
+
+
+
+
+
+{% block extra-js %}
+
+
+
+
+    <script>
+
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        var inputs = $("input");
+        $.each(inputs, function (i, obj) {
+            //console.log(obj);
+            $(obj).attr('type', 'text');
+        });
+
+
+        function icon_minus() {
+            $(this).prev().find('svg').attr('data-icon', 'minus')
+        }
+
+        function icon_plus() {
+            $(this).prev().find('svg').attr('data-icon', 'plus')
+        }
+
+        $('#host').on('shown.bs.collapse', icon_minus);
+        $('#host').on('hidden.bs.collapse', icon_plus);
+        $('#mem').on('shown.bs.collapse', icon_minus);
+        $('#mem').on('hidden.bs.collapse', icon_plus);
+        $('#disk').on('shown.bs.collapse', icon_minus);
+        $('#disk').on('hidden.bs.collapse', icon_plus);
+        $('#nic').on('shown.bs.collapse', icon_minus);
+        $('#nic').on('hidden.bs.collapse', icon_plus);
+
+
+        $(document).ready(function () {
+            $('#host').collapse();
+        });
+
+
+        //  Reply : Change icon
+        function reply(ele) {
+
+
+            user = $("#reply_post [name='userid']").val();
+            repair = $("#reply_post [name='repairid']").val();
+            content = $("#reply_post [name='content']").val();
+
+            console.log(user);
+
+            data = {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                content: content,
+                user: user,
+                repair: repair,
+
+            };
+
+            $.ajax({
+
+                url: "{% url 'asset_repair_detail_add' %}",
+                data: data,
+                type: 'POST',
+                async: false,
+                success: function (callback) {
+                    console.log(callback);
+                    console.log(callback.data);
+
+                    if (callback.status == 'ok') {
+
+                        $("#reply").append('<div class="panel panel-primary"><div class="panel-heading"><i class="far fa-user"></i> <strong>' + callback.data.user + '</strong></div><div class="panel-body">' + callback.data.content + '<p class="text-right">' + callback.data.date + '</p></div></div>');
+                        $("#reply_post [name='content']").val("");
+
+
+                    }
+
+                },
+                error: function () {
+                    put_status = false
+
+                }
+
+            });
+
+        }
+
+        function show_reply(ele) {
+            {#console.log($(this));#}
+            $('#reply').toggleClass('hide');
+
+        }
+
+
+    </script>
+
+{% endblock %}
+
+
+

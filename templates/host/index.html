@@ -1,0 +1,506 @@
+{% extends 'host/base.html' %}
+{% load asset_tags %}
+
+
+{% block title %}主機列表{% endblock %}
+
+{% block head %}
+    <!-- CSS -->
+    <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/css/bootstrap-select.css">
+
+    <!--  JavaScript -->
+    <script src="/static/js/bootstrap-datepicker.js"></script>
+    <script src="/static/js/bootstrap-datepicker.zh-TW.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="/static/js/bootstrap-select.js"></script>
+
+    <style>
+        .list-group-item .active > a {
+
+            color: white;
+        }
+    </style>
+
+{% endblock %}
+
+
+
+{% block content %}
+
+
+
+
+    <ol class="breadcrumb">
+        <li><a href="#">主機列表</a></li>
+
+
+    </ol>
+
+    <div class="panel panel-default" style="padding: 20px">
+
+
+        <div class="row">
+
+            <div class="col-md-12" style="text-align: right">
+
+                <form class="form-inline" method="get">
+
+                    <div class="form-group">
+                        <label for="inputsearch" class="col-form-label">搜尋</label>
+                        <input type="text" class="form-control" name='name' id="search" placeholder=""
+                               value="{{ name }}">
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-form-label">類型</label>
+                        <select class="selectpicker" name='status' data-width="fit">
+                            <option value="">-------</option>
+                            {% for k,v in status_field %}
+                                <option value="{{ k }}">{{ v }}</option>
+                            {% endfor %}
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-form-label">部門</label>
+                        <select class="selectpicker" name="dent_id" data-width="fit">
+                            <option value="">-------</option>
+                            {% for department in department_obj %}
+                                <option value="{{ department.id }}">{{ department.name }}部({{ department.code }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success" style="margin-left: 20px">Submit</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>排序</th>
+                    <th>主機名稱</th>
+                    <th>類型</th>
+                    <th>型號</th>
+                    <th>管理IP</th>
+                    <th>作業系統</th>
+                    <th>位置</th>
+                    <th>運維負責人</th>
+                    <th>所屬部門</th>
+                    <th>關聯資產</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for host in host_obj %}
+                    <tr>
+                        <td name="id" style="display: none">
+                            {{ host.id }}
+                        </td>
+
+
+                        <td>
+                            {{ forloop.counter }}
+                        </td>
+
+                        <td name="name" class="col-xs-1">
+                             <span class="form-control-static">
+                                {{ host.name }}
+                            </span>
+
+
+                        </td>
+                        <td name="status" class="col-xs-2">
+
+                            <span class="form-control-static">
+                                {{ host.status }}
+                            </span>
+
+                            <select class="form-control" style="display: none">
+
+                                {% for k,v in host.status_choice %}
+                                    {% if host.status   ==  v %}
+                                        <option selected
+                                                value="{{ k }}">{{ v }}
+                                        </option>
+                                    {% else %}
+                                        <option value="{{ k }}">{{ v }}</option>
+                                    {% endif %}
+
+                                {% endfor %}
+                            </select>
+                        </td>
+
+                        <td class="">
+                            <span class="form-control-static">
+                                {{ host.manufacturer|default:'' }} {{ host.model|default:'' }}
+                            </span>
+                        </td>
+
+
+                        <td name="manufacturer" style="display: none">
+                            <span class="form-control-static">
+                               {{ host.manufacturer|default:'' }}
+                            </span>
+
+                            <input type="text" class='form-control input-sm' value="{{ host.manufacturer }}"
+                                   style="display: none">
+                        </td>
+
+                        <td name="model" style="display: none">
+                            <span class="form-control-static">
+                               {{ host.model|default:'' }}
+                            </span>
+
+                            <input type="text" class='form-control input-sm' value="{{ host.model }}"
+                                   style="display: none">
+                        </td>
+
+
+                        <td name="manage_ip" class="col-xs-1">
+
+                            <span class="form-control-static">
+                               {{ host.manage_ip|default:'' }}
+                            </span>
+
+                            <input type="text" class='form-control input-sm' value="{{ host.manage_ip }}"
+                                   style="display: none">
+
+                        </td>
+
+                        <td name="os_platform" class="col-xs-1">
+                            <span class="form-control-static">
+                               {{ host.os_platform|default:'' }}
+                            </span>
+
+                            <input type="text" class='form-control input-sm' value="{{ host.os_platform }}"
+                                   style="display: none">
+                        </td>
+
+
+                        <td name="location" class="col-xs-2">
+                            <span class="form-control-static">
+                               {{ host.location|default:'' }}
+                            </span>
+
+                            <select class="form-control" style="display: none">
+
+                                {% for location in location_obj %}
+                                    {% if host.location   ==  location %}
+                                        <option selected
+                                                value="{{ location.id }}">{{ location.name }}
+                                        </option>
+                                    {% else %}
+                                        <option value="{{ location.id }}">{{ location.name }}</option>
+                                    {% endif %}
+
+                                {% endfor %}
+                            </select>
+                        </td>
+
+
+                        <td name="ops_owner" class="col-xs-2">
+                            <span class="form-control-static">
+                               {{ host.ops_owner|default:'' }}
+                            </span>
+
+                            <select class="form-control" style="display: none">
+                                {% for user in it_user_obj %}
+                                    {% if host.ops_owner   ==  user %}
+                                        <option selected
+                                                value="{{ user.id }}">{{ user }}
+                                        </option>
+                                    {% else %}
+                                        <option value="{{ user.id }}">{{ user }}</option>
+                                    {% endif %}
+
+                                {% endfor %}
+                            </select>
+                        </td>
+
+                        <td class="col-xs-2">
+                            {{ host.asset.department.name | default:'' }}
+                        </td>
+
+                        <td name="asset" class="col-xs-1">
+                            <span class="form-control-static">
+                               {{ host.asset|default:'' }}
+                            </span>
+
+                            <input type="text" class='form-control input-sm'
+                                   value="{% if host.asset %}{{ host.asset.id }}{% else %} {% endif %}"
+                                   style="display: none">
+
+                            <select id='asset_list' class="form-control" style="display: none">
+                                <option value="">-----</option>
+
+                            </select>
+                        </td>
+
+
+                        <td class="col-xs-1">
+                            <a style="color:black; text-decoration:none" href="{% url 'host_info' host.id %}"><i
+                                    class="fas fa-eye"></i></a>
+                            <i class="fas fa-pen"></i>
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+                </tbody>
+
+
+                <tfoot>
+                <th colspan="2">
+                    <nav aria-label="Page navigation">
+
+                        <ul class="pagination pull-left">
+                            共{{ paginator.count }}筆
+                        </ul>
+
+                    </nav>
+                </th>
+                <th colspan="10">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination pull-right">
+                            {% get_pageer host_obj search_field %}
+                        </ul>
+                    </nav>
+                </th>
+                </tfoot>
+
+
+            </table>
+        </div>
+
+
+    </div>
+
+    {% csrf_token %}
+
+
+
+{% endblock %}
+
+
+
+
+{% block extra-js %}
+
+    <script>
+
+
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        $(document).ready(function () {
+            //$('.dropdown-toggle').dropdown();
+
+            $(".selectpicker[name='status']").selectpicker('val', '{{ status }}');
+            $(".selectpicker[name='dent_id']").selectpicker('val', '{{ dent_id }}');
+
+
+            //編輯 EditData : Change icon
+            $(".table").on('click', ".fa-pen", function (ele) {
+                console.log('edit');
+
+                $(this).attr('data-icon', 'file');
+                console.log($(this));
+                tds = $(this).parent().prevAll();
+                tr = $(this).closest("tr");
+                var obj_id = $.trim(tr.find("[name='id']").text());
+                var asset_id = tr.find("[name='asset'] input").val();
+                var select_obj = tr.find("[name='asset'] select");
+                console.log(asset_id);
+                console.log(tds);
+                // 請求asset
+                get_asset(obj_id, asset_id, select_obj);
+
+                $.each(tds, function (i, ele) {
+                    var span_tag = $(this).find("span");
+                    var input_tag = $(this).find("input");
+
+                    //user
+                    select_list = ['status', 'location', 'ops_owner', 'asset'];
+                    input_list = [];
+
+                    n = $(this).attr("name");
+                    if (select_list.includes(n)) {
+                        //console.log(n);
+                        span_tag.hide();
+                        $(this).find('select').show();
+                    }
+
+                    if (input_list.includes(n)) {
+                        span_tag.hide();
+                        //console.log(span_tag);
+                        input_tag.val($.trim(span_tag.text()));
+                        input_tag.show()
+                    }
+
+                });
+
+            });
+
+
+            //SaveData : PUT
+            $(".table").on('click', ".fa-file", function (ele) {
+
+                console.log('save');
+                $(this).attr('data-icon', 'pen');
+
+                tr = $(this).closest('tr');
+                tds = $(this).parent().prevAll();
+                console.log(tds);
+
+                // 主機ID
+                var id = $.trim(tr.find("[name='id']").text());
+
+                // 類型
+                var status = $.trim(tr.find("[name='status'] select").val());
+
+                // 運維負責人
+                var ops_owner = $.trim(tr.find("[name='ops_owner'] select").val());
+
+                // 關聯資產
+                var asset = $.trim(tr.find("[name='asset'] select").val());
+
+                // 位置
+                var location = $.trim(tr.find("[name='location'] select").val());
+
+                console.log(id, status, ops_owner, asset, location);
+
+                data = {
+                    'id': id, 'status': status, 'ops_owner': ops_owner, 'asset': asset, 'location': location
+                };
+
+                // Ajax put請求 /host
+                $.ajax({
+                    url: "{% url 'host_index' %}",
+                    data: data,
+                    type: 'PUT',
+                    async: false,
+                    success: function (callback) {
+                        console.log(callback);
+
+                        if (callback.status == 'ok') {
+                            put_status = true
+
+                        } else {
+                            put_status = false
+                        }
+
+                    },
+                    error: function () {
+                        put_status = false
+
+                    }
+
+                });
+
+                if (put_status) {
+                    $(this).attr('data-icon', 'pen');
+                    $.each(tds, function (i, ele) {
+
+                        var span_tag = $(this).find("span");
+                        var input_tag = $(this).find("input");
+                        var select_tag = $(this).find('select');
+
+                        select_list = ['status', 'location', 'ops_owner', 'asset'];
+                        input_list = [];
+
+                        n = $(this).attr("name");
+
+                        if (select_list.includes(n)) {
+
+                            //console.log(select_tag);
+                            selected_text = $.trim(select_tag.find(":selected").text());
+                            console.log(selected_text);
+                            span_tag.text(selected_text);
+                            select_tag.hide();
+                            span_tag.show();
+
+                        }
+
+                        if (input_list.includes(n)) {
+                            span_tag.show();
+                            span_tag.text($.trim(input_tag.val()));
+                            input_tag.hide()
+                        }
+
+                    })
+
+                }
+
+            });
+
+        });
+
+
+        // 發送hostid 向請求API進行請求
+        function get_asset(hostid, assetid, select_obj) {
+
+            //console.log("dd", select_obj.children('option'));
+
+            $.ajax({
+                url: "/api/host",
+                data: {'hostid': hostid, 'assetid': assetid},
+                type: 'GET',
+                async: false,
+                success: function (callback) {
+                    console.log(callback);
+                    assets = callback.data;
+                    own = callback.own;
+
+                    // 讓select只保留一個
+                    document.getElementById("asset_list").options.length = 1;
+
+                    // 遍歷 assets
+                    $.each(assets, function (i, item) {
+                        console.log(item);
+
+                        select_obj.append($('<option>', {
+                            value: item.id,
+                            text: item.asset,
+                        }));
+
+                    });
+                    select_obj.val(own);
+
+                },
+                error: function () {
+
+
+                }
+
+            });
+        };
+
+
+    </script>
+
+{% endblock %}
+

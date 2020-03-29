@@ -1,0 +1,12 @@
+
+.list-unstyled li a {
+    font-size: 0.9em !important;
+    padding-left: 30px !important;
+
+
+}
+
+
+.list-unstyled li {
+    padding: 10px;
+}

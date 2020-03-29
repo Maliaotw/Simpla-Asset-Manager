@@ -1,0 +1,172 @@
+{% extends 'asset_repair/base.html' %}
+{% load asset_tags %}
+
+<!-- 驗證用戶部門  -->
+{% verify_permissions request as admin_dent %}
+
+
+
+
+
+{% block title %}新增維修記錄表{% endblock %}
+
+{% block head %}
+
+
+    <link rel="stylesheet" href="/static/css/bootstrap-fileinput.css">
+
+    <script src="/static/js/bootstrap-fileinput.js"></script>
+    <script src="/static/js/bootstrap-fileinput_zh-TW.js"></script>
+
+
+
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">新增維修記錄表</h1>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+
+    <div class="" style="padding: 20px">
+        <form role="form" method="post" id="form">
+
+            {% csrf_token %}
+            <div class="row">
+
+                <div class="col-lg-6 form-group has-feedback">
+                    {{ forms_obj.category.label_tag }}
+                    {{ forms_obj.category }}
+                </div>
+
+                <div class="col-lg-6 form-group has-feedback">
+                    {{ forms_obj.asset_obj.label_tag }}
+                    {{ forms_obj.asset_obj }}
+                </div>
+
+                <div class="col-lg-12 form-group has-feedback">
+                    {{ forms_obj.title.label_tag }}
+                    {{ forms_obj.title }}
+                </div>
+
+                <div class="col-lg-12 form-group has-feedback">
+                    {{ forms_obj.summary.label_tag }}
+                    {{ forms_obj.summary }}
+                </div>
+
+
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <label for="id_summary">上傳圖片:</label>
+                    <input id="input-id" type="file" class="file" name="img" multiple=true data-preview-file-type="any">
+                </div>
+            </div>
+
+
+            <div class="row" style="padding: 15px">
+                <div class="col-lg-12 form-group">
+                    <button id="submit" type="submit" class="btn btn-success center-block">提交表單</button>
+                </div>
+            </div>
+
+
+        </form>
+    </div>
+
+
+
+
+{% endblock %}
+
+
+{% block extra-js %}
+
+    <script>
+
+
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        var data = {{ data|safe }};
+
+        function foo(e) {
+            console.log('foo');
+            console.log(e.value);
+            document.getElementById("id_asset_obj").options.length = 1;
+            $.each(data[e.value], function (i, item) {
+                $('#id_asset_obj').append($('<option>', {
+                    value: item.id,
+                    text: item.name,
+                }));
+            });
+            $("#id_asset_obj").removeAttr('disabled');
+        }
+
+
+        $("#input-id").fileinput({
+
+            uploadUrl: "{% url 'asset_file' %}", //设置上传的地址
+            language: "zh-TW",
+            previewFileType: 'any',
+            allowedFileExtensions: ['jpg', 'gif', 'png'],
+            maxFileCount: 3,
+            showUpload: true,
+            uploadExtraData: {
+                "csrfmiddlewaretoken": csrftoken //帶上CSRF参数
+            },
+
+
+        }).on("fileuploaded", function (event, data) {//上传成功之后的一些处理
+            console.log(data);
+            console.log(data.response);
+
+            $('#form').append('<input type="hidden" name="photo" value=' + data.response.id + '>')
+
+        });
+
+
+        $(document).ready(function () {
+
+            window.photo = [];
+
+            // bind button
+            $("#submit").on("click", function (e) {
+                //$('#input-id').fileinput('upload');
+                $("#form").submit();
+            });
+
+
+            // 提交 新增表單
+            $("#form").on("submit", function (e) {
+                console.log('form');
+                {#var postData = $(this).serializeArray();#}
+            });
+
+
+
+        });
+
+
+    </script>
+
+{% endblock %}
+
+

@@ -1,0 +1,250 @@
+{% extends 'asset/base.html' %}
+{% load asset_tags %}
+{% load widget_tweaks %}
+
+<!-- 驗證用戶部門  -->
+
+
+
+
+{% block title %}資產管理{% endblock %}
+
+{% block head %}
+    <!-- CSS -->
+    <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
+
+
+    <!--  JavaScript -->
+    <script src="/static/js/bootstrap-datepicker.js"></script>
+    <script src="/static/js/bootstrap-datepicker.zh-TW.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <link rel="stylesheet" href="/static/css/bootstrap-select.css">
+    <script src="/static/js/bootstrap-select.js"></script>
+
+
+{% endblock %}
+
+
+{% block content %}
+
+    <ol class="breadcrumb">
+        <li><a href="#">資產列表</a></li>
+
+    </ol>
+
+
+    <div class="panel panel-default" style="padding: 20px">
+
+        <div class="row">
+
+            <div class="col-md-2">
+                {% verify_permissions request as admin_dent %}
+                {% if admin_dent %}
+                    <a href="{% url 'asset_create' %}" class="btn btn-primary" role="button">新增資產</a>
+                {% endif %}
+            </div>
+
+            <!-- 篩選 -->
+            <div class="col-md-10" style="text-align: right">
+
+                <form class="form-inline" method="get">
+
+
+                    <div class="form-group" style="display: none">
+                        <input type="text" class="form-control" name='contacts' id="search" placeholder=""
+                               value="{{ contacts }}">
+                    </div>
+
+                    {{ filterset.form.name.label_tag }}
+                    {% render_field filterset.form.name class="form-control mr-2" %}
+
+
+                    {{ filterset.form.category.label_tag }}
+                    {% render_field filterset.form.category class="form-control mr-2" %}
+
+
+
+                    {% if admin_dent %}
+
+                        {{ filterset.form.department.label_tag }}
+                        {% render_field filterset.form.department class="form-control mr-2" %}
+
+                    {% endif %}
+
+                    {{ filterset.form.status.label_tag }}
+                    {% render_field filterset.form.status class="form-control mr-2" %}
+
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success" style="margin-left: 20px">Submit</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+
+        <!--- 資產列表-->
+        <table class="table" id="mytable" style="margin-top: 20px">
+            <thead>
+            <tr>
+                <th>排序</th>
+                <th>資產編號</th>
+                <th>類型</th>
+                <th>部門</th>
+                <th>負責人</th>
+                {% if admin_dent %}
+                    <th>購買日期</th>
+                    <th>價格</th>
+                {% endif %}
+                <th>狀態</th>
+                <th>操作</th>
+
+
+            </tr>
+            </thead>
+            <tbody>
+
+            {% for asset in object_list %}
+
+                <tr>
+                    <td>
+                        {{ forloop.counter }}
+
+                    </td>
+
+                    <td name="id" style="display: none">
+                        <input type="text" class="form-control" value="{{ asset.id }}"/>
+                    </td>
+
+
+                    <td>
+                        <span class="form-control-static">
+                            {{ asset.name }}
+                        </span>
+                    </td>
+
+
+                    <td name="category">
+
+                        <span class="form-control-static">
+                            {{ asset.category }}
+                        </span>
+                    </td>
+
+
+                    <td name="department">
+                        <span class="form-control-static">
+                            {{ asset.department|default:"" }}
+                        </span>
+                    </td>
+
+
+                    <td name="manager">
+                        <span class="form-control-static">
+                            {{ asset.manager|default:"" }}
+                        </span>
+
+
+                    </td>
+
+                    {% if admin_dent %}
+                        <td name="purchase_date" id="datebox">
+                            <span class="form-control-static">{{ asset.purchase_date|date:"Y-m-d" }}</span>
+                        </td>
+                        <td name="price">
+                        <span class="form-control-static">
+                            {{ asset.price|default:"" }}
+                        </span>
+                        </td>
+                    {% endif %}
+
+                    <td name="status">
+                        {{ asset.get_status_display }}
+                    </td>
+
+                    <td>
+                        <a href="{% url 'asset_update' asset.id %}"><i class="fas fa-pen"></i></a>
+                        <a href="#" data-uid="{{ asset.id }}" data-name="[{{ asset.name }}]"><i class="fas fa-trash-alt" ></i></a>
+
+                    </td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+
+
+            <tfoot>
+            <th colspan="9">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pull-left">
+                        共{{ paginator.count }}筆
+                        <label style="padding-left: 20px">顯示</label>
+                        <select class="selectpicker" name='contacts' data-width="fit" id='contacts'>
+                            <option value=10>10</option>
+                            <option value=20>20</option>
+                            <option value=50>50</option>
+                            <option value=100>100</option>
+                        </select>筆
+                    </ul>
+
+
+                    <ul class="pagination pull-right">
+                        {% get_pageer page_obj search_field %}
+                    </ul>
+                </nav>
+
+            </th>
+
+            </tfoot>
+
+        </table>
+
+    </div>
+
+
+    {% csrf_token %}
+
+{% endblock %}
+
+
+{% block extra-js %}
+
+
+
+    <script>
+
+
+        $(document).ready(function () {
+        })
+            .on('click', '.btn-delete', function () {
+                var $this = $(this);
+
+                var the_url = "{% url 'asset' 0 %}".replace('0', $this.data('uid'));
+                swal({
+                    title: "你確定刪除嗎",
+                    text: $this.data('name'),
+                    type: "warning",
+                    showCancelButton: true,
+                    cancelButtonText: '取消',
+                    confirmButtonColor: "#ed5565",
+                    confirmButtonText: '確認',
+                    closeOnConfirm: true
+                }, function () {
+                    $.ajax({
+                        url: the_url,
+                        type: 'POST',
+
+                    }).done(function () {
+                        document.location.reload();
+                    });
+                });
+
+            });
+
+
+    </script>
+{% endblock %}
+
+

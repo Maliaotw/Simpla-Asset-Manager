@@ -1,0 +1,139 @@
+{% extends 'host/base.html' %}
+{% load asset_tags %}
+
+{% block title %}主機匯入{% endblock %}
+
+{% block head %}
+    <!-- CSS -->
+    <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/bootstrap-select.css">
+
+    <!--  JavaScript -->
+    <script src="/static/js/bootstrap-datepicker.js"></script>
+    <script src="/static/js/bootstrap-datepicker.zh-TW.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="/static/js/bootstrap-select.js"></script>
+
+
+    <link rel="stylesheet" href="/static/css/bootstrap-fileinput.css">
+
+    <script src="/static/js/bootstrap-fileinput.js"></script>
+    <script src="/static/js/bootstrap-fileinput_zh-TW.js"></script>
+
+
+    <style>
+
+    </style>
+
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+    <ol class="breadcrumb">
+        <li class="active">主機匯入</li>
+
+    </ol>
+
+
+
+
+    <div class="panel panel-default" style="padding: 20px">
+
+        你可以在這裡下載`範例檔案`, 或是直接上傳檔案進行匯入。
+
+        <input id="input-b2" name="file" type="file" class="file" data-show-preview="false">
+
+        {% csrf_token %}
+    </div>
+
+
+
+    <!--- 新增完成 表單-->
+    <div class="modal fade" id="Modal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title"></h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <a href="{% url 'host' %}" class="btn btn-primary" role="button">返回列表</a>
+                    <a href="{% url 'host_input' %}" class="btn btn-success" role="button">繼續上傳</a>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}
+
+
+
+
+
+{% block extra-js %}
+
+    <script>
+
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+
+        $("#input-b2").fileinput({
+            language: "zh-TW",
+            allowedFileExtensions: ["csv"],
+            mainClass: "input-group-lg", //文件输入框为大型号
+            uploadUrl: "{% url 'user_input' %}", //上传图片的服务器地址
+            uploadExtraData: {
+                "csrfmiddlewaretoken": csrftoken //帶上CSRF参数
+            },
+
+        });
+
+
+        // 上傳成功
+        $("#input-b2").on('fileuploaded', function (event, data, previewId, index) {
+            console.log("asset_input fileuploaded");
+
+            if (data.response.status == 'ok') {
+                console.log("response ok");
+
+                $("#Modal").modal("show");
+                $(".modal-title").text("匯入成功");
+                $(".modal-body").text("你可以繼續上傳或返回列表。");
+
+            } else {
+                console.log("response error");
+                $("#Modal").modal("show");
+                $(".modal-title").text("匯入失敗");
+                $(".modal-title").css({'color':'red'});
+                $(".modal-body").html("你可以再次上傳或返回列表<br><i class='fa fa-exclamation-triangle'></i>錯誤訊息 : <b>"+ data.response.msg + "</b>");
+            }
+        });
+
+    </script>
+
+{% endblock %}
+
+
+
+
+
+
+

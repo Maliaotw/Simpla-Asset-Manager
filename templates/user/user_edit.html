@@ -1,0 +1,332 @@
+{% extends 'user/base.html' %}
+{% load asset_tags %}
+
+{% block title %}更改用戶{% endblock %}
+
+{% block head %}
+    <!-- CSS -->
+    <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/css/bootstrap-select.css">
+
+
+
+    <!--  JavaScript -->
+    <script src="/static/js/bootstrap-datepicker.js"></script>
+    <script src="/static/js/bootstrap-datepicker.zh-TW.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="/static/js/bootstrap-select.js"></script>
+
+    <style>
+
+        .col-md-2.col-form-label, .col-md-6.form-group, .col-md-10.form-control-static {
+            padding-left: 15px;
+        }
+
+        .form-control-static {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+
+    .modal-dialog {
+
+            width: 600px;
+            left: 50%;
+            top: 50%;
+            margin-top: -134.5px;
+            margin-left: -250px;
+
+        }
+
+    </style>
+
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+
+    <ol class="breadcrumb">
+        <li><a href="{% url 'user' %}">用戶管理</a></li>
+        <li class="active">
+            {{ userinfo_obj.code }} {{ userinfo_obj.user.username }}
+        </li>
+
+    </ol>
+
+
+    <div class="panel panel-default" style="padding: 20px">
+        <form class="form" id="form">
+            {% csrf_token %}
+
+
+            <!-- 錯誤提示-->
+            <div class="alert" style="display: none">
+                <strong></strong>
+            </div>
+
+
+            <div class="form-group">
+                <label> 基本信息</label>
+            </div>
+
+
+            <div class="form-group col-md-6 has-feedback">
+
+                {{ forms_userproinfo_obj.code.label_tag }}
+                {{ forms_userproinfo_obj.code }}
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+            </div>
+
+            <div class="col-md-6  form-group has-feedback">
+                {{ forms_userproinfo_obj.dent.label_tag }}
+                {{ forms_userproinfo_obj.dent }}
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+            </div>
+
+            <div class="form-group col-md-6 has-feedback" style="display: none">
+                {{ forms_userproinfo_obj.number.label_tag }}
+                {{ forms_userproinfo_obj.number }}
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+            </div>
+
+
+            <div class="col-md-6 form-group has-feedback">
+                {{ forms_user_obj.username.label_tag }}
+                {{ forms_user_obj.username }}
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+            </div>
+
+            <div class="col-md-6  form-group has-feedback">
+                {{ forms_userproinfo_obj.name.label_tag }}
+                {{ forms_userproinfo_obj.name }}
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+            </div>
+
+            <div class="col-md-6 form-group has-feedback">
+                {{ forms_userproinfo_obj.sex.label_tag }}
+                {{ forms_userproinfo_obj.sex }}
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+            </div>
+
+
+            <div class="col-md-6  form-group has-feedback">
+                {{ forms_userproinfo_obj.birthday.label_tag }}
+                {{ forms_userproinfo_obj.birthday }}
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+            </div>
+
+            <div class="col-md-12 form-group has-feedback" style="padding-left:15px ">
+                {{ forms_userproinfo_obj.in_service.label_tag }}
+                {{ forms_userproinfo_obj.in_service }}
+                <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+            </div>
+
+
+            <div class="form-group">
+                <label> 登入功能</label>
+                {% if forms_user_obj.instance.is_staff %}
+                    <button id="change_passwd" type="button" class="btn btn-success" style="margin-left: 20px">更改密碼
+                    </button>
+                {% endif %}
+
+                <div style="display: none">
+                    {{ forms_user_obj.pd_status }}
+                </div>
+
+            </div>
+
+            <div class="row" style="padding-left: 30px">
+
+                <div class="form-horizontal">
+
+                    <div class="form-group col-md-12 has-feedback">
+                        <label class="col-md-2 ">{{ forms_user_obj.is_staff.label }}</label>
+                        {{ forms_user_obj.is_staff }}
+                        <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+                    </div>
+
+
+                    <!-- Text input-->
+                    <div class="form-group col-md-12 has-feedback" style="display: none">
+                        <label class="col-md-2 ">{{ forms_user_obj.password1.label }}</label>
+                        {{ forms_user_obj.password1 }}
+                        <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+                    </div>
+
+
+                    <!-- Text input-->
+                    <div class="form-group col-md-12 has-feedback" style="display: none">
+                        <label class="col-md-2 ">{{ forms_user_obj.password2.label }}</label>
+                        {{ forms_user_obj.password2 }}
+                        <span class="glyphicon form-control-feedback" style="margin-right: 15px;"></span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="row">
+                <div class="form-group">
+                    <button id="submit" type="button" class="btn btn-primary center-block">更改</button>
+
+                </div>
+
+            </div>
+        </form>
+
+    </div>
+
+
+
+
+
+    <!--- Modal -->
+    <div class="modal fade" id="Modal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title"></h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    是否還需要繼續修改資料
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <a href="{% url 'user' %}" class="btn btn-primary" role="button">返回列表</a>
+                    <a href="{% url 'user_edit' pk %}" class="btn btn-success" role="button">繼續修改</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}
+
+
+
+
+
+{% block extra-js %}
+
+    <script>
+
+
+        // 更改密碼按紐
+        $("#change_passwd").bind("click", function (e) {
+            if ($("#id_pd_status").prop("checked")) {
+                $("#id_pd_status").prop("checked", false);
+                $("[name='password1']").closest(".form-group").hide();
+                $("[name='password2']").closest(".form-group").hide();
+
+            } else {
+                $("#id_pd_status").prop("checked", true);
+                $("[name='password1']").closest(".form-group").show();
+                $("[name='password2']").closest(".form-group").show();
+            }
+
+        });
+
+        // 提交
+        $("#form").on("submit", function (e) {
+
+            var postData = $(this).serializeArray();
+            console.log(postData);
+
+            $.ajax({
+                url: "{% url 'user_edit' pk %}",
+                type: "POST",
+                data: postData,
+                success: function (callback) {
+                    console.log(callback);
+
+
+                    if (callback.status == 'ok') {
+                        console.log("ok");
+
+                        $.each(callback.success_fields, function (i, val) {
+
+                            input_tag = $("[name='" + val + "']");
+                            div_tag = input_tag.closest("div");
+                            div_tag.removeClass("has-error").addClass("has-success");
+                            div_tag.find("span").removeClass("glyphicon-remove").addClass("glyphicon-ok");
+
+                        });
+
+                        $('#Modal').modal({backdrop: 'static', keyboard: false});
+                        $("#Modal").modal('show');
+                        $(".modal-title").text(callback.msg);
+
+
+                    } else {
+                        console.log("error");
+                        $(".alert").show();
+                        $(".alert strong").text(callback.msg);
+                        $(".alert").addClass("alert-danger").removeClass("alert-success");
+                        $(".modal-title").text(callback.msg);
+                        $(".modal-title").css({'color': 'red'});
+
+                        $.each(callback.errors_fields, function (i, val) {
+
+                            input_tag = $("[name='" + val + "']");
+                            div_tag = input_tag.closest("div");
+                            div_tag.removeClass("has-success").addClass("has-error");
+                            div_tag.find("span").removeClass("glyphicon-ok").addClass("glyphicon-remove");
+
+
+                        });
+
+                        $.each(callback.success_fields, function (i, val) {
+
+                            input_tag = $("[name='" + val + "']");
+                            div_tag = input_tag.closest("div");
+                            div_tag.removeClass("has-error").addClass("has-success");
+                            div_tag.find("span").removeClass("glyphicon-remove").addClass("glyphicon-ok");
+
+                        });
+
+
+                    }
+                }
+
+            });
+
+
+        });
+
+
+    </script>
+
+{% endblock %}
+
+
+
+
+
+
+

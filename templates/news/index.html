@@ -1,0 +1,280 @@
+{% extends 'news/base.html' %}
+{% load asset_tags %}
+
+{% block title %}新聞列表{% endblock %}
+
+
+{% block head %}
+    {% load static %}
+
+
+    <link rel="stylesheet" href="/static/plugins/bootstrap-select/bootstrap-select.min.css">
+    <script src="/static/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+    <script src="{% static 'ckeditor/ckeditor/plugins/prism/lib/prism/prism_patched.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'plugins/prism.css' %}">
+
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+
+
+    <style>
+
+
+    </style>
+
+{% endblock %}
+
+
+
+{% block content %}
+
+
+    <ol class="breadcrumb">
+        <li><a href="#">新聞列表</a></li>
+
+    </ol>
+
+
+    <div class="panel panel-default" style="padding: 20px">
+
+        <div class="row">
+
+
+            <div class="col-md-4">
+                <a href="{% url 'news_add' %}" class="btn btn-primary">
+                    新增公告
+                </a>
+            </div>
+
+            <div class="col-md-8" style="text-align: right">
+                <form class="form-inline" method="get">
+                    <div class="form-group">
+                        <label for="inputsearch" class="col-form-label">搜尋</label>
+                        <input type="text" class="form-control" name='name' id="search" placeholder=""
+                               value="{{ name }}">
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-form-label">部門</label>
+                        <select class="selectpicker" name="dent_id" data-width="fit">
+                            <option value="">-------</option>
+                            {% for dent in dent_obj %}
+                                <option value="{{ dent.id }}">{{ dent.name }}部({{ dent.code }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-form-label">狀態</label>
+                        <select class="selectpicker" name="status" data-width="fit">
+                            <option value="">-------</option>
+                            <option value="y">已讀取</option>
+                            <option value="n">未讀取</option>
+                        </select>
+                    </div>
+
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success" style="margin-left: 20px">Submit</button>
+                    </div>
+
+                </form>
+
+
+            </div>
+        </div>
+
+
+        <!--- 資產列表-->
+        <table class="table" id="mytable" style="margin-top: 20px">
+            <thead>
+            <tr>
+                <th>排序</th>
+                <th>公告時間</th>
+                <th>標題</th>
+                <th>公告人</th>
+                <th>狀態</th> <!--已讀/未讀 -->
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for news in news_obj %}
+
+                <tr>
+                    <td>
+                        {% if forloop.last and page %}
+                            {{ page }}0
+                        {% else %}
+                            {{ page|add:"-1"|default:"" }}{{ forloop.counter }}
+                        {% endif %}
+                    </td>
+
+                    <td name="id" style="display: none">
+                        <input type="text" class="form-control" value="{{ news.id }}"/>
+                    </td>
+
+
+                    <td name="create_date">
+                        <span class="form-control-static">
+                            {{ news.create_date|date:"Y/m/d H:i" }}
+                        </span>
+                    </td>
+
+                    <td name="name">
+                        <span class="form-control-static">
+                            <a href="{% url 'news_info' news.id %}">{{ news.title }}</a>
+                        </span>
+                    </td>
+
+                    <td name="dent">
+                        <span class="form-control-static">
+                            {{ news.creator.dent }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {% if request.user.userprofile in news.userprofile.all %}
+                            <span class="form-control-static" style="color: green">
+                                已讀
+                                </span>
+                        {% else %}
+                            <span class="form-control-static" style="color: red">
+                                未讀
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% verify_permissions request as admin_dent %}
+                        {% if admin_dent or news.creator.dent == request.user.userprofile.dent %}
+                            <a href="{% url 'news_edit' news.id %}" style="color:black; text-decoration:none"><i
+                                    class="fas fa-pen"></i></a>
+                            <a href="#" style="color:black; text-decoration:none"><i class="fas fa-trash-alt"></i></a>
+
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+
+
+            <tfoot>
+            <th colspan="9">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pull-left">
+                        共{{ paginator.count }}筆
+                    </ul>
+                    <ul class="pagination pull-right">
+                        {% get_pageer news_obj search_field %}
+                    </ul>
+                </nav>
+
+            </th>
+
+            </tfoot>
+
+        </table>
+
+    </div>
+
+
+    <!--- 刪除部門表單 -->
+    <div class="modal fade" id="form_del_Modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">刪除公告</h4>
+                </div>
+                <div class="modal-body">
+                    <p>您確定要刪除<span style="color: red"></span><input type="number" style="display:none;">嗎</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="form_del_submit" type="button" class="btn btn-primary">確認</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+    {% csrf_token %}
+
+{% endblock %}
+
+
+
+
+{% block extra-js %}
+
+    <script>
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+
+        $(".selectpicker[name='name']").selectpicker('val', '{{ name }}');
+        $(".selectpicker[name='dent_id']").selectpicker('val', {{ dent_id }});
+        $(".selectpicker[name='status']").selectpicker('val', '{{ status }}');
+
+        // 刪除 DelData : Del icon
+        $("#mytable").on('click', ".fa-trash-alt", function (ele) {
+
+            console.log('del');
+            tr = $(this).closest("tr");
+            var id = $.trim(tr.find("[name='id'] input").val());
+            var name = $.trim(tr.find("[name='name']").text());
+            //console.log($.trim(id),$.trim(name));
+
+            $('#form_del_Modal .modal-body').find('span').text(name);
+            $('#form_del_Modal .modal-body').find('input').val(id);
+            $('#form_del_Modal').modal('show');
+        });
+
+        // 提交刪除
+        $("#form_del_submit").on('click', function (event) {
+
+            var name = $('#form_del_Modal .modal-body').find('span').text();
+            var id = $('#form_del_Modal .modal-body').find('input').val();
+
+            console.log(name, id);
+            data = {id: id};
+
+            $.ajax({
+                url: '{% url 'news' %}',
+                data: data,
+                type: 'DELETE',
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback.status == 'ok') {
+                        tr.remove();
+                        $('#form_del_Modal').modal('hide');
+                    }
+                }
+            });
+
+        });
+
+
+    </script>
+
+{% endblock %}
+
+

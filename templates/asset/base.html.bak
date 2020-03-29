@@ -1,0 +1,425 @@
+{% extends 'base.html' %}
+{% load asset_tags %}
+
+
+{% block title %}
+    CDMB
+{% endblock %}
+
+
+{% block navbar_left %}
+
+    <!-- 驗證用戶部門(admin)  -->
+    {% verify_permissions request as admin_dent %}
+
+    {% verify_dent request 'IT' as ITdent %}
+
+    {% if admin_dent or ITdent %}
+
+        <li class="active"><a href="{% url 'asset' %}">部門資產</a></li>
+        <li><a href="{% url 'host' %}">IT運維</a></li>
+
+    {% else %}
+
+        <li class="active"><a href="{% url 'asset' %}">部門資產</a></li>
+
+    {% endif %}
+
+{% endblock %}
+
+
+{% block sideber_menu %}
+
+
+    {% url 'asset' as asset %}
+    {% url 'asset_list' as asset_index %}
+    {% url 'asset_busunit' as asset_busunit %}
+
+    {% url 'asset_repair' as asset_repair %}
+    {% url 'asset_repair_add' as asset_repair_add %}
+
+    {% url 'host' as host %}
+
+    {% url 'user' as user %}
+    {% url 'user_input' as user_input %}
+
+    {% url 'category' as category %}
+    {% url 'category_input' as category_input %}
+
+    {% url 'department' as department %}
+    {% url 'department_input' as department_input %}
+
+    {% url 'busunit' as busunit %}
+
+
+    {% url 'news' as news %}
+    {% url 'news_add' as news_add %}
+
+
+
+
+    <!--- sidebar 選單 -->
+    {% verify_permissions request as admin_dent %}
+
+    {% if admin_dent %}
+
+
+        <!--- nav-sidebar -->
+        <ul class="nav nav-sidebar">
+
+
+            <ul class="list-group">
+
+                <!-- 資產首頁 --->
+                <a href="{{ asset }}"
+                   class="list-group-item {% if request.path == asset %}active{% endif %}">
+                <span>
+                    <i class="fa fa-box"></i> 資產首頁
+                </span>
+                </a>
+
+
+                <!-- 資產管理 -->
+                <li class="">
+                    <a href="#assetSubmenu" data-toggle="collapse" aria-expanded="false"
+                       class="list-group-item dropdown-toggle collapsed"><span> <i
+                            class="fa fa-box"></i> 資產管理</span><span style="float:right"><i
+                            class="fa fa-angle-right"></i></span></a>
+
+                    <ul class="list-unstyled collapse" id="assetSubmenu" style="">
+
+
+                        <li class="list-group-item  {% if request.path == asset_index %}active{% endif %}">
+                            <a href={{ asset_index }}>資產列表</a>
+                        </li>
+
+                        <li class="list-group-item  {% if request.path == asset_busunit %}active{% endif %}">
+                            <a href={{ asset_busunit }}>資產業務線對應表</a>
+                        </li>
+
+
+                        <li class="list-group-item  {% if request.path == asset_repair %}active{% endif %}">
+                            <a href="{{ asset_repair }}">資產維修紀錄表</a>
+                        </li>
+
+
+
+
+
+                    </ul>
+                </li>
+
+                <!--- 業務線管理 -->
+                <li class="">
+                    <a href="#busunitSubmenu" data-toggle="collapse" aria-expanded="false"
+                       class="list-group-item dropdown-toggle collapsed">
+                        <span><i class="fa fa-th"></i> 業務線管理</span>
+                        <span style="float:right"><i class="fa fa-angle-right"></i></span></a>
+
+                    <ul class="list-unstyled collapse" id="busunitSubmenu" style="">
+
+
+                        <li class="list-group-item  {% if request.path == busunit %}active{% endif %}">
+                            <a href={{ busunit }}>業務線列表</a>
+                        </li>
+
+                    </ul>
+                </li>
+
+
+                <!--- 用戶管理 -->
+                <li class="">
+                    <a href="#userSubmenu" data-toggle="collapse" aria-expanded="false"
+                       class="list-group-item dropdown-toggle collapsed">
+                        <span><i class="fa fa-users"></i> 用戶管理</span>
+                        <span style="float:right"><i class="fa fa-angle-right"></i></span></a>
+
+                    <ul class="list-unstyled collapse" id="userSubmenu" style="">
+
+
+                        <li class="list-group-item  {% if request.path == user %}active{% endif %}">
+                            <a href={{ user }}>用戶列表</a>
+                        </li>
+
+                        <li class="list-group-item  {% if request.path == user_input %}active{% endif %}">
+                            <a href={{ user_input }}>匯入</a>
+                        </li>
+
+                        <li class="list-group-item">
+                            <a href="{% url 'user_output' %}" target="_blank">匯出</a>
+                        </li>
+
+
+                    </ul>
+                </li>
+
+
+                <!--- 部門管理 -->
+                <li class="">
+                    <a href="#dentSubmenu" data-toggle="collapse" aria-expanded="false"
+                       class="list-group-item dropdown-toggle collapsed">
+                        <span><i class="fa fa-sitemap"></i> 部門管理</span>
+                        <span style="float:right"><i class="fa fa-angle-right"></i></span></a>
+
+                    <ul class="list-unstyled collapse" id="dentSubmenu" style="">
+
+                        <li class="list-group-item  {% if request.path == department %}active{% endif %}">
+                            <a href={{ department }}>部門列表</a>
+                        </li>
+
+                        <li class="list-group-item  {% if request.path == department_input %}active{% endif %}">
+                            <a href={{ department_input }}>匯入</a>
+                        </li>
+
+                        <li class="list-group-item">
+                            <a href="{% url 'department_output' %}" target="_blank">匯出</a>
+                        </li>
+
+                    </ul>
+                </li>
+
+
+                <!--- 類型管理 -->
+                <li class="">
+                    <a href="#categorySubmenu" data-toggle="collapse" aria-expanded="false"
+                       class="list-group-item dropdown-toggle collapsed">
+                        <span><i class="fa fa-th"></i> 類型管理</span>
+                        <span style="float:right"><i class="fa fa-angle-right"></i></span></a>
+
+                    <ul class="list-unstyled collapse" id="categorySubmenu" style="">
+
+
+                        <li class="list-group-item  {% if request.path == category %}active{% endif %}">
+                            <a href={{ category }}>類型列表</a>
+                        </li>
+
+                        <li class="list-group-item  {% if request.path == category_input %}active{% endif %}">
+                            <a href={{ category_input }}>匯入</a>
+                        </li>
+
+                        <li class="list-group-item">
+                            <a href="{% url 'category_output' %}" target="_blank">匯出</a>
+                        </li>
+
+                    </ul>
+                </li>
+
+                <!--- 公告管理 -->
+                <li class="">
+                    <a href="#newsSubmenu" data-toggle="collapse" aria-expanded="false"
+                       class="list-group-item dropdown-toggle collapsed">
+                        <span><i class="fa fa-newspaper"></i> 公告管理</span>
+                        <span style="float:right"><i class="fa fa-angle-right"></i></span></a>
+
+                    <ul class="list-unstyled collapse" id="newsSubmenu" style="">
+
+
+                        <li class="list-group-item  {% if request.path == news %}active{% endif %}">
+                            <a href={{ news }}>公告列表</a>
+                        </li>
+
+                    </ul>
+                </li>
+
+
+            </ul>
+
+        </ul>
+    {% else %}
+
+        <!--- nav-sidebar -->
+        <!--- 一般用戶 -->
+        <ul class="nav nav-sidebar">
+
+            <ul class="list-group">
+
+
+                <a href="{{ asset }}"
+                   class="list-group-item {% if request.path == asset %}active{% endif %}">
+                <span>
+                    <i class="fa fa-box"></i> 資產首頁
+                </span>
+                </a>
+
+
+                <a href="{{ asset_index }}"
+                   class="list-group-item {% if request.path == asset_index %}active{% endif %}">
+                <span>
+                    <i class="fa fa-box"></i> 資產列表
+                </span>
+
+
+                    <a href="{{ asset_busunit }}"
+                       class="list-group-item {% if request.path == asset_busunit %}active{% endif %}">
+                <span>
+                    <i class="fa fa-box"></i> 資產業務線對應表
+                </span>
+                    </a>
+
+
+                    <a href="{{ asset_repair }}"
+                       class="list-group-item {% if request.path == asset_repair %}active{% endif %}">
+                <span>
+                    <i class="fa fa-box"></i> 資產維修紀錄
+                </span>
+                    </a>
+
+                    <a href="{{ asset_repair_add }}"
+                       class="list-group-item {% if request.path == asset_repair_add %}active{% endif %}">
+                <span>
+                    <i class="fa fa-box"></i> 新增資產維修紀錄
+                </span>
+                    </a>
+
+                    <a href="{{ busunit }}"
+                       class="list-group-item {% if request.path == busunit %}active{% endif %}">
+                <span>
+                    <i class="fa fa-bus"></i> 業務線列表
+                </span>
+                    </a>
+
+                    <a href="{{ news }}"
+                       class="list-group-item {% if request.path == news %}active{% endif %}">
+                <span>
+                    <i class="fa fa-newspaper"></i> 公告列表
+                </span>
+                    </a>
+
+                 <a href="{{ news_add }}"
+                       class="list-group-item {% if request.path == news_add %}active{% endif %}">
+                <span>
+                    <i class="fa fa-newspaper"></i> 新增公告
+                </span>
+                    </a>
+
+            </ul>
+
+        </ul>
+
+    {% endif %}
+
+
+
+
+
+
+{% endblock %}
+
+
+{% block content %}
+
+
+
+{% endblock %}
+
+
+{% block base-js %}
+
+
+    <script>
+
+
+        // 日期
+        $('#id_purchase_date').datepicker(
+            {
+                language: 'zh-TW',
+                format: "yyyy-mm-dd",
+                todayHighlight: true,
+
+            });
+        $('#id_status_date').datepicker(
+            {
+                language: 'zh-TW',
+                format: "yyyy-mm-dd",
+                todayHighlight: true,
+
+            });
+
+
+        // 選擇部門後請求關聯使用資料
+        function get_dent_user(e) {
+            //console.log(e);
+            //console.log($(this));
+            //console.log(e.value);
+
+            $.ajax({
+                url: "/api/dent_user",
+                type: "GET",
+                data: {'dent': e.value},
+                async: false,
+
+                success: function (callback) {
+                    window.dent_user = {
+                        'status': 'ok',
+                        'data': callback
+                    };
+                    console.log(window.dent_user);
+                },
+                error: function () {
+
+                }
+            });
+        };
+
+
+        // 新增資產 關聯用戶
+        function add_assetform_user(e) {
+            get_dent_user(e);
+            dent_user = window.dent_user;
+            //console.log(dent_user);
+            if (dent_user.status == 'ok') {
+                // 解開#user_add select選項 disabled
+                $("#id_manager").removeAttr("disabled");
+
+                console.log('add_assetform_user');
+
+                $("#id_manager").find('option')
+                    .remove()
+                    .end()
+                    .append('<option value="">--------</option>')
+                    .val('')
+                ;
+
+                var users = dent_user.data.users;
+                var owner = dent_user.data.owner;
+
+
+                $.each(users, function (i, item) {
+                    console.log(item);
+
+                    $("#id_manager").append($('<option>', {
+                            value: item.id,
+                            text: item.name
+                        }
+                    ));
+
+                    if (owner) {
+                        $("#id_manager").val(owner)
+                    }
+
+                })
+            }
+        };
+
+
+        // 檢查狀態
+        function ch_status_ele(e) {
+
+            if (e.value == "使用中") {
+                $("#id_department").removeAttr("disabled").val("");
+                $("#id_manager").removeAttr("disabled").val("");
+
+
+            } else {
+                $("#id_department").attr("disabled", "disabled").val("");
+                $("#id_manager").attr("disabled", "disabled").val("");
+
+            }
+
+        }
+
+    </script>
+
+
+{% endblock %}
+

@@ -1,0 +1,69 @@
+{% extends 'asset/base.html' %}
+{% load asset_tags %}
+
+
+{% block head %}
+    <!-- CSS -->
+    <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/css/bootstrap-select.css">
+
+    <!--  JavaScript -->
+    <script src="/static/js/bootstrap-datepicker.js"></script>
+    <script src="/static/js/bootstrap-datepicker.zh-TW.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="/static/js/bootstrap-select.js"></script>
+
+
+
+{% endblock %}
+
+
+{% block content %}
+
+    <ol class="breadcrumb">
+        <li><a href="#">Test1</a></li>
+
+    </ol>
+
+
+    <div class="panel panel-default" style="padding: 20px">
+
+        <div class="row">
+            <div class="col-md-4">
+
+
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    {{ forms_obj }}
+
+
+                    <button type="submit" class="btn btn-primary">send</button>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+
+{% endblock %}
+
+
+{% block extra-js %}
+
+    <script>
+
+
+    </script>
+
+{% endblock %}
+
+

@@ -1,0 +1,86 @@
+{% extends 'news/base.html' %}
+{% load asset_tags %}
+
+{% block title %}新增公告{% endblock %}
+
+
+{% block head %}
+
+    <!-- CSS -->
+    <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/plugins/bootstrap-select/bootstrap-select.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="/static/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'plugins/prism.css' %}">
+    {#    <script src="{% static 'plugins/prism.js' %}"></script>#}
+
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+    <ol class="breadcrumb">
+        <li><a href="{% url 'news' %}">公告列表</a></li>
+        <li class="active">新增公告</li>
+    </ol>
+
+    <div class="" style="">
+        <form role="form" method="post" id="form">
+            {% csrf_token %}
+            <!-- 錯誤提示-->
+            <div class="alert" style="display: none">
+                <strong></strong>
+            </div>
+
+            <div class="row" style="padding-left: 15px">
+
+                <div class="col-md-8 form-group">
+                    {{ forms_obj.title.label_tag }}
+                    {{ forms_obj.title }}
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label></label>
+                    <input type="submit" id="submit"  class="btn btn-success" style="width: 100%" value="發布"/>
+                </div>
+
+
+                <div class="col-md-8 form-group">
+                    {{ forms_obj.content }}
+                </div>
+
+
+                <div class="col-md-4 form-group">
+                    {{ forms_obj.dent.label_tag }}
+                    {{ forms_obj.dent }}
+                </div>
+            </div>
+
+        </form>
+    </div>
+{% endblock %}
+
+
+
+
+{% block extra-js %}
+
+    <script>
+        $(".django-ckeditor-widget").removeAttr('style');
+
+
+    </script>
+
+{% endblock %}
+
+

@@ -1,0 +1,123 @@
+{% extends 'asset/base.html' %}
+{% load asset_tags %}
+
+
+{% block head %}
+    <!-- CSS -->
+    <link href="/static/css/bootstrap-datepicker.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/css/bootstrap-select.css">
+
+    <!--  JavaScript -->
+    <script src="/static/js/bootstrap-datepicker.js"></script>
+    <script src="/static/js/bootstrap-datepicker.zh-TW.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="/static/js/bootstrap-select.js"></script>
+
+
+
+{% endblock %}
+
+
+{% block content %}
+
+    <ol class="breadcrumb">
+        <li><a href="#">Test1</a></li>
+
+    </ol>
+
+
+    <div class="panel panel-default" style="padding: 20px">
+
+        <div class="row">
+            <div class="col-md-12">
+
+
+                <form action="" method="POST" onsubmit="BeforeFormSubmit()">
+                    {% csrf_token %}
+
+
+                    <div class="form-group">
+                        <label> 基本信息</label>
+                    </div>
+
+
+                    <div class="form-group col-md-6">
+                        <label class="col-form-label">編號</label>
+                        <input disabled type="number" name="code" class="form-control" placeholder=""
+                               value="{{ userinfo_obj.dent.block_number }}{{ userinfo_obj.code }}">
+
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="col-form-label">用戶名</label>
+                        {{ forms_user_obj.username }}
+
+                    </div>
+
+
+                    <div class="form-group col-md-6">
+                        {{ forms_userproinfo_obj.sex.label }}
+                        {{ forms_userproinfo_obj.sex }}
+
+                    </div>
+
+
+                    <div class="form-group col-md-6">
+                        {{ forms_userproinfo_obj.dent.label }}
+                        {{ forms_userproinfo_obj.dent }}
+
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        <label class="col-form-label">用戶名</label>
+                        {{ forms_user_obj.username }}
+
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        <label class="col-form-label">用戶名</label>
+                        {{ forms_user_obj.username }}
+
+                    </div>
+
+
+                    <div class="form-group">
+                        <label> 登入功能</label>
+                    </div>
+
+
+                    {{ forms_user_obj }}
+
+                    <button id="submit" type="submit" class="btn btn-primary">send</button>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+
+{% endblock %}
+
+
+{% block extra-js %}
+
+    <script>
+
+
+        function BeforeFormSubmit(e) {
+            $(":disabled").removeAttr("disabled");
+        }
+
+    </script>
+
+{% endblock %}
+
+

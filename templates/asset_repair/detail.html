@@ -1,0 +1,510 @@
+{% extends 'asset_repair/base.html' %}
+{% load asset_tags %}
+
+
+{% block title %}主機列表{% endblock %}
+
+{% block head %}
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+    {% csrf_token %}
+
+
+    {% block breadcrumb %}
+        <ol class="breadcrumb">
+            <li>
+                <a href="{% url 'asset_repair' %}">資產維修表</a>
+            </li>
+            <li class="active">{{ asset_repair_obj.asset_obj.name }} {{ asset_repair_obj.title }}</li>
+
+        </ol>
+    {% endblock %}
+
+
+
+    <div class="">
+
+
+        <!-- /維修紀錄 Tab -->
+        <div class="tab-pane" id="tab_repair">
+
+
+            <div class="well">
+                <div class="media">
+
+                    <div id="post">
+
+                        <div class="media-body" style="margin-bottom: 20px;height: 150px">
+                            <h3 class="media-heading">
+                                {{ asset_repair_obj.asset_obj.name }} {{ asset_repair_obj.title }}
+
+
+                                {% verify_dent request 'IT' as user_dent %}
+                                {% if user_dent %}
+
+                                    {% if asset_repair_obj.status %}
+                                        <button class="badge alert-success" onclick="ch_status(this)"
+                                                data-status="{{ asset_repair_obj.status }}">已處理
+                                        </button>
+                                    {% else %}
+
+                                        <button class="badge alert-danger" onclick="ch_status(this)"
+                                                data-status="{{ asset_repair_obj.status }}">跟進中
+                                        </button>
+                                    {% endif %}
+                                {% else %}
+
+                                    {% if asset_repair_obj.status %}
+                                        <span class="badge alert-success">已處理
+                                        </span>
+                                    {% else %}
+
+                                        <span class="badge alert-danger">跟進中
+                                        </span>
+                                    {% endif %}
+
+                                {% endif %}
+
+
+                            </h3>
+
+                            <p class="text-left">
+                                <span>
+                                    <i style="color: black" class="far fa-user"></i> {{ asset_repair_obj.creator.code }}
+                                </span>
+                            </p>
+
+                            <p style="min-height: 60px">{{ asset_repair_obj.summary }}</p>
+
+                            <ul class="list-inline">
+
+                                <li>
+                                    <span>
+                                        <i class="glyphicon glyphicon-calendar"></i> {{ asset_repair_obj.create_date |date:"Y/m/d" }}
+                                    </span>
+                                </li>
+
+                                <li>|</li>
+
+                                <li><span><i class="glyphicon glyphicon-wrench"></i>
+                                    <!--- TODO 只篩選資訊部 User Code -->
+                                    {% for re in fix_users %}
+                                        {{ re }}
+                                    {% endfor %}
+                                    </span></li>
+
+                                <li>|</li>
+
+                                <span>
+                                    <i class="glyphicon glyphicon-comment "></i> {{ asset_repair_detail|length }} 留言
+                                </span>
+
+                            </ul>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- 更多圖片 -->
+                {% if asset_repair_obj.photo.all %}
+
+
+                    <hr>
+
+                    <div>
+                        <p>更多圖片</p>
+                        <div class="row">
+
+
+                            {% for i in asset_repair_obj.photo.all %}
+
+                                <div class="col-md-4">
+                                    <div class="thumbnail">
+                                        <a href="{{ i.photo.url }}" target="_blank">
+                                            <img src="{{ i.photo.url }}" alt="Lights">
+                                        </a>
+                                    </div>
+                                </div>
+
+
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+
+            <!--- 留言  -->
+            <div id="reply">
+                {% for ass_re in asset_repair_detail %}
+                    <div class="panel panel-primary" data-id="{{ ass_re.id }}" data-repair="{{ asset_repair_obj.id }}">
+                        <div class="panel-heading">
+
+                            <strong><i class="far fa-user"></i> {{ ass_re.user.code }}</strong>
+
+                            <!-- 如果是自己的回覆 可以編輯/刪除-->
+                            {% if ass_re.user.code == request.user.userprofile.code %}
+                                <button class="pull-right commit_del" style="background: transparent;border: none"
+                                        onclick="commit_del(this)">
+                                    <i class="fa fa-trash fa-fw"></i>刪除
+                                </button>
+
+
+                                <button class="pull-right commit_edit" style="background: transparent;border: none"
+                                        onclick="commit_edit(this)">
+                                    <i class="fa fa-edit fa-fw"></i>編輯
+                                </button>
+
+                                <button class="pull-right commit_submit"
+                                        style="background: transparent;border: none;display: none"
+                                        onclick="commit_submit(this)">
+                                    修改
+                                </button>
+
+                            {% endif %}
+
+
+                        </div>
+                        <div class="panel-body">
+                            <span>{{ ass_re.content }}</span>
+                            <textarea style="display: none" class="form-control"></textarea>
+
+                            <p class="text-right">{{ ass_re.create_date|date:'Y/m/d H:i' }}</p>
+                        </div><!-- /panel-body -->
+                    </div><!-- /panel panel-default -->
+
+                {% endfor %}
+            </div>
+
+            <!-- 回覆 -->
+            {% if not asset_repair_obj.status %}
+                <div class="panel " style="border-color:black">
+                    <div class="panel-heading">
+                        <strong>添加一條新回覆</strong>
+                    </div>
+                    <div class="panel-body" id="reply_post">
+
+                                    <textarea class="form-control" name="content" maxlength="10000"
+                                              style="overflow: hidden; overflow-wrap: break-word; resize: none; height: 100px"></textarea>
+
+                        <input name="userid" value="{{ request.user.userprofile.id }}"
+                               style="display: none">
+                        <input name="repairid" value="{{ asset_repair_obj.id }}"
+                               style="display: none">
+                        <button id='reply_btn' class="btn btn-info" style="margin-top: 15px"
+                                onclick="reply()">回覆
+                        </button>
+                    </div><!-- /panel-body -->
+                </div>
+            {% endif %}
+
+
+        </div>
+
+
+    </div>
+
+
+    <!--- 刪除部門表單 -->
+
+    <div class="modal fade" id="del_Modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">刪除留言</h4>
+                </div>
+                <div class="modal-body">
+                    <p>您確定要刪除<span style="color: red"></span><input type="number" style="display:none;">嗎</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button id="del_submit" type="button" class="btn btn-primary">確認</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+
+
+
+
+{% endblock %}
+
+
+
+
+
+{% block extra-js %}
+
+
+
+
+    <script>
+
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        //var inputs = $("input");
+        //$.each(inputs, function (i, obj) {
+        //console.log(obj);
+        //  $(obj).attr('type', 'text');
+        //});
+
+
+        // 更改狀態 :只有IT能修改
+        function ch_status(ele) {
+
+
+            data = {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                ststus: $(ele).attr('data-status'),
+                user: {{ request.user.userprofile.id }},
+                repair: {{ asset_repair_obj.id }},
+
+            };
+            console.log(data);
+
+
+            $.ajax({
+
+                url: "{% url 'asset_repair_detail' asset_repair_obj.id %}",
+                data: data,
+                type: 'PUT',
+                async: false,
+                success: function (callback) {
+                    console.log(callback);
+                    console.log(callback.msg);
+                    $(ele).text(callback.data.text);
+                    $(ele).attr('data-status', callback.data.status);
+                    $(ele).toggleClass('alert-danger');
+                    $(ele).toggleClass('alert-success');
+
+
+                },
+                error: function () {
+
+
+                }
+
+            });
+
+
+        }
+
+
+        //  Reply : Change icon
+        function reply(ele) {
+
+
+            user = $("#reply_post [name='userid']").val();
+            repair = $("#reply_post [name='repairid']").val();
+            content = $("#reply_post [name='content']").val();
+
+            console.log(user);
+
+            data = {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                content: content,
+                user: user,
+                repair: repair,
+
+            };
+
+            $.ajax({
+
+                url: "{% url 'asset_repair_detail_add' %}",
+                data: data,
+                type: 'POST',
+                async: false,
+                success: function (callback) {
+                    console.log(callback);
+                    console.log(callback.data);
+
+                    if (callback.status == 'ok') {
+
+                        $("#reply").append('<div class="panel panel-primary"><div class="panel-heading"><i class="far fa-user"></i> <strong>' + callback.data.user + '</strong></div><div class="panel-body">' + callback.data.content + '<p class="text-right">' + callback.data.date + '</p></div></div>');
+                        $("#reply_post [name='content']").val("");
+
+                    }
+
+                },
+                error: function () {
+                    put_status = false
+
+                }
+
+            });
+
+        }
+
+        // 編輯
+        function commit_edit(ele) {
+
+            console.log("edit");
+            //console.log(ele);
+            {#console.log($(ele).data('id'));#}
+            var primary = $(ele).closest(".panel-primary");
+
+            var id = primary.data('id');
+            console.log(id);
+
+
+            var span = primary.find('span');
+            span.hide();
+
+            var textarea = primary.find('textarea');
+            textarea.val(span.text());
+            textarea.show();
+
+            primary.find('button').hide();
+            primary.find('.commit_submit').show();
+
+
+        }
+
+        // 修改
+        function commit_submit(ele) {
+
+            console.log('commit_submit');
+
+            var primary = $(ele).closest(".panel-primary");
+
+            var id = primary.data('id');
+            console.log(id);
+
+            var repair = primary.data('repair');
+            console.log(repair);
+
+
+            var content = primary.find('textarea');
+
+            console.log(content.val());
+
+            data = {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                id: id,
+                content: content.val(),
+                user: $("#reply_post [name='userid']").val(),
+                repair: repair
+
+
+            };
+
+            $.ajax({
+
+                url: "{% url 'asset_repair_detail_edit' %}",
+                data: data,
+                type: 'PUT',
+                async: false,
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback.status == 'ok') {
+
+                        content.hide();
+                        var span = primary.find('span');
+                        span.text(content.val());
+                        span.show();
+
+                        primary.find('button').show();
+                        primary.find('.commit_submit').hide();
+
+                    }
+
+
+                },
+                error: function () {
+
+
+                }
+
+            });
+
+
+        }
+
+        // 刪除
+        function commit_del(ele) {
+
+            console.log("del");
+
+
+            primary = $(ele).closest(".panel-primary");
+
+            var id = primary.data('id');
+            console.log(id);
+
+
+            var span = primary.find('span');
+            console.log(span.text());
+
+
+            $('#del_Modal .modal-body').find('span').text(span.text());
+            $('#del_Modal .modal-body').find('input').val(id);
+            $('#del_Modal').modal('show');
+
+
+        }
+
+        // 提交刪除
+
+        $("#del_submit").on('click', function (event) {
+
+
+            var text = $('#del_Modal .modal-body').find('span').text();
+            var id = $('#del_Modal .modal-body').find('input').val();
+
+            console.log(text, id);
+
+            data = {id: id};
+
+            $.ajax({
+                url: "{% url 'asset_repair_detail_del' %}",
+                data: data,
+                type: 'DELETE',
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback.status == 'ok') {
+
+                        //tr.remove();
+                        primary.remove();
+                        $('#del_Modal').modal('hide');
+
+
+                    }
+                }
+            });
+
+
+        });
+
+
+    </script>
+
+{% endblock %}
+
+
+
